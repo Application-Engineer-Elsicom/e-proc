@@ -28,10 +28,12 @@ export default function LoginPage() {
       setError('Username atau Password salah!');
       setLoading(false);
     } else {
-      // Jika berhasil, arahkan ke dashboard engineer
-      // Middleware akan otomatis mengecek role user nanti
-      router.push('/engineer');
-      router.refresh(); 
+      // Refresh session first to get the latest role
+      router.refresh();
+      // Wait a bit for session to populate (simplest way in this context)
+      setTimeout(() => {
+        router.push('/'); // Let the root layout/middleware or index page handle role redirection
+      }, 500);
     }
   };
 

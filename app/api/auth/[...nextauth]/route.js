@@ -8,15 +8,24 @@ export const authOptions = {
     CredentialsProvider({
       name: "credentials",
       async authorize(credentials) {
+        console.log("Authorize attempt for:", credentials.username);
         // Mencari user di MySQL berdasarkan username
         const user = await prisma.user.findUnique({
           where: { username: credentials.username }
         })
 
+        if (!user) {
+          console.log("User not found in DB");
+          return null;
+        }
+
         // Validasi password menggunakan bcrypt
-        if (user && await bcrypt.compare(credentials.password, user.password)) {
+        const isPasswordValid = await bcrypt.compare(credentials.password, user.password);
+        console.log("Password valid:", isPasswordValid);
+
+        if (user && isPasswordValid) {
           return { 
-            id: user.id, 
+            id: user.id.toString(), 
             name: user.name, 
             role: user.role, 
             position: user.position 
@@ -30,6 +39,7 @@ export const authOptions = {
     // Menyimpan role dan jabatan ke dalam Token JWT
     async jwt({ token, user }) {
       if (user) {
+        token.id = user.id
         token.role = user.role
         token.position = user.position
       }
@@ -38,6 +48,7 @@ export const authOptions = {
     // Menyimpan data dari token ke dalam Session agar bisa diakses di Frontend
     async session({ session, token }) {
       if (session.user) {
+        session.user.id = token.id
         session.user.role = token.role
         session.user.position = token.position
       }
