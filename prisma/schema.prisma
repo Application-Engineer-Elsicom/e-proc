@@ -9,11 +9,40 @@ datasource db {
 
 enum Role {
   ENGINEER
+  PROCUREMENT
+  MARKETING
   WPO
   PROJECT_MANAGER
-  PROCUREMENT
   FINANCE
   WAREHOUSE
+}
+
+enum EngineerRole {
+  STAFF
+  WPO
+  SYSTEM
+}
+
+enum BomStatus {
+  DRAFT
+  SUBMITTED
+  WPO_REVIEW
+  WPO_APPROVED
+  WPO_REJECTED
+  SYSTEM_REVIEW
+  SYSTEM_APPROVED
+  SYSTEM_REJECTED
+  REJECTED
+  ACTIVE
+  ARCHIVED
+}
+
+enum BomItemStatus {
+  PENDING
+  REFINED
+  APPROVED
+  REJECTED
+  PRICED
 }
 
 enum Status {
@@ -41,20 +70,30 @@ enum Priority {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  username  String   @unique
-  password  String
-  name      String
-  role      Role     @default(ENGINEER)
-  position  String?
-  createdAt DateTime @default(now())
+  id           String  @id @default(cuid())
+  username     String  @unique
+  password     String
+  name         String
+  role         Role    @default(ENGINEER)
+  engineerRole EngineerRole? // Only populated if role = ENGINEER
+  position     String?
+  createdAt    DateTime @default(now())
 
-  // Relations
+  // Existing Relations - MaterialRequest
   materialRequests MaterialRequest[] @relation("RequestedBy")
   pmApprovals      MaterialRequest[] @relation("PMApprovedBy")
   wpoApprovals     MaterialRequest[] @relation("WPOApprovedBy")
+
+  // Existing Relations - FaultReport & Warehouse
   faultReports     FaultReport[]
   warehouseReleases WarehouseRelease[]
+
+  // New Relations - BoM
+  bomsCreated      BillOfMaterial[] @relation("BomCreatedBy")
+  bomsSubmitted    BillOfMaterial[] @relation("BomSubmittedBy")
+  bomsWpoApproved  BillOfMaterial[] @relation("BomWpoApprovedBy")
+  bomsSystemApproved BillOfMaterial[] @relation("BomSystemApprovedBy")
+  bomHistories     BomHistory[]
 }
 
 model MaterialRequest {
@@ -177,4 +216,104 @@ model SuratJalan {
   driverName        String
   vehiclePlate      String
   issuedAt          DateTime @default(now())
+}
+
+// ========== BoM (Bill of Material) Models ==========
+
+model BillOfMaterial {
+  id                String   @id @default(cuid())
+  bomNo             String   @unique          // Format: BOM-2026-XXXX
+
+  // Project Reference
+  projectId         String
+  projectName       String
+  projectCode       String                    // Contoh: "2244"
+  contractNo        String?
+
+  // Metadata
+  bomStatus         BomStatus @default(DRAFT)
+  description       String?   @db.Text
+
+  // Ownership & Approval
+  createdBy         String
+  creator           User      @relation("BomCreatedBy", fields: [createdBy], references: [id])
+
+  submittedBy       String?
+  submitter         User?     @relation("BomSubmittedBy", fields: [submittedBy], references: [id])
+
+  wpoApprovedBy     String?
+  wpoApprover       User?     @relation("BomWpoApprovedBy", fields: [wpoApprovedBy], references: [id])
+  wpoApprovedAt     DateTime?
+  wpoRemarks        String?
+
+  systemApprovedBy  String?
+  systemApprover    User?     @relation("BomSystemApprovedBy", fields: [systemApprovedBy], references: [id])
+  systemApprovedAt  DateTime?
+  systemRemarks     String?
+
+  // Items dalam BoM
+  items             BomItem[]
+
+  // History audit trail
+  histories         BomHistory[]
+
+  // Timeline
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  submittedAt       DateTime?
+
+  @@index([projectId])
+  @@index([bomStatus])
+}
+
+model BomItem {
+  id                String   @id @default(cuid())
+  bomId             String
+  bom               BillOfMaterial @relation(fields: [bomId], references: [id], onDelete: Cascade)
+
+  // Marketing baseline (dari kontrak)
+  marketingDesc     String                    // Deskripsi dari kontrak
+  marketingQty      Int?                      // Qty dari kontrak (optional)
+  marketingUnit     String?                   // Unit dari kontrak (optional)
+
+  // Engineer rincian (oleh Engineer Staff)
+  itemStatus        BomItemStatus @default(PENDING)
+  refinedDesc       String?                   // Deskripsi lebih detail dari engineer
+  refinedQty        Int?                      // Qty yang diminta engineer
+  refinedUnit       String?
+  notes             String?   @db.Text        // Catatan dari engineer
+
+  // Procurement pricing
+  unitPrice         Decimal?  @db.Decimal(15, 2)
+  totalPrice        Decimal?  @db.Decimal(15, 2) // refinedQty * unitPrice
+  currency          String?   @default("IDR")
+  supplier          String?
+  leadTime          Int?                      // Hari
+
+  // Approval tracking
+  rejectionReason   String?
+
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@index([bomId])
+  @@index([itemStatus])
+}
+
+model BomHistory {
+  id                String   @id @default(cuid())
+  bomId             String
+  bom               BillOfMaterial @relation(fields: [bomId], references: [id], onDelete: Cascade)
+
+  action            String                    // "CREATED", "SUBMITTED", "APPROVED", "REJECTED", etc
+  performedBy       String
+  user              User      @relation(fields: [performedBy], references: [id])
+
+  details           String?   @db.Text
+  previousData      String?   @db.Text        // JSON snapshot sebelum
+  newData           String?   @db.Text        // JSON snapshot sesudah
+
+  timestamp         DateTime @default(now())
+
+  @@index([bomId])
 }

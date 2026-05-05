@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "biome check",
-    "format": "biome format --write"
+    "format": "biome format --write",
+    "seed": "node --loader tsx app/lib/seed.js"
   },
   "dependencies": {
     "@prisma/client": "^6.19.2",
@@ -19,11 +20,13 @@
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "react-hook-form": "^7.72.1",
-    "xlsx": "^0.18.5"
+    "xlsx": "^0.18.5",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@biomejs/biome": "2.2.0",
     "@tailwindcss/postcss": "^4",
-    "tailwindcss": "^4"
+    "tailwindcss": "^4",
+    "tsx": "^4.7.0"
   }
 }
