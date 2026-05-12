@@ -8,7 +8,8 @@ import {
   updateBom,
   submitBomForRefinement,
   deleteBom,
-} from '@/app/actions/bom'
+  getEngineerStaffList,
+} from '@/actions/bom'
 
 export default function BoMDetailPage() {
   const router = useRouter()
@@ -21,6 +22,12 @@ export default function BoMDetailPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
   const [successMessage, setSuccessMessage] = useState('')
+
+  // Assignment modal state
+  const [showAssignModal, setShowAssignModal] = useState(false)
+  const [staffList, setStaffList] = useState([])
+  const [selectedStaffId, setSelectedStaffId] = useState('')
+  const [loadingStaff, setLoadingStaff] = useState(false)
 
   const { register, control, handleSubmit, formState: { errors }, reset } =
     useForm({
@@ -41,6 +48,13 @@ export default function BoMDetailPage() {
   useEffect(() => {
     loadBomDetail()
   }, [bomId])
+
+  // Load staff list when modal opens
+  useEffect(() => {
+    if (showAssignModal && staffList.length === 0) {
+      loadStaffList()
+    }
+  }, [showAssignModal])
 
   const loadBomDetail = async () => {
     try {
@@ -71,6 +85,22 @@ export default function BoMDetailPage() {
       setErrorMessage(error.message || 'Failed to load BoM')
     } finally {
       setLoading(false)
+    }
+  }
+
+  const loadStaffList = async () => {
+    setLoadingStaff(true)
+    try {
+      const result = await getEngineerStaffList()
+      if (result.success) {
+        setStaffList(result.data)
+      } else {
+        setErrorMessage(result.error || 'Gagal memuat daftar Engineer Staff')
+      }
+    } catch (error) {
+      setErrorMessage(error.message || 'Gagal memuat daftar Engineer Staff')
+    } finally {
+      setLoadingStaff(false)
     }
   }
 
@@ -115,20 +145,32 @@ export default function BoMDetailPage() {
     }
   }
 
-  const handleSubmitForRefinement = async () => {
-    try {
-      setIsSubmitting(true)
-      setErrorMessage('')
-      setSuccessMessage('')
+  // Open assignment modal instead of submitting directly
+  const handleSubmitClick = () => {
+    setErrorMessage('')
+    setSuccessMessage('')
+    setSelectedStaffId('')
+    setShowAssignModal(true)
+  }
 
-      const result = await submitBomForRefinement(bomId)
+  // Confirm assignment and submit BoM
+  const handleConfirmSubmit = async () => {
+    if (!selectedStaffId) return
+
+    setShowAssignModal(false)
+    setIsSubmitting(true)
+    setErrorMessage('')
+    setSuccessMessage('')
+
+    try {
+      const result = await submitBomForRefinement(bomId, selectedStaffId)
 
       if (!result.success) {
         setErrorMessage(result.error || 'Failed to submit BoM')
         return
       }
 
-      setSuccessMessage('BoM submitted for refinement!')
+      setSuccessMessage(result.message || 'BoM submitted for refinement!')
       setTimeout(() => {
         loadBomDetail()
       }, 500)
@@ -193,6 +235,82 @@ export default function BoMDetailPage() {
 
   return (
     <div className="space-y-8">
+      {/* Assignment Modal */}
+      {showAssignModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+          <div className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-gray-700 p-6 w-full max-w-md mx-4 shadow-2xl">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center flex-shrink-0">
+                <span className="text-lg">👷</span>
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white">
+                  Assign Engineer Staff
+                </h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  {bom.bomNo} — {bom.projectName}
+                </p>
+              </div>
+            </div>
+
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+              Pilih Engineer Staff yang akan melakukan refinement untuk BoM ini.
+            </p>
+
+            {loadingStaff ? (
+              <div className="flex justify-center py-6">
+                <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-blue-500"></div>
+              </div>
+            ) : staffList.length === 0 ? (
+              <div className="bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 rounded-lg p-4 mb-4">
+                <p className="text-red-700 dark:text-red-300 text-sm font-medium">
+                  Tidak ada Engineer Staff yang tersedia.
+                </p>
+                <p className="text-red-600 dark:text-red-400 text-xs mt-1">
+                  Hubungi administrator untuk menambahkan Engineer Staff.
+                </p>
+              </div>
+            ) : (
+              <div className="mb-5">
+                <label className="block text-sm font-medium text-gray-900 dark:text-white mb-2">
+                  Engineer Staff <span className="text-red-500">*</span>
+                </label>
+                <select
+                  value={selectedStaffId}
+                  onChange={(e) => setSelectedStaffId(e.target.value)}
+                  className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-slate-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                >
+                  <option value="">-- Pilih Engineer Staff --</option>
+                  {staffList.map((staff) => (
+                    <option key={staff.id} value={staff.id}>
+                      {staff.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            <div className="flex gap-3 justify-end pt-2 border-t border-gray-200 dark:border-gray-700 mt-2">
+              <button
+                type="button"
+                onClick={() => setShowAssignModal(false)}
+                className="px-4 py-2 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-900 dark:text-white rounded-lg font-medium transition"
+              >
+                Batal
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmSubmit}
+                disabled={!selectedStaffId || loadingStaff}
+                className="px-5 py-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-lg font-medium transition"
+              >
+                Submit & Assign
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <div className="flex justify-between items-start">
         <div>
@@ -587,7 +705,7 @@ export default function BoMDetailPage() {
 
           {/* Actions */}
           {bom.bomStatus === 'DRAFT' && (
-            <div className="flex gap-4">
+            <div className="flex gap-4 flex-wrap">
               <button
                 onClick={() => setIsEditing(true)}
                 className="px-6 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg font-medium transition"
@@ -595,7 +713,7 @@ export default function BoMDetailPage() {
                 Edit
               </button>
               <button
-                onClick={handleSubmitForRefinement}
+                onClick={handleSubmitClick}
                 disabled={isSubmitting}
                 className="px-6 py-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white rounded-lg font-medium transition"
               >

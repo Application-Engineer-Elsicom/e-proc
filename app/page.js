@@ -12,8 +12,12 @@ export default async function Home() {
   // Redirect berdasarkan role
   if (session.user.role === "ENGINEER") {
     redirect("/engineer");
+  } else if (session.user.role === "MARKETING") {
+    redirect("/marketing");
   } else if (session.user.role === "WPO") {
     redirect("/wpo");
+  } else if (session.user.role === "PROCUREMENT") {
+    redirect("/procurement");
   } else {
     // Default fallback jika role belum dikenal
     return (

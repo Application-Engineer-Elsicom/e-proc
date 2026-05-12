@@ -34,6 +34,7 @@ enum BomStatus {
   SYSTEM_REJECTED
   REJECTED
   ACTIVE
+  PRICED
   ARCHIVED
 }
 
@@ -47,6 +48,7 @@ enum BomItemStatus {
 
 enum Status {
   WAITING_WPO
+  WAITING_SYSTEM
   WAITING_PM
   APPROVED
   PROCUREMENT_PROCESS
@@ -69,6 +71,27 @@ enum Priority {
   URGENT
 }
 
+enum POHealth {
+  ON_TRACK    // > 14 hari dari delivery target
+  WARNING     // 7–14 hari dari delivery target
+  CRITICAL    // 0–7 hari dari delivery target
+  LATE        // Delivery target sudah lewat, belum received
+  RECEIVED    // Semua item sudah Mat In
+}
+
+enum POStatus {
+  DRAFT            // Belum released ke supplier
+  RELEASED         // Sudah dikirim ke supplier
+  PARTIAL_RECEIVED // Sebagian item sudah Mat In
+  FULL_RECEIVED    // Semua item sudah Mat In
+  CANCELLED        // Dibatalkan
+}
+
+enum BorrowStatus {
+  BORROWED   // Sedang dipinjam
+  RETURNED   // Sudah dikembalikan
+}
+
 model User {
   id           String  @id @default(cuid())
   username     String  @unique
@@ -83,17 +106,33 @@ model User {
   materialRequests MaterialRequest[] @relation("RequestedBy")
   pmApprovals      MaterialRequest[] @relation("PMApprovedBy")
   wpoApprovals     MaterialRequest[] @relation("WPOApprovedBy")
+  mrSystemApproved MaterialRequest[] @relation("MRSystemApprovedBy")
 
   // Existing Relations - FaultReport & Warehouse
-  faultReports     FaultReport[]
-  warehouseReleases WarehouseRelease[]
+  faultReports              FaultReport[]
+  faultReportsWpoApproved   FaultReport[]      @relation("FRWpoApprovedBy")
+  faultReportsSysApproved   FaultReport[]      @relation("FRSystemApprovedBy")
+  faultReportsPmApproved    FaultReport[]      @relation("FRPmApprovedBy")
+  warehouseReleases         WarehouseRelease[]
+  wrWpoApproved             WarehouseRelease[] @relation("WRWpoApprovedBy")
+  wrSysApproved             WarehouseRelease[] @relation("WRSystemApprovedBy")
+  wrPmApproved              WarehouseRelease[] @relation("WRPmApprovedBy")
 
   // New Relations - BoM
-  bomsCreated      BillOfMaterial[] @relation("BomCreatedBy")
-  bomsSubmitted    BillOfMaterial[] @relation("BomSubmittedBy")
-  bomsWpoApproved  BillOfMaterial[] @relation("BomWpoApprovedBy")
+  bomsCreated        BillOfMaterial[] @relation("BomCreatedBy")
+  bomsSubmitted      BillOfMaterial[] @relation("BomSubmittedBy")
+  bomsWpoApproved    BillOfMaterial[] @relation("BomWpoApprovedBy")
   bomsSystemApproved BillOfMaterial[] @relation("BomSystemApprovedBy")
-  bomHistories     BomHistory[]
+  bomsAssignedStaff  BillOfMaterial[] @relation("BomAssignedToStaff")
+  bomsAssignedWpo    BillOfMaterial[] @relation("BomAssignedToWpo")
+  bomsAssignedSystem BillOfMaterial[] @relation("BomAssignedToSystem")
+  bomHistories       BomHistory[]
+
+  // New Relations - Procurement PO
+  purchaseOrders     PurchaseOrder[]  @relation("POCreatedBy")
+  borrowedProcessed  BorrowedItem[]   @relation("BorrowedProcessedBy")
+  projectBudgets     ProjectBudget[]  @relation("BudgetInputBy")
+  supplierPrices     SupplierPrice[]  @relation("SupplierPriceInputBy")
 }
 
 model MaterialRequest {
@@ -112,17 +151,24 @@ model MaterialRequest {
   
   items           MaterialRequestItem[]
   suratJalan      SuratJalan[]
-  warehouseReleases WarehouseRelease[] // New relation
+  warehouseReleases WarehouseRelease[]
+  purchaseOrders  PurchaseOrder[]     @relation("POFromMR")
 
   requestedBy     String   
   requester       User     @relation("RequestedBy", fields: [requestedBy], references: [id])
   
-  wpoApprovedBy   String?  
+  wpoApprovedBy   String?
   wpoApprover     User?    @relation("WPOApprovedBy", fields: [wpoApprovedBy], references: [id])
-  
-  pmApprovedBy    String?  
+  wpoApprovedAt   DateTime?
+
+  systemApprovedBy String?
+  systemApprover   User?    @relation("MRSystemApprovedBy", fields: [systemApprovedBy], references: [id])
+  systemApprovedAt DateTime?
+
+  pmApprovedBy    String?
   pmApprover      User?    @relation("PMApprovedBy", fields: [pmApprovedBy], references: [id])
-  
+  pmApprovedAt    DateTime?
+
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 }
@@ -158,7 +204,19 @@ model FaultReport {
   
   reportedBy    String
   reporter      User        @relation(fields: [reportedBy], references: [id])
-  
+
+  // Approval chain fields (terpisah dari status teknis OPEN/IN_PROGRESS/CLOSED)
+  approvalStatus      Status?    // null = belum masuk approval chain
+  wpoApprovedBy       String?
+  wpoApprover         User?      @relation("FRWpoApprovedBy", fields: [wpoApprovedBy], references: [id])
+  wpoApprovedAt       DateTime?
+  systemApprovedBy    String?
+  systemApprover      User?      @relation("FRSystemApprovedBy", fields: [systemApprovedBy], references: [id])
+  systemApprovedAt    DateTime?
+  pmApprovedBy        String?
+  pmApprover          User?      @relation("FRPmApprovedBy", fields: [pmApprovedBy], references: [id])
+  pmApprovedAt        DateTime?
+
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
 }
@@ -179,9 +237,22 @@ model WarehouseRelease {
   
   requesterId   String
   requester     User     @relation(fields: [requesterId], references: [id])
-  
+
+  // Approval chain
+  status              Status    @default(WAITING_WPO)
+  wpoApprovedBy       String?
+  wpoApprover         User?     @relation("WRWpoApprovedBy", fields: [wpoApprovedBy], references: [id])
+  wpoApprovedAt       DateTime?
+  systemApprovedBy    String?
+  systemApprover      User?     @relation("WRSystemApprovedBy", fields: [systemApprovedBy], references: [id])
+  systemApprovedAt    DateTime?
+  pmApprovedBy        String?
+  pmApprover          User?     @relation("WRPmApprovedBy", fields: [pmApprovedBy], references: [id])
+  pmApprovedAt        DateTime?
+
   items         WarehouseReleaseItem[]
   createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }
 
 model WarehouseReleaseItem {
@@ -218,6 +289,178 @@ model SuratJalan {
   issuedAt          DateTime @default(now())
 }
 
+// ========== Procurement PO Models ==========
+
+model PurchaseOrder {
+  id              String     @id @default(cuid())
+  poNumber        String     @unique  // Format: "001/2499/Elsicom" — auto-generate, editable
+
+  // Project
+  projectId       String
+  projectCode     String
+
+  // Supplier & Terms
+  supplierName    String
+  termOfPayment   String?              // "100% Before Delivery", "30% DP 70% After", dll
+  deliveryTime    DateTime             // Target delivery date
+  poDate          DateTime  @default(now())
+
+  // Status
+  status          POStatus  @default(RELEASED)
+  poHealth        POHealth  @default(ON_TRACK) // Auto-calculated saat fetch (tidak disimpan permanen)
+
+  // Financial
+  totalAmount     Decimal?  @db.Decimal(15, 2)
+  currency        String    @default("IDR")
+  notes           String?   @db.Text
+
+  // Source: dari MR tertentu atau dibuat manual
+  materialRequestId String?
+  materialRequest   MaterialRequest? @relation("POFromMR", fields: [materialRequestId], references: [id])
+
+  // Relations
+  items           POItem[]
+  invoices        POInvoice[]
+
+  // Audit
+  createdBy       String
+  creator         User      @relation("POCreatedBy", fields: [createdBy], references: [id])
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([projectCode])
+  @@index([status])
+  @@index([poHealth])
+  @@index([deliveryTime])
+}
+
+model POItem {
+  id              String        @id @default(cuid())
+  poId            String
+  po              PurchaseOrder @relation(fields: [poId], references: [id], onDelete: Cascade)
+
+  // Item detail
+  description     String
+  partNumber      String?
+
+  // Quantity
+  qty             Int
+  unit            String
+  unitPrice       Decimal?      @db.Decimal(15, 2)
+  totalPrice      Decimal?      @db.Decimal(15, 2) // qty * unitPrice, auto-calc
+
+  // PR Tracking (Purchase Requisition info dari MR/manual)
+  prNo            String?       // No Urut PR
+  prDate          DateTime?     // Tgl Purchase Requisition
+  prProcessDate   DateTime?     // Tgl Total PR Process
+
+  // Receiving — diisi oleh Procurement/Warehouse saat barang tiba
+  matIn           DateTime?     // Tanggal material diterima di gudang
+  receivedQty     Int?          // Qty yang sudah diterima (partial receive)
+
+  // Source dari MR item (optional)
+  mrItemId        Int?
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([poId])
+}
+
+model POInvoice {
+  id              String        @id @default(cuid())
+  poId            String
+  po              PurchaseOrder @relation(fields: [poId], references: [id], onDelete: Cascade)
+
+  invoiceNo       String        // Nomor invoice dari supplier (Inv1, Inv2, atau nomor asli)
+  invoiceDate     DateTime?
+  amount          Decimal?      @db.Decimal(15, 2)
+  isPaid          Boolean       @default(false)
+  paidAt          DateTime?
+  notes           String?
+
+  createdAt       DateTime @default(now())
+
+  @@index([poId])
+}
+
+model BorrowedItem {
+  id              String      @id @default(cuid())
+  docNo           String      @unique  // Format: BR-2026-XXXX
+
+  // Inter-project borrowing
+  fromProjectId   String      // Project sumber (yang memiliki barang)
+  fromProjectName String?
+  toProjectId     String      // Project peminjam (yang membutuhkan)
+  toProjectName   String?
+
+  // Item detail
+  description     String
+  partNumber      String?
+  qty             Int
+  unit            String
+  notes           String?     @db.Text
+
+  // Timeline
+  borrowDate      DateTime    @default(now())
+  dueDate         DateTime?   // Target pengembalian
+
+  // Status
+  status          BorrowStatus @default(BORROWED)
+  returnedAt      DateTime?
+  returnNotes     String?
+
+  // Diproses oleh Head Procurement
+  processedBy     String
+  processor       User        @relation("BorrowedProcessedBy", fields: [processedBy], references: [id])
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([fromProjectId])
+  @@index([toProjectId])
+  @@index([status])
+}
+
+model ProjectBudget {
+  id          String   @id @default(cuid())
+  projectId   String
+  year        Int
+  budget      Decimal  @db.Decimal(15, 2)
+  currency    String   @default("IDR")
+
+  inputBy     String
+  inputter    User     @relation("BudgetInputBy", fields: [inputBy], references: [id])
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([projectId, year])
+  @@index([year])
+}
+
+model SupplierPrice {
+  id              String   @id @default(cuid())
+
+  // Supplier & Item
+  supplierName    String
+  description     String
+  partNumber      String?
+  unit            String
+  unitPrice       Decimal  @db.Decimal(15, 2)
+  currency        String   @default("IDR")
+  notes           String?
+
+  // Audit
+  inputBy         String
+  inputter        User     @relation("SupplierPriceInputBy", fields: [inputBy], references: [id])
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([supplierName])
+}
+
 // ========== BoM (Bill of Material) Models ==========
 
 model BillOfMaterial {
@@ -251,6 +494,20 @@ model BillOfMaterial {
   systemApprovedAt  DateTime?
   systemRemarks     String?
 
+  // Procurement tracking
+  pricedBy          String?                   // Procurement user yang input pricing
+  pricedAt          DateTime?                 // Kapan semua item selesai di-price
+  procurementNotes  String?   @db.Text        // Catatan dari procurement
+
+  // Assignment tracking
+  assignedToStaff   String?                   // Engineer STAFF yang handle refinement
+  assignedStaff     User?     @relation("BomAssignedToStaff", fields: [assignedToStaff], references: [id])
+  assignedToWpo     String?                   // Engineer WPO yang handle approval
+  assignedWpo       User?     @relation("BomAssignedToWpo", fields: [assignedToWpo], references: [id])
+  assignedToSystem  String?                   // Engineer SYSTEM yang handle activation
+  assignedSystem    User?     @relation("BomAssignedToSystem", fields: [assignedToSystem], references: [id])
+  refinementStartedAt DateTime?               // Kapan refinement dimulai
+
   // Items dalam BoM
   items             BomItem[]
 
@@ -281,7 +538,16 @@ model BomItem {
   refinedDesc       String?                   // Deskripsi lebih detail dari engineer
   refinedQty        Int?                      // Qty yang diminta engineer
   refinedUnit       String?
+  specifications    String?   @db.Text        // Spesifikasi teknis
   notes             String?   @db.Text        // Catatan dari engineer
+
+  // Refinement tracking
+  refinedBy         String?                   // Engineer STAFF yang refine
+  refinedAtStaff    DateTime?                 // Kapan di-refine oleh STAFF
+  refinedByWpo      String?                   // Engineer WPO yang approve
+  refinedAtWpo      DateTime?                 // Kapan di-approve oleh WPO
+  refinedBySystem   String?                   // Engineer SYSTEM yang activate
+  refinedAtSystem   DateTime?                 // Kapan di-activate oleh SYSTEM
 
   // Procurement pricing
   unitPrice         Decimal?  @db.Decimal(15, 2)
@@ -289,15 +555,53 @@ model BomItem {
   currency          String?   @default("IDR")
   supplier          String?
   leadTime          Int?                      // Hari
+  pricedBy          String?
+  pricedAt          DateTime?
 
   // Approval tracking
-  rejectionReason   String?
+  rejectionReason   String?   @db.Text
+
+  // Engineer breakdown mode:
+  // false = engineer fills qty directly on this item
+  // true  = engineer creates sub-items (BomSubItem) under this item
+  hasSubItems       Boolean   @default(false)
+  subItems          BomSubItem[]
 
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 
   @@index([bomId])
   @@index([itemStatus])
+}
+
+// Sub-item breakdown created by Engineer Staff
+// Only exists when BomItem.hasSubItems = true
+model BomSubItem {
+  id            String   @id @default(cuid())
+  bomItemId     String
+  parentItem    BomItem  @relation(fields: [bomItemId], references: [id], onDelete: Cascade)
+
+  // Engineer-defined detail
+  description   String
+  qty           Int
+  unit          String
+  specifications String?  @db.Text
+  notes         String?   @db.Text
+  sortOrder     Int       @default(0)
+
+  // Procurement pricing (filled by Procurement team)
+  unitPrice     Decimal?  @db.Decimal(15, 2)
+  totalPrice    Decimal?  @db.Decimal(15, 2)
+  currency      String    @default("IDR")
+  supplier      String?
+  leadTime      Int?                      // Lead time in days
+  pricedBy      String?
+  pricedAt      DateTime?
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([bomItemId])
 }
 
 model BomHistory {

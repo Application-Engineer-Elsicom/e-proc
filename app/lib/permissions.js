@@ -300,6 +300,51 @@ export function isMarketing(user) {
   return user && user.role === "MARKETING";
 }
 
+// ─── FR / MR / WR Approval Permissions ───────────────────────────────────────
+
+/**
+ * Check if user can approve FR/MR/WR at WPO stage (Engineer WPO)
+ * @param {Object} user - User object
+ * @returns {boolean}
+ */
+export function canApproveWpoEngineer(user) {
+  return user && user.role === "ENGINEER" && user.engineerRole === "WPO";
+}
+
+/**
+ * Check if user can approve FR/MR/WR at SYSTEM stage (Engineer SYSTEM)
+ * @param {Object} user - User object
+ * @returns {boolean}
+ */
+export function canApproveSystemEngineer(user) {
+  return user && user.role === "ENGINEER" && user.engineerRole === "SYSTEM";
+}
+
+/**
+ * Check if user can approve FR/MR/WR at PM stage
+ * @param {Object} user - User object
+ * @returns {boolean}
+ */
+export function canApproveAsPM(user) {
+  return user && user.role === "PROJECT_MANAGER";
+}
+
+/**
+ * Get initial approval status for FR/MR/WR based on creator's engineerRole
+ * STAFF  → WAITING_WPO
+ * WPO    → WAITING_SYSTEM (skip own level)
+ * SYSTEM → WAITING_PM    (skip own + WPO level)
+ * @param {string} engineerRole - Creator's engineerRole
+ * @returns {string} - Initial Status enum value
+ */
+export function getInitialApprovalStatus(engineerRole) {
+  switch (engineerRole) {
+    case "WPO":    return "WAITING_SYSTEM";
+    case "SYSTEM": return "WAITING_PM";
+    default:       return "WAITING_WPO";  // STAFF and unknown
+  }
+}
+
 /**
  * Check if user is procurement
  * @param {Object} user - User object

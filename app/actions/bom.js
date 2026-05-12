@@ -2,7 +2,7 @@
 
 import { prisma } from '@/lib/prisma'
 import { getServerSession } from 'next-auth'
-import { authOptions } from '@/app/api/auth/[...nextauth]/route'
+import { authOptions } from '@/api/auth/[...nextauth]/route'
 import { revalidatePath } from 'next/cache'
 import { validateBomCreate } from '@/lib/zod-schemas'
 import { generateBomNo, createHistoryEntry } from '@/lib/bom-utils'
@@ -227,12 +227,16 @@ export async function deleteBom(bomId) {
 /**
  * Submit BoM for refinement (DRAFT → SUBMITTED)
  */
-export async function submitBomForRefinement(bomId) {
+export async function submitBomForRefinement(bomId, assignedStaffId) {
   try {
     const session = await getServerSession(authOptions)
 
     if (!session) {
       return { success: false, error: 'Not authenticated' }
+    }
+
+    if (!assignedStaffId) {
+      return { success: false, error: 'Pilih Engineer STAFF yang akan di-assign' }
     }
 
     const bom = await prisma.billOfMaterial.findUnique({
@@ -247,13 +251,25 @@ export async function submitBomForRefinement(bomId) {
       return { success: false, error: 'Only creator can submit draft BoM' }
     }
 
-    // Update status
-    const updated = await prisma.billOfMaterial.update({
+    // Verify assigned user is Engineer STAFF
+    const assignedStaff = await prisma.user.findUnique({
+      where: { id: assignedStaffId },
+      select: { id: true, name: true, role: true, engineerRole: true },
+    })
+
+    if (!assignedStaff || assignedStaff.role !== 'ENGINEER' || assignedStaff.engineerRole !== 'STAFF') {
+      return { success: false, error: 'User yang dipilih bukan Engineer STAFF' }
+    }
+
+    // Update status + assignment
+    await prisma.billOfMaterial.update({
       where: { id: bomId },
       data: {
         bomStatus: 'SUBMITTED',
         submittedBy: session.user.id,
         submittedAt: new Date(),
+        assignedToStaff: assignedStaffId,
+        refinementStartedAt: null,
       },
     })
 
@@ -263,18 +279,19 @@ export async function submitBomForRefinement(bomId) {
         bomId,
         'SUBMITTED',
         session.user.id,
-        'BoM submitted for engineer refinement',
+        `BoM submitted for refinement, assigned to ${assignedStaff.name}`,
         { status: 'DRAFT' },
-        { status: 'SUBMITTED' },
+        { status: 'SUBMITTED', assignedTo: assignedStaff.name },
       ),
     })
 
     revalidatePath('/marketing/bom')
     revalidatePath(`/marketing/bom/${bomId}`)
+    revalidatePath('/engineer/bom')
 
     return {
       success: true,
-      message: 'BoM submitted for refinement',
+      message: `BoM submitted dan di-assign ke ${assignedStaff.name}`,
     }
   } catch (error) {
     console.error('Error submitting BoM:', error)
@@ -282,6 +299,29 @@ export async function submitBomForRefinement(bomId) {
       success: false,
       error: error.message || 'Failed to submit BoM',
     }
+  }
+}
+
+/**
+ * Get list of Engineer STAFF for assignment dropdown
+ */
+export async function getEngineerStaffList() {
+  try {
+    const session = await getServerSession(authOptions)
+
+    if (!session) {
+      return { success: false, error: 'Not authenticated' }
+    }
+
+    const staffList = await prisma.user.findMany({
+      where: { role: 'ENGINEER', engineerRole: 'STAFF' },
+      select: { id: true, name: true, username: true },
+      orderBy: { name: 'asc' },
+    })
+
+    return { success: true, data: staffList }
+  } catch (error) {
+    return { success: false, error: error.message }
   }
 }
 

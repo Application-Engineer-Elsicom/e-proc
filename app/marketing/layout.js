@@ -1,5 +1,5 @@
 import { getServerSession } from 'next-auth'
-import { authOptions } from '@/app/api/auth/[...nextauth]/route'
+import { authOptions } from '@/api/auth/[...nextauth]/route'
 import { redirect } from 'next/navigation'
 
 export const metadata = {
@@ -68,6 +68,12 @@ export default async function MarketingLayout({ children }) {
                   {session.user.name?.charAt(0).toUpperCase()}
                 </span>
               </div>
+              <a
+                href="/api/auth/signout?callbackUrl=/login"
+                className="ml-2 px-3 py-1 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition"
+              >
+                Logout
+              </a>
             </div>
           </div>
         </div>

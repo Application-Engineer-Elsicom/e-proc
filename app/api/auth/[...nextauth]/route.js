@@ -24,11 +24,12 @@ export const authOptions = {
         console.log("Password valid:", isPasswordValid);
 
         if (user && isPasswordValid) {
-          return { 
-            id: user.id.toString(), 
-            name: user.name, 
-            role: user.role, 
-            position: user.position 
+          return {
+            id: user.id.toString(),
+            name: user.name,
+            role: user.role,
+            engineerRole: user.engineerRole,
+            position: user.position
           }
         }
         return null
@@ -41,6 +42,7 @@ export const authOptions = {
       if (user) {
         token.id = user.id
         token.role = user.role
+        token.engineerRole = user.engineerRole
         token.position = user.position
       }
       return token
@@ -50,6 +52,7 @@ export const authOptions = {
       if (session.user) {
         session.user.id = token.id
         session.user.role = token.role
+        session.user.engineerRole = token.engineerRole
         session.user.position = token.position
       }
       return session

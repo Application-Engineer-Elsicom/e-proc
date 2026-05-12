@@ -4,6 +4,7 @@ import { prisma } from "../lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../api/auth/[...nextauth]/route";
 import { revalidatePath } from "next/cache";
+import { getInitialApprovalStatus } from "../lib/permissions";
 import fs from "fs/promises";
 import path from "path";
 
@@ -27,39 +28,41 @@ async function generateDocControlNo() {
 
 /**
  * Create a new Material Request
+ * Auto-detects initial status based on creator's engineerRole:
+ *   STAFF  → WAITING_WPO
+ *   WPO    → WAITING_SYSTEM
+ *   SYSTEM → WAITING_PM
  */
 export async function createMaterialRequest(formData) {
   try {
     const session = await getServerSession(authOptions);
     if (!session || !session.user) throw new Error("Unauthorized");
 
-    // NEW: Use manual input if provided, otherwise generate
+    // Use manual input if provided, otherwise generate
     const manualDocNo = formData.get("docControlNo");
-    const docControlNo = manualDocNo && manualDocNo.trim() !== "" 
-      ? manualDocNo 
+    const docControlNo = manualDocNo && manualDocNo.trim() !== ""
+      ? manualDocNo
       : await generateDocControlNo();
-    
-    // Extracting data from FormData
-    const projectId = formData.get("projectId");
-    const projectName = formData.get("projectName");
-    const assignSys = formData.get("assignSys"); // New
-    const assignPM = formData.get("assignPM"); // New
-    const workPackage = formData.get("workPackage");
-    const wpo = formData.get("wpo");
-    const keterangan = formData.get("keterangan");
-    const dateReleasedStr = formData.get("dateReleased"); // New
 
-    // Parsing items
+    const projectId    = formData.get("projectId");
+    const projectName  = formData.get("projectName");
+    const assignSys    = formData.get("assignSys");
+    const assignPM     = formData.get("assignPM");
+    const workPackage  = formData.get("workPackage");
+    const wpo          = formData.get("wpo");
+    const keterangan   = formData.get("keterangan");
+    const dateReleasedStr = formData.get("dateReleased");
+
     const items = JSON.parse(formData.get("items") || "[]");
-    const file = formData.get("file");
+    const file  = formData.get("file");
 
     let fileUrl = null;
     if (file && file.size > 0) {
-      const bytes = await file.arrayBuffer();
+      const bytes  = await file.arrayBuffer();
       const buffer = Buffer.from(bytes);
       const uploadDir = path.join(process.cwd(), "public", "uploads");
-      
-      try { await fs.access(uploadDir); } 
+
+      try { await fs.access(uploadDir); }
       catch { await fs.mkdir(uploadDir, { recursive: true }); }
 
       const fileName = `${Date.now()}-${file.name}`;
@@ -67,6 +70,9 @@ export async function createMaterialRequest(formData) {
       await fs.writeFile(filePath, buffer);
       fileUrl = `/uploads/${fileName}`;
     }
+
+    // Auto-detect initial status based on engineer sub-role
+    const initialStatus = getInitialApprovalStatus(session.user.engineerRole);
 
     const newMR = await prisma.materialRequest.create({
       data: {
@@ -78,21 +84,21 @@ export async function createMaterialRequest(formData) {
         workPackage,
         wpo,
         keterangan,
-        status: "WAITING_WPO",
+        status: initialStatus,
         fileUrl,
         dateReleased: dateReleasedStr ? new Date(dateReleasedStr) : null,
         requestedBy: session.user.id.toString(),
         items: {
           create: items.map(item => ({
-            description: item.description,
-            elsicomPartNum: item.elsicomPartNum,
-            manufacturePartNum: item.manufacturePartNum,
-            type: item.type, // New
-            manufacturer: item.manufacturer, // New
-            qty: parseInt(item.qty, 10) || 0,
-            unit: item.unit,
-            targetDate: item.targetDate ? new Date(item.targetDate) : null,
-            remarks: item.remarks
+            description:         item.description,
+            elsicomPartNum:      item.elsicomPartNum,
+            manufacturePartNum:  item.manufacturePartNum,
+            type:                item.type,
+            manufacturer:        item.manufacturer,
+            qty:                 parseInt(item.qty, 10) || 0,
+            unit:                item.unit,
+            targetDate:          item.targetDate ? new Date(item.targetDate) : null,
+            remarks:             item.remarks,
           }))
         }
       }
@@ -107,16 +113,212 @@ export async function createMaterialRequest(formData) {
 }
 
 /**
- * Get all Material Requests
+ * Get Material Requests — role-based filtering:
+ *   STAFF  → own submissions
+ *   WPO    → own submissions + WAITING_WPO queue
+ *   SYSTEM → own submissions + WAITING_SYSTEM queue
+ *   PM     → WAITING_PM queue + APPROVED
  */
 export async function getMaterialRequests() {
   try {
-    const requests = await prisma.materialRequest.findMany({
-      orderBy: { createdAt: "desc" },
-      include: { items: true, requester: true }
-    });
+    const session = await getServerSession(authOptions);
+    if (!session) throw new Error("Unauthorized");
+
+    const { role, engineerRole, id } = session.user;
+
+    let requests;
+
+    if (role === "ENGINEER") {
+      if (engineerRole === "STAFF") {
+        // Only own submissions
+        requests = await prisma.materialRequest.findMany({
+          where: { requestedBy: id },
+          orderBy: { createdAt: "desc" },
+          include: { items: true, requester: true }
+        });
+      } else if (engineerRole === "WPO") {
+        // Own + anything waiting for WPO
+        requests = await prisma.materialRequest.findMany({
+          where: {
+            OR: [
+              { requestedBy: id },
+              { status: "WAITING_WPO" }
+            ]
+          },
+          orderBy: { createdAt: "desc" },
+          include: { items: true, requester: true }
+        });
+      } else if (engineerRole === "SYSTEM") {
+        // Own + anything waiting for SYSTEM
+        requests = await prisma.materialRequest.findMany({
+          where: {
+            OR: [
+              { requestedBy: id },
+              { status: "WAITING_SYSTEM" }
+            ]
+          },
+          orderBy: { createdAt: "desc" },
+          include: { items: true, requester: true }
+        });
+      } else {
+        requests = await prisma.materialRequest.findMany({
+          where: { requestedBy: id },
+          orderBy: { createdAt: "desc" },
+          include: { items: true, requester: true }
+        });
+      }
+    } else if (role === "PROJECT_MANAGER") {
+      requests = await prisma.materialRequest.findMany({
+        where: { status: { in: ["WAITING_PM", "APPROVED", "REJECTED"] } },
+        orderBy: { createdAt: "desc" },
+        include: { items: true, requester: true, wpoApprover: true, systemApprover: true }
+      });
+    } else {
+      // Procurement, Warehouse, etc. — see all
+      requests = await prisma.materialRequest.findMany({
+        orderBy: { createdAt: "desc" },
+        include: { items: true, requester: true }
+      });
+    }
+
     return { success: true, data: requests };
   } catch (error) {
+    return { success: false, error: error.message };
+  }
+}
+
+// ─── Approval Level 1 — Engineer WPO ─────────────────────────────────────────
+
+/**
+ * Approve MR by Engineer WPO
+ * WAITING_WPO → WAITING_SYSTEM
+ */
+export async function approveMRByWpo(mrId) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session || session.user.role !== "ENGINEER" || session.user.engineerRole !== "WPO") {
+      throw new Error("Unauthorized: Only Engineer WPO can perform this action.");
+    }
+
+    const mr = await prisma.materialRequest.findUnique({ where: { id: mrId } });
+    if (!mr) throw new Error("Material Request tidak ditemukan.");
+    if (mr.status !== "WAITING_WPO") {
+      throw new Error(`Status tidak valid untuk WPO approval. Status saat ini: ${mr.status}`);
+    }
+
+    const updated = await prisma.materialRequest.update({
+      where: { id: mrId },
+      data: {
+        status:          "WAITING_SYSTEM",
+        wpoApprovedBy:   session.user.id,
+        wpoApprovedAt:   new Date(),
+      }
+    });
+
+    revalidatePath("/engineer/material-request");
+    return { success: true, data: updated };
+  } catch (error) {
+    console.error("Error approving MR by WPO:", error);
+    return { success: false, error: error.message };
+  }
+}
+
+/**
+ * Reject MR by Engineer WPO
+ */
+export async function rejectMRByWpo(mrId, reason) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session || session.user.role !== "ENGINEER" || session.user.engineerRole !== "WPO") {
+      throw new Error("Unauthorized: Only Engineer WPO can perform this action.");
+    }
+
+    const mr = await prisma.materialRequest.findUnique({ where: { id: mrId } });
+    if (!mr) throw new Error("Material Request tidak ditemukan.");
+    if (mr.status !== "WAITING_WPO") {
+      throw new Error("Status tidak valid untuk WPO rejection.");
+    }
+
+    const updated = await prisma.materialRequest.update({
+      where: { id: mrId },
+      data: {
+        status:      "REJECTED",
+        keterangan:  reason ? `DITOLAK WPO: ${reason}` : "DITOLAK WPO",
+      }
+    });
+
+    revalidatePath("/engineer/material-request");
+    return { success: true, data: updated };
+  } catch (error) {
+    console.error("Error rejecting MR by WPO:", error);
+    return { success: false, error: error.message };
+  }
+}
+
+// ─── Approval Level 2 — Engineer SYSTEM ──────────────────────────────────────
+
+/**
+ * Approve MR by Engineer SYSTEM
+ * WAITING_SYSTEM → WAITING_PM
+ */
+export async function approveMRBySystem(mrId) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session || session.user.role !== "ENGINEER" || session.user.engineerRole !== "SYSTEM") {
+      throw new Error("Unauthorized: Only Engineer SYSTEM can perform this action.");
+    }
+
+    const mr = await prisma.materialRequest.findUnique({ where: { id: mrId } });
+    if (!mr) throw new Error("Material Request tidak ditemukan.");
+    if (mr.status !== "WAITING_SYSTEM") {
+      throw new Error(`Status tidak valid untuk SYSTEM approval. Status saat ini: ${mr.status}`);
+    }
+
+    const updated = await prisma.materialRequest.update({
+      where: { id: mrId },
+      data: {
+        status:            "WAITING_PM",
+        systemApprovedBy:  session.user.id,
+        systemApprovedAt:  new Date(),
+      }
+    });
+
+    revalidatePath("/engineer/material-request");
+    return { success: true, data: updated };
+  } catch (error) {
+    console.error("Error approving MR by SYSTEM:", error);
+    return { success: false, error: error.message };
+  }
+}
+
+/**
+ * Reject MR by Engineer SYSTEM
+ */
+export async function rejectMRBySystem(mrId, reason) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session || session.user.role !== "ENGINEER" || session.user.engineerRole !== "SYSTEM") {
+      throw new Error("Unauthorized: Only Engineer SYSTEM can perform this action.");
+    }
+
+    const mr = await prisma.materialRequest.findUnique({ where: { id: mrId } });
+    if (!mr) throw new Error("Material Request tidak ditemukan.");
+    if (mr.status !== "WAITING_SYSTEM") {
+      throw new Error("Status tidak valid untuk SYSTEM rejection.");
+    }
+
+    const updated = await prisma.materialRequest.update({
+      where: { id: mrId },
+      data: {
+        status:     "REJECTED",
+        keterangan: reason ? `DITOLAK SYSTEM: ${reason}` : "DITOLAK SYSTEM",
+      }
+    });
+
+    revalidatePath("/engineer/material-request");
+    return { success: true, data: updated };
+  } catch (error) {
+    console.error("Error rejecting MR by SYSTEM:", error);
     return { success: false, error: error.message };
   }
 }

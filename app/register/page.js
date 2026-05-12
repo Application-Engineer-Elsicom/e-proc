@@ -1,5 +1,5 @@
 "use client";
-import { registerUser } from "@/app/lib/actions/auth";
+import { registerUser } from "@/lib/actions/auth";
 
 export default function RegisterPage() {
   return (

@@ -1,5 +1,5 @@
 import { getServerSession } from 'next-auth'
-import { authOptions } from '@/app/api/auth/[...nextauth]/route'
+import { authOptions } from '@/api/auth/[...nextauth]/route'
 import { redirect } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import Link from 'next/link'
@@ -41,6 +41,7 @@ export default async function BoMListPage({ searchParams }) {
     { value: 'DRAFT', label: 'Draft' },
     { value: 'SUBMITTED', label: 'Submitted' },
     { value: 'ACTIVE', label: 'Active' },
+    { value: 'PRICED', label: 'Ready from Procurement' },
     { value: 'ARCHIVED', label: 'Archived' },
   ]
 
@@ -216,6 +217,7 @@ function formatStatus(status) {
     SYSTEM_REJECTED: 'System Rejected',
     REJECTED: 'Rejected',
     ACTIVE: 'Active',
+    PRICED: '✅ BoM Ready from Procurement',
     ARCHIVED: 'Archived',
   }
   return map[status] || status
@@ -233,6 +235,8 @@ function getStatusBadgeClasses(status) {
       return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
     case 'ACTIVE':
       return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+    case 'PRICED':
+      return 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200'
     case 'REJECTED':
     case 'WPO_REJECTED':
     case 'SYSTEM_REJECTED':

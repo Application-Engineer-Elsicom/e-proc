@@ -50,7 +50,25 @@ export default async function EngineerLayout({ children }) {
                   href="/engineer/bom"
                   className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white font-medium transition"
                 >
-                  BoM List
+                  BoM
+                </a>
+                <a
+                  href="/engineer/material-request"
+                  className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white font-medium transition"
+                >
+                  Material Request
+                </a>
+                <a
+                  href="/engineer/fault-report"
+                  className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white font-medium transition"
+                >
+                  Fault Report
+                </a>
+                <a
+                  href="/engineer/warehouse-release"
+                  className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white font-medium transition"
+                >
+                  Warehouse Release
                 </a>
               </nav>
             </div>
@@ -69,6 +87,12 @@ export default async function EngineerLayout({ children }) {
                   {session.user.name?.charAt(0).toUpperCase()}
                 </span>
               </div>
+              <a
+                href="/api/auth/signout?callbackUrl=/login"
+                className="ml-2 px-3 py-1 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition"
+              >
+                Logout
+              </a>
             </div>
           </div>
         </div>

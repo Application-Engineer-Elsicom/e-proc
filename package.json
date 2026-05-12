@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "biome check",
     "format": "biome format --write",
-    "seed": "node --loader tsx app/lib/seed.js"
+    "seed": "node seed.cjs"
   },
   "dependencies": {
     "@prisma/client": "^6.19.2",
@@ -20,6 +20,7 @@
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "react-hook-form": "^7.72.1",
+    "recharts": "^3.8.1",
     "xlsx": "^0.18.5",
     "zod": "^3.23.8"
   },
