@@ -9,30 +9,33 @@ export const authOptions = {
       name: "credentials",
       async authorize(credentials) {
         console.log("Authorize attempt for:", credentials.username);
-        // Mencari user di MySQL berdasarkan username
-        const user = await prisma.user.findUnique({
-          where: { username: credentials.username }
-        })
+        try {
+          const user = await prisma.user.findUnique({
+            where: { username: credentials.username }
+          })
 
-        if (!user) {
-          console.log("User not found in DB");
+          if (!user) {
+            console.log("User not found in DB");
+            return null;
+          }
+
+          const isPasswordValid = await bcrypt.compare(credentials.password, user.password);
+          console.log("Password valid:", isPasswordValid);
+
+          if (isPasswordValid) {
+            return {
+              id: user.id.toString(),
+              name: user.name,
+              role: user.role,
+              engineerRole: user.engineerRole,
+              position: user.position
+            }
+          }
+          return null
+        } catch (error) {
+          console.error("Auth error:", error.message);
           return null;
         }
-
-        // Validasi password menggunakan bcrypt
-        const isPasswordValid = await bcrypt.compare(credentials.password, user.password);
-        console.log("Password valid:", isPasswordValid);
-
-        if (user && isPasswordValid) {
-          return {
-            id: user.id.toString(),
-            name: user.name,
-            role: user.role,
-            engineerRole: user.engineerRole,
-            position: user.position
-          }
-        }
-        return null
       }
     })
   ],
