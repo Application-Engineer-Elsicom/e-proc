@@ -91,7 +91,7 @@ export default function POPlanContent() {
       {/* Filters & Export */}
       <div className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-gray-800 p-4">
         <div className="flex justify-between items-center mb-3">
-          <p className="text-xs font-bold text-gray-600 dark:text-gray-400 uppercase">Filter</p>
+          <p className="text-xs font-bold text-gray-600 dark:text-gray-400 uppercase">Saring</p>
           <button
             onClick={() => exportPOItemsToExcel(filteredItems)}
             className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded text-xs transition flex items-center gap-1"
@@ -147,13 +147,13 @@ export default function POPlanContent() {
         <table className="w-full text-sm">
           <thead className="bg-gray-50 dark:bg-gray-800/50 border-b border-gray-200 dark:border-gray-800 sticky top-0">
             <tr>
-              <th className="px-4 py-3 text-left font-black text-gray-900 dark:text-white text-xs uppercase tracking-tight">Description</th>
+              <th className="px-4 py-3 text-left font-black text-gray-900 dark:text-white text-xs uppercase tracking-tight">Deskripsi</th>
               <th className="px-4 py-3 text-left font-black text-gray-900 dark:text-white text-xs uppercase tracking-tight">Part Number</th>
               <th className="px-4 py-3 text-right font-black text-gray-900 dark:text-white text-xs uppercase tracking-tight">Qty</th>
               <th className="px-4 py-3 text-left font-black text-gray-900 dark:text-white text-xs uppercase tracking-tight">PO</th>
               <th className="px-4 py-3 text-left font-black text-gray-900 dark:text-white text-xs uppercase tracking-tight">Mat In</th>
-              <th className="px-4 py-3 text-left font-black text-gray-900 dark:text-white text-xs uppercase tracking-tight">Unit</th>
-              <th className="px-4 py-3 text-left font-black text-gray-900 dark:text-white text-xs uppercase tracking-tight">Project</th>
+              <th className="px-4 py-3 text-left font-black text-gray-900 dark:text-white text-xs uppercase tracking-tight">Satuan</th>
+              <th className="px-4 py-3 text-left font-black text-gray-900 dark:text-white text-xs uppercase tracking-tight">Proyek</th>
               <th className="px-4 py-3 text-left font-black text-gray-900 dark:text-white text-xs uppercase tracking-tight">PR No</th>
             </tr>
           </thead>

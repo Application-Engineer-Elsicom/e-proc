@@ -3,11 +3,12 @@ import { getFaultReports } from '../../actions/fault-report'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '../../api/auth/[...nextauth]/route'
 import FRApprovalButtons from './FRApprovalButtons'
+import { getStatusLabel, getPriorityLabel, getFaultStatusLabel } from '@/lib/permissions'
 
 export const dynamic = 'force-dynamic'
 
 export const metadata = {
-  title: 'Fault Report - Engineer',
+  title: 'Fault Report',
 }
 
 function PriorityBadge({ priority }) {
@@ -19,7 +20,7 @@ function PriorityBadge({ priority }) {
   }
   return (
     <span className={`px-2 py-0.5 rounded text-[9px] font-black border border-inherit ${colors[priority] || 'bg-gray-100 text-gray-600'}`}>
-      {priority}
+      {getPriorityLabel(priority)}
     </span>
   )
 }
@@ -32,7 +33,7 @@ function TechStatusBadge({ status }) {
   }
   return (
     <span className={`px-2 py-0.5 rounded text-[9px] font-black border border-inherit ${colors[status] || 'bg-gray-100 text-gray-600'}`}>
-      {status?.replace('_', ' ')}
+      {getFaultStatusLabel(status)}
     </span>
   )
 }
@@ -46,16 +47,9 @@ function ApprovalStatusBadge({ status }) {
     APPROVED:       'bg-green-100 text-green-700',
     REJECTED:       'bg-red-100 text-red-700',
   }
-  const labels = {
-    WAITING_WPO:    'Menunggu WPO',
-    WAITING_SYSTEM: 'Menunggu SYSTEM',
-    WAITING_PM:     'Menunggu PM',
-    APPROVED:       'Disetujui',
-    REJECTED:       'Ditolak',
-  }
   return (
     <span className={`px-2 py-0.5 rounded text-[9px] font-black ${styles[status] || 'bg-gray-100 text-gray-600'}`}>
-      {labels[status] || status.replace(/_/g, ' ')}
+      {getStatusLabel(status)}
     </span>
   )
 }

@@ -232,7 +232,7 @@ export default function CreateWarehouseRelease() {
               </div>
            </div>
            <button type="submit" disabled={isPending} className="bg-red-600 text-white px-20 py-5 rounded-[24px] font-black hover:bg-black shadow-2xl shadow-red-600/20 transition-all uppercase tracking-widest text-sm active:scale-95">
-              {isPending ? 'Processing...' : 'Create Release Order'}
+              {isPending ? 'Memproses…' : 'Create Release Order'}
            </button>
         </div>
       </form>

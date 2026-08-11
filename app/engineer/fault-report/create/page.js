@@ -62,7 +62,7 @@ export default function CreateFaultReport() {
               <input {...register("projectId", { required: true })} className="w-full p-4 bg-gray-50 dark:bg-slate-800 border-none rounded-2xl text-sm font-bold outline-none ring-2 ring-transparent focus:ring-green-400 transition-all dark:text-white" />
             </div>
             <div className="space-y-2">
-              <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Project Name</label>
+              <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Nama Proyek</label>
               <input {...register("projectName")} className="w-full p-4 bg-gray-50 dark:bg-slate-800 border-none rounded-2xl text-sm font-bold outline-none ring-2 ring-transparent focus:ring-green-400 transition-all dark:text-white" />
             </div>
             <div className="space-y-2">

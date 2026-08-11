@@ -2,7 +2,6 @@
 
 import Image from 'next/image';
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { signIn } from 'next-auth/react'; // Tambahkan ini
 
 export default function LoginPage() {
@@ -10,7 +9,6 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState(''); // Untuk menampilkan pesan error
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -27,14 +25,21 @@ export default function LoginPage() {
     if (result?.error) {
       setError('Username atau Password salah!');
       setLoading(false);
-    } else {
-      // Refresh session first to get the latest role
-      router.refresh();
-      // Wait a bit for session to populate (simplest way in this context)
-      setTimeout(() => {
-        router.push('/'); // Let the root layout/middleware or index page handle role redirection
-      }, 500);
+      return;
     }
+
+    // Pindah halaman penuh, bukan router.push.
+    //
+    // Halaman "/" adalah server component yang memanggil redirect() ke dashboard
+    // sesuai role. Lewat navigasi klien, router harus mengambil RSC "/" lalu
+    // menyusulnya dengan RSC tujuan redirect — dan pengambilan kedua itu batal
+    // (net::ERR_ABORTED) karena bertabrakan dengan router.refresh() yang masih
+    // berjalan. Hasilnya cangkang kosong: URL tetap "/" dan layar gelap.
+    //
+    // Navigasi dokumen penuh mengirim cookie sesi yang baru dibuat dan membiarkan
+    // server menjawab dengan redirect HTTP biasa, sehingga tidak ada balapan dan
+    // tidak perlu menebak-nebak dengan setTimeout.
+    window.location.href = '/';
   };
 
   return (
@@ -97,12 +102,13 @@ export default function LoginPage() {
               disabled={loading}
               className={`w-full ${loading ? 'bg-gray-400' : 'bg-[#2d2d2d] hover:bg-black'} text-white py-4 rounded-lg font-bold text-lg transition-all shadow-lg`}
             >
-              {loading ? 'Processing...' : 'Sign In'}
+              {loading ? 'Memproses…' : 'Masuk'}
             </button>
           </form>
 
+          {/* Tidak ada tautan daftar mandiri: akun dibuat oleh pihak berwenang. */}
           <p className="text-center mt-6 text-sm text-gray-600">
-            Belum punya akun? <a href="/register" className="text-red-600 font-bold hover:underline">Register</a>
+            Belum punya akun? Hubungi administrator sistem.
           </p>
         </div>
       </div>

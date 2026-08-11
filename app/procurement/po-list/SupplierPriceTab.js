@@ -82,12 +82,12 @@ export default function SupplierPriceTab() {
           <table className="w-full text-sm">
             <thead className="bg-gray-50 dark:bg-gray-800/50 border-b border-gray-200 dark:border-gray-800 sticky top-0">
               <tr>
-                <th className="px-4 py-3 text-left font-black text-gray-900 dark:text-white text-xs uppercase tracking-tight">Description</th>
+                <th className="px-4 py-3 text-left font-black text-gray-900 dark:text-white text-xs uppercase tracking-tight">Deskripsi</th>
                 <th className="px-4 py-3 text-left font-black text-gray-900 dark:text-white text-xs uppercase tracking-tight">Part Number</th>
-                <th className="px-4 py-3 text-left font-black text-gray-900 dark:text-white text-xs uppercase tracking-tight">Supplier</th>
-                <th className="px-4 py-3 text-left font-black text-gray-900 dark:text-white text-xs uppercase tracking-tight">Unit</th>
+                <th className="px-4 py-3 text-left font-black text-gray-900 dark:text-white text-xs uppercase tracking-tight">Pemasok</th>
+                <th className="px-4 py-3 text-left font-black text-gray-900 dark:text-white text-xs uppercase tracking-tight">Satuan</th>
                 <th className="px-4 py-3 text-right font-black text-gray-900 dark:text-white text-xs uppercase tracking-tight">Unit Price</th>
-                <th className="px-4 py-3 text-center font-black text-gray-900 dark:text-white text-xs uppercase tracking-tight">Action</th>
+                <th className="px-4 py-3 text-center font-black text-gray-900 dark:text-white text-xs uppercase tracking-tight">Aksi</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200 dark:divide-gray-800">
@@ -109,7 +109,7 @@ export default function SupplierPriceTab() {
                       onClick={() => handleDelete(price.id)}
                       className="px-2 py-1 bg-red-100 dark:bg-red-900 text-red-600 dark:text-red-200 text-xs font-bold rounded hover:bg-red-200 dark:hover:bg-red-800 transition"
                     >
-                      Delete
+                      Hapus
                     </button>
                   </td>
                 </tr>

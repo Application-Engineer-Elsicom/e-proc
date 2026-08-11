@@ -64,7 +64,7 @@ export default function CreateBoMPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Create New BoM</h1>
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Buat BoM Baru</h1>
         <p className="text-gray-600 dark:text-gray-400 mt-2">
           Buat daftar item kebutuhan proyek. Engineer akan mengisi quantity dan detail teknis.
         </p>
@@ -84,7 +84,7 @@ export default function CreateBoMPage() {
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         {/* Project Info */}
         <div className="bg-white dark:bg-slate-900 rounded-lg border border-gray-200 dark:border-gray-800 p-6">
-          <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">Project Information</h2>
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">Informasi Proyek</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block text-sm font-medium text-gray-900 dark:text-white mb-2">

@@ -106,12 +106,12 @@ export default function POListContent() {
           <tr>
             <th className="px-4 py-3 text-left font-black text-gray-900 dark:text-white text-xs uppercase tracking-tight">PO Number</th>
             <th className="px-4 py-3 text-left font-black text-gray-900 dark:text-white text-xs uppercase tracking-tight">Date</th>
-            <th className="px-4 py-3 text-left font-black text-gray-900 dark:text-white text-xs uppercase tracking-tight">Project</th>
-            <th className="px-4 py-3 text-left font-black text-gray-900 dark:text-white text-xs uppercase tracking-tight">Supplier</th>
+            <th className="px-4 py-3 text-left font-black text-gray-900 dark:text-white text-xs uppercase tracking-tight">Proyek</th>
+            <th className="px-4 py-3 text-left font-black text-gray-900 dark:text-white text-xs uppercase tracking-tight">Pemasok</th>
             <th className="px-4 py-3 text-left font-black text-gray-900 dark:text-white text-xs uppercase tracking-tight">Delivery Target</th>
             <th className="px-4 py-3 text-left font-black text-gray-900 dark:text-white text-xs uppercase tracking-tight">Health</th>
             <th className="px-4 py-3 text-right font-black text-gray-900 dark:text-white text-xs uppercase tracking-tight">Amount</th>
-            <th className="px-4 py-3 text-center font-black text-gray-900 dark:text-white text-xs uppercase tracking-tight">Action</th>
+            <th className="px-4 py-3 text-center font-black text-gray-900 dark:text-white text-xs uppercase tracking-tight">Aksi</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-200 dark:divide-gray-800">

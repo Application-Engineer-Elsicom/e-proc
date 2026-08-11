@@ -48,14 +48,14 @@ export default function RefineBomPage({ params }) {
     try {
       const result = await getBomForRefinement(params.bomId)
       if (!result.success) {
-        alert('Failed to load BoM: ' + result.error)
+        alert('Gagal memuat BoM: ' + result.error)
         router.push('/engineer/bom')
         return
       }
       setBom(result.data)
       setItems(result.data.items.map(buildItemState))
     } catch (error) {
-      alert('Error loading BoM: ' + error.message)
+      alert('Terjadi kesalahan saat memuat BoM: ' + error.message)
     } finally {
       setLoading(false)
     }
@@ -580,7 +580,7 @@ function ItemCard({
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
             <div>
               <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Quantity <span className="text-red-500">*</span>
+                Jumlah <span className="text-red-500">*</span>
               </label>
               <input
                 type="number"

@@ -322,3 +322,61 @@ export async function rejectMRBySystem(mrId, reason) {
     return { success: false, error: error.message };
   }
 }
+
+/**
+ * Pilihan isian untuk form Material Request.
+ *
+ * Sebelumnya daftar proyek di form ditulis mati sebagai PRJ-2413/PRJ-2414 dan
+ * daftar PM sebagai "Agus PM", sehingga proyek yang benar-benar berjalan tidak
+ * bisa dipilih. Selama belum ada tabel induk Project (lihat Tahap B di
+ * APP_PLAN.md), daftar proyek disusun dari dokumen yang sudah ada.
+ */
+export async function getMrFormOptions() {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session) throw new Error("Unauthorized");
+
+    const [bomProjects, mrProjects, systemEngineers, projectManagers] =
+      await Promise.all([
+        prisma.billOfMaterial.findMany({
+          select: { projectId: true, projectName: true },
+          distinct: ["projectId"],
+        }),
+        prisma.materialRequest.findMany({
+          select: { projectId: true, projectName: true },
+          distinct: ["projectId"],
+        }),
+        prisma.user.findMany({
+          where: { role: "ENGINEER", engineerRole: "SYSTEM" },
+          select: { name: true },
+          orderBy: { name: "asc" },
+        }),
+        prisma.user.findMany({
+          where: { role: "PROJECT_MANAGER" },
+          select: { name: true },
+          orderBy: { name: "asc" },
+        }),
+      ]);
+
+    // Gabungkan dua sumber, buang duplikat berdasarkan projectId.
+    const byId = new Map();
+    for (const p of [...bomProjects, ...mrProjects]) {
+      if (p.projectId && !byId.has(p.projectId)) byId.set(p.projectId, p);
+    }
+    const projects = [...byId.values()].sort((a, b) =>
+      a.projectId.localeCompare(b.projectId),
+    );
+
+    return {
+      success: true,
+      data: {
+        projects,
+        systemEngineers: systemEngineers.map((u) => u.name),
+        projectManagers: projectManagers.map((u) => u.name),
+      },
+    };
+  } catch (error) {
+    console.error("Error loading MR form options:", error);
+    return { success: false, error: error.message };
+  }
+}

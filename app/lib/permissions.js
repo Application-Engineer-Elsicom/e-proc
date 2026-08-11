@@ -353,3 +353,87 @@ export function getInitialApprovalStatus(engineerRole) {
 export function isProcurement(user) {
   return user && user.role === "PROCUREMENT";
 }
+
+// ─── Label Status ────────────────────────────────────────────────────────────
+// Satu tempat untuk semua nama status yang dilihat pengguna. Sebelumnya tiap
+// halaman punya peta sendiri, sehingga daftar menulis "WPO Review" sementara
+// dashboard menulis "WPO_REVIEW" untuk dokumen yang sama.
+
+const STATUS_LABELS = {
+  WAITING_WPO: "Menunggu WPO",
+  WAITING_SYSTEM: "Menunggu SYSTEM",
+  WAITING_PM: "Menunggu PM",
+  APPROVED: "Disetujui",
+  PROCUREMENT_PROCESS: "Proses Pengadaan",
+  FINANCE_PAID: "Sudah Dibayar",
+  AVAILABLE_IN_WAREHOUSE: "Tersedia di Gudang",
+  SHIPPED: "Dikirim",
+  REJECTED: "Ditolak",
+};
+
+const BOM_STATUS_LABELS = {
+  DRAFT: "Draft",
+  SUBMITTED: "Diajukan",
+  WPO_REVIEW: "Tinjauan WPO",
+  WPO_APPROVED: "Disetujui WPO",
+  WPO_REJECTED: "Ditolak WPO",
+  SYSTEM_REVIEW: "Tinjauan SYSTEM",
+  SYSTEM_APPROVED: "Disetujui SYSTEM",
+  SYSTEM_REJECTED: "Ditolak SYSTEM",
+  REJECTED: "Ditolak",
+  ACTIVE: "Aktif",
+  PRICED: "Sudah Diharga",
+  ARCHIVED: "Diarsipkan",
+};
+
+const BOM_ITEM_STATUS_LABELS = {
+  PENDING: "Belum Dirinci",
+  REFINED: "Sudah Dirinci",
+  APPROVED: "Disetujui",
+  REJECTED: "Ditolak",
+  PRICED: "Sudah Diharga",
+};
+
+/** Ubah kode status jadi teks yang bisa dibaca pengguna. */
+function labelFrom(map, status) {
+  if (!status) return "—";
+  return map[status] || String(status).replace(/_/g, " ");
+}
+
+/** Status dokumen FR / MR / WR (enum Status). */
+export function getStatusLabel(status) {
+  return labelFrom(STATUS_LABELS, status);
+}
+
+/** Status Bill of Material (enum BomStatus). */
+export function getBomStatusLabel(status) {
+  return labelFrom(BOM_STATUS_LABELS, status);
+}
+
+/** Status satu item di dalam BoM (enum BomItemStatus). */
+export function getBomItemStatusLabel(status) {
+  return labelFrom(BOM_ITEM_STATUS_LABELS, status);
+}
+
+const PRIORITY_LABELS = {
+  LOW: "Rendah",
+  MEDIUM: "Sedang",
+  HIGH: "Tinggi",
+  URGENT: "Mendesak",
+};
+
+const FAULT_STATUS_LABELS = {
+  OPEN: "Terbuka",
+  IN_PROGRESS: "Ditangani",
+  CLOSED: "Selesai",
+};
+
+/** Tingkat prioritas Fault Report (enum Priority). */
+export function getPriorityLabel(priority) {
+  return labelFrom(PRIORITY_LABELS, priority);
+}
+
+/** Status teknis Fault Report (enum FaultStatus). */
+export function getFaultStatusLabel(status) {
+  return labelFrom(FAULT_STATUS_LABELS, status);
+}

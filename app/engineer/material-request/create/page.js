@@ -1,8 +1,8 @@
 "use client";
-import { useState, useTransition, useRef } from 'react';
+import { useState, useTransition, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import { useForm, useFieldArray } from 'react-hook-form';
-import { createMaterialRequest } from '../../../actions/material-request';
+import { createMaterialRequest, getMrFormOptions } from '../../../actions/material-request';
 import { useRouter } from 'next/navigation';
 import * as XLSX from 'xlsx';
 
@@ -12,6 +12,13 @@ export default function CreateMR() {
   const [errorMessage, setErrorMessage] = useState("");
   const fileInputRef = useRef(null);
   const [selectedFile, setSelectedFile] = useState(null);
+  const [options, setOptions] = useState({ projects: [], systemEngineers: [], projectManagers: [] });
+
+  useEffect(() => {
+    getMrFormOptions().then((result) => {
+      if (result.success) setOptions(result.data);
+    });
+  }, []);
 
   const { register, control, handleSubmit, setValue, formState: { errors } } = useForm({
     defaultValues: {
@@ -77,6 +84,8 @@ export default function CreateMR() {
       formData.set("wpo", data.wpo);
       formData.set("keterangan", data.keterangan);
       formData.set("dateReleased", data.dateReleased);
+      // Nama field di server adalah docControlNo; kosong = nomor digenerate otomatis.
+      formData.set("docControlNo", data.docNo || "");
       formData.set("items", JSON.stringify(filteredItems));
 
       if (selectedFile) formData.append("file", selectedFile);
@@ -115,29 +124,43 @@ export default function CreateMR() {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div className="space-y-2">
               <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Project ID</label>
-              <select {...register("projectId", { required: true })} className="w-full p-4 bg-gray-50 dark:bg-slate-800 border-none rounded-2xl text-sm font-bold outline-none ring-2 ring-transparent focus:ring-yellow-400 transition-all dark:text-white">
-                <option value="">Select ID</option>
-                <option value="PRJ-2413">PRJ-2413</option>
-                <option value="PRJ-2414">PRJ-2414</option>
+              <select
+                {...register("projectId", { required: true })}
+                onChange={(e) => {
+                  register("projectId").onChange(e);
+                  // Nama proyek ikut terisi supaya tidak ada dua penulisan
+                  // berbeda untuk proyek yang sama.
+                  const picked = options.projects.find((p) => p.projectId === e.target.value);
+                  if (picked) setValue("projectName", picked.projectName);
+                }}
+                className="w-full p-4 bg-gray-50 dark:bg-slate-800 border-none rounded-2xl text-sm font-bold outline-none ring-2 ring-transparent focus:ring-yellow-400 transition-all dark:text-white"
+              >
+                <option value="">Pilih Project ID</option>
+                {options.projects.map((p) => (
+                  <option key={p.projectId} value={p.projectId}>{p.projectId}</option>
+                ))}
               </select>
             </div>
             <div className="space-y-2">
-              <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Project Name</label>
+              <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Nama Proyek</label>
               <input {...register("projectName", { required: true })} className="w-full p-4 bg-gray-50 dark:bg-slate-800 border-none rounded-2xl text-sm font-bold outline-none ring-2 ring-transparent focus:ring-yellow-400 transition-all dark:text-white" />
             </div>
             <div className="space-y-2">
               <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Assign Sys</label>
               <select {...register("assignSys")} className="w-full p-4 bg-gray-50 dark:bg-slate-800 border-none rounded-2xl text-sm font-bold outline-none ring-2 ring-transparent focus:ring-yellow-400 transition-all dark:text-white">
-                <option value="">Select Sys</option>
-                <option value="System A">System A</option>
-                <option value="System B">System B</option>
+                <option value="">Pilih Engineer System</option>
+                {options.systemEngineers.map((name) => (
+                  <option key={name} value={name}>{name}</option>
+                ))}
               </select>
             </div>
             <div className="space-y-2">
               <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Assign PM</label>
               <select {...register("assignPM")} className="w-full p-4 bg-gray-50 dark:bg-slate-800 border-none rounded-2xl text-sm font-bold outline-none ring-2 ring-transparent focus:ring-yellow-400 transition-all dark:text-white">
-                <option value="">Select PM</option>
-                <option value="Agus PM">Agus PM</option>
+                <option value="">Pilih Project Manager</option>
+                {options.projectManagers.map((name) => (
+                  <option key={name} value={name}>{name}</option>
+                ))}
               </select>
             </div>
 
@@ -175,9 +198,9 @@ export default function CreateMR() {
                   <th className="p-4 w-40">Type</th>
                   <th className="p-4 w-40">Manufacturer</th>
                   <th className="p-4 w-24">Qty</th>
-                  <th className="p-4 w-24">Unit</th>
+                  <th className="p-4 w-24">Satuan</th>
                   <th className="p-4 w-40">Target Date</th>
-                  <th className="p-4">Remarks</th>
+                  <th className="p-4">Keterangan</th>
                 </tr>
               </thead>
               <tbody className="divide-y dark:divide-gray-800">
@@ -189,7 +212,8 @@ export default function CreateMR() {
                         type="button"
                         onClick={() => remove(index)}
                         className="opacity-0 group-hover:opacity-100 text-red-500 hover:text-red-700 transition-all p-1"
-                        title="Remove Row"
+                        title={`Hapus baris ${index + 1}`}
+                        aria-label={`Hapus baris ${index + 1}`}
                       >
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -249,8 +273,9 @@ export default function CreateMR() {
               <input
                 {...register("docNo")}
                 className="w-48 bg-gray-50 dark:bg-slate-800 border-none p-2 rounded-xl text-center text-xs font-black outline-none focus:ring-2 focus:ring-red-400 dark:text-white"
-                placeholder="INPUT DOC NO"
+                placeholder="OTOMATIS"
               />
+              <p className="text-[9px] text-gray-400 mt-1">Kosongkan untuk nomor otomatis</p>
             </div>
             <div className="bg-white dark:bg-slate-900 px-8 py-4 rounded-3xl border border-gray-100 dark:border-gray-800 text-center">
               <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Date Released</p>
@@ -258,7 +283,7 @@ export default function CreateMR() {
             </div>
           </div>
           <button type="submit" disabled={isPending} className="bg-[#2d2d2d] dark:bg-yellow-400 text-white dark:text-black px-20 py-5 rounded-[24px] font-black hover:bg-black dark:hover:bg-white shadow-2xl transition-all uppercase tracking-widest text-sm active:scale-95 disabled:bg-gray-400">
-            {isPending ? 'Sending...' : 'Confirm & Send Request'}
+            {isPending ? 'Mengirim…' : 'Confirm & Send Request'}
           </button>
         </div>
       </form>

@@ -3,9 +3,10 @@ import { authOptions } from '@/api/auth/[...nextauth]/route'
 import { redirect } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import Link from 'next/link'
+import { getBomStatusLabel } from '@/lib/permissions'
 
 export const metadata = {
-  title: 'Engineer Dashboard - BoM Refinement',
+  title: 'Dashboard Engineer',
   description: 'Dashboard untuk engineer team',
 }
 
@@ -105,11 +106,11 @@ export default async function EngineerDashboard() {
   const getTaskDescription = () => {
     switch (engineerRole) {
       case 'STAFF':
-        return 'Refine marketing items — update quantities and add specifications'
+        return 'Rinci item dari Marketing — isi jumlah dan spesifikasi'
       case 'WPO':
-        return 'Review refined items — quality check and approval'
+        return 'Tinjau hasil perincian — pemeriksaan mutu dan persetujuan'
       case 'SYSTEM':
-        return 'Final system review — validate and activate BoM'
+        return 'Tinjauan akhir sistem — validasi dan aktifkan BoM'
       default:
         return 'Review and manage BoM items'
     }
@@ -131,7 +132,7 @@ export default async function EngineerDashboard() {
     <div className="space-y-8">
       <div className="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950 dark:to-orange-950 rounded-lg p-8 border border-amber-200 dark:border-amber-800">
         <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-          Welcome, {session.user.name}!
+          Halo, {session.user.name}!
         </h2>
         <p className="text-gray-600 dark:text-gray-400">{getTaskDescription()}</p>
         {engineerRole === 'STAFF' && (
@@ -187,7 +188,7 @@ export default async function EngineerDashboard() {
       <div>
         <div className="flex justify-between items-center mb-6">
           <h3 className="text-lg font-bold text-gray-900 dark:text-white">
-            {engineerRole === 'STAFF' ? 'BoM Assigned to Me' : 'Your Assigned Tasks'}
+            {engineerRole === 'STAFF' ? 'BoM yang Ditugaskan ke Saya' : 'Tugas yang Ditugaskan ke Anda'}
           </h3>
           <Link
             href={engineerRole === 'STAFF' ? '/engineer/bom?status=SUBMITTED&mine=true' : '/engineer/bom'}
@@ -203,12 +204,12 @@ export default async function EngineerDashboard() {
               <table className="w-full">
                 <thead className="bg-gray-50 dark:bg-slate-800 border-b border-gray-200 dark:border-gray-700">
                   <tr>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900 dark:text-white">BoM No</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900 dark:text-white">Project</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900 dark:text-white">Items</th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900 dark:text-white">No. BoM</th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900 dark:text-white">Proyek</th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900 dark:text-white">Item</th>
                     <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900 dark:text-white">Status</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900 dark:text-white">From</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900 dark:text-white">Action</th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900 dark:text-white">Dari</th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900 dark:text-white">Aksi</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
@@ -228,7 +229,7 @@ export default async function EngineerDashboard() {
                       </td>
                       <td className="px-6 py-4 text-sm">
                         <span className="inline-block px-3 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200">
-                          {bom.bomStatus}
+                          {getBomStatusLabel(bom.bomStatus)}
                         </span>
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">

@@ -9,6 +9,16 @@ import WRApprovalButtons from './WRApprovalButtons'
 
 export const dynamic = 'force-dynamic'
 
+/**
+ * Nama pemberi persetujuan pada satu jenjang.
+ * Dokumen hanya sampai ke PM lewat persetujuan atau aturan skip-level, jadi
+ * jenjang tanpa approver berarti memang dilewati — bukan menunggu.
+ * Jangan pernah jatuh ke isian teks bebas pada form: itu bukan approver.
+ */
+function approverLabel(approver) {
+  return approver?.name || 'Dilewati'
+}
+
 export default async function PMDashboard({ searchParams }) {
   const session = await getServerSession(authOptions)
 
@@ -16,7 +26,8 @@ export default async function PMDashboard({ searchParams }) {
     redirect('/login')
   }
 
-  const tab = searchParams?.tab || 'mr'
+  // Next 15: searchParams adalah Promise, harus di-await sebelum dibaca.
+  const tab = (await searchParams)?.tab || 'mr'
 
   // Fetch all pending items in parallel
   const [mrResult, frResult, wrResult] = await Promise.all([
@@ -106,11 +117,11 @@ export default async function PMDashboard({ searchParams }) {
                     <div className="space-y-3 mb-6">
                       <div className="flex justify-between text-xs border-b dark:border-gray-800 pb-2">
                         <span className="text-gray-400">WPO Approver:</span>
-                        <span className="font-bold text-green-600">{req.wpoApprover?.name || req.wpo || '—'}</span>
+                        <span className="font-bold text-green-600">{approverLabel(req.wpoApprover)}</span>
                       </div>
                       <div className="flex justify-between text-xs border-b dark:border-gray-800 pb-2">
                         <span className="text-gray-400">SYSTEM Approver:</span>
-                        <span className="font-bold text-violet-600">{req.systemApprover?.name || '—'}</span>
+                        <span className="font-bold text-violet-600">{approverLabel(req.systemApprover)}</span>
                       </div>
                       <div className="flex justify-between text-xs border-b dark:border-gray-800 pb-2">
                         <span className="text-gray-400">Work Package:</span>
@@ -169,11 +180,11 @@ export default async function PMDashboard({ searchParams }) {
                       </div>
                       <div className="flex justify-between text-xs border-b dark:border-gray-800 pb-2">
                         <span className="text-gray-400">WPO Approver:</span>
-                        <span className="font-bold text-green-600">{fr.wpoApprover?.name || '—'}</span>
+                        <span className="font-bold text-green-600">{approverLabel(fr.wpoApprover)}</span>
                       </div>
                       <div className="flex justify-between text-xs border-b dark:border-gray-800 pb-2">
                         <span className="text-gray-400">SYSTEM Approver:</span>
-                        <span className="font-bold text-violet-600">{fr.systemApprover?.name || '—'}</span>
+                        <span className="font-bold text-violet-600">{approverLabel(fr.systemApprover)}</span>
                       </div>
                       {fr.description && (
                         <div className="pt-1">
@@ -218,11 +229,11 @@ export default async function PMDashboard({ searchParams }) {
                       </div>
                       <div className="flex justify-between text-xs border-b dark:border-gray-800 pb-2">
                         <span className="text-gray-400">WPO Approver:</span>
-                        <span className="font-bold text-green-600">{wr.wpoApprover?.name || '—'}</span>
+                        <span className="font-bold text-green-600">{approverLabel(wr.wpoApprover)}</span>
                       </div>
                       <div className="flex justify-between text-xs border-b dark:border-gray-800 pb-2">
                         <span className="text-gray-400">SYSTEM Approver:</span>
-                        <span className="font-bold text-violet-600">{wr.systemApprover?.name || '—'}</span>
+                        <span className="font-bold text-violet-600">{approverLabel(wr.systemApprover)}</span>
                       </div>
                       <div className="pt-2">
                         <p className="text-[10px] uppercase font-black text-gray-300 mb-2">Items ({wr.items?.length})</p>

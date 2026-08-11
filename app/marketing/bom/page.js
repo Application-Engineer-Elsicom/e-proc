@@ -3,10 +3,11 @@ import { authOptions } from '@/api/auth/[...nextauth]/route'
 import { redirect } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import Link from 'next/link'
+import { getBomStatusLabel } from '@/lib/permissions'
 
 export const metadata = {
-  title: 'BoM List - Marketing',
-  description: 'View and manage all your Bill of Materials',
+  title: 'Daftar BoM',
+  description: 'Lihat dan kelola seluruh Bill of Material',
 }
 
 export default async function BoMListPage({ searchParams }) {
@@ -37,12 +38,12 @@ export default async function BoMListPage({ searchParams }) {
   })
 
   const statuses = [
-    { value: 'all', label: 'All' },
+    { value: 'all', label: 'Semua' },
     { value: 'DRAFT', label: 'Draft' },
-    { value: 'SUBMITTED', label: 'Submitted' },
-    { value: 'ACTIVE', label: 'Active' },
-    { value: 'PRICED', label: 'Ready from Procurement' },
-    { value: 'ARCHIVED', label: 'Archived' },
+    { value: 'SUBMITTED', label: 'Diajukan' },
+    { value: 'ACTIVE', label: 'Aktif' },
+    { value: 'PRICED', label: 'Sudah Diharga' },
+    { value: 'ARCHIVED', label: 'Diarsipkan' },
   ]
 
   return (
@@ -61,7 +62,7 @@ export default async function BoMListPage({ searchParams }) {
           href="/marketing/bom/create"
           className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition"
         >
-          + Create New BoM
+          + Buat BoM Baru
         </Link>
       </div>
 
@@ -92,22 +93,22 @@ export default async function BoMListPage({ searchParams }) {
               <thead className="bg-gray-50 dark:bg-slate-800 border-b border-gray-200 dark:border-gray-700">
                 <tr>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900 dark:text-white">
-                    BoM Number
+                    No. BoM
                   </th>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900 dark:text-white">
-                    Project
+                    Proyek
                   </th>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900 dark:text-white">
-                    Items
+                    Item
                   </th>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900 dark:text-white">
                     Status
                   </th>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900 dark:text-white">
-                    Created
+                    Dibuat
                   </th>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900 dark:text-white">
-                    Actions
+                    Aksi
                   </th>
                 </tr>
               </thead>
@@ -141,7 +142,7 @@ export default async function BoMListPage({ searchParams }) {
                           bom.bomStatus,
                         )}`}
                       >
-                        {formatStatus(bom.bomStatus)}
+                        {getBomStatusLabel(bom.bomStatus)}
                       </span>
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
@@ -157,7 +158,7 @@ export default async function BoMListPage({ searchParams }) {
                           href={`/marketing/bom/${bom.id}`}
                           className="text-blue-600 dark:text-blue-400 hover:underline text-sm font-medium"
                         >
-                          View
+                          Lihat
                         </Link>
                         {bom.bomStatus === 'DRAFT' && (
                           <>
@@ -168,7 +169,7 @@ export default async function BoMListPage({ searchParams }) {
                               href={`/marketing/bom/${bom.id}`}
                               className="text-amber-600 dark:text-amber-400 hover:underline text-sm font-medium"
                             >
-                              Edit
+                              Ubah
                             </Link>
                           </>
                         )}
@@ -185,12 +186,12 @@ export default async function BoMListPage({ searchParams }) {
               <span className="text-4xl">📭</span>
             </div>
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-              No BoMs found
+              Tidak ada BoM
             </h3>
             <p className="text-gray-600 dark:text-gray-400 mb-6">
               {status
-                ? 'No BoMs with this status'
-                : "You haven't created any BoMs yet"}
+                ? 'Tidak ada BoM pada status ini'
+                : 'Anda belum membuat BoM'}
             </p>
             <Link
               href="/marketing/bom/create"
@@ -205,23 +206,6 @@ export default async function BoMListPage({ searchParams }) {
   )
 }
 
-function formatStatus(status) {
-  const map = {
-    DRAFT: 'Draft',
-    SUBMITTED: 'Submitted',
-    WPO_REVIEW: 'WPO Review',
-    WPO_APPROVED: 'WPO Approved',
-    WPO_REJECTED: 'WPO Rejected',
-    SYSTEM_REVIEW: 'System Review',
-    SYSTEM_APPROVED: 'System Approved',
-    SYSTEM_REJECTED: 'System Rejected',
-    REJECTED: 'Rejected',
-    ACTIVE: 'Active',
-    PRICED: '✅ BoM Ready from Procurement',
-    ARCHIVED: 'Archived',
-  }
-  return map[status] || status
-}
 
 function getStatusBadgeClasses(status) {
   switch (status) {

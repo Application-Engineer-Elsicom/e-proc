@@ -2,8 +2,9 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/api/auth/[...nextauth]/route'
 import { prisma } from '@/lib/prisma'
 import Link from 'next/link'
+import { getBomStatusLabel } from '@/lib/permissions'
 
-export const metadata = { title: 'Procurement - BoM List' }
+export const metadata = { title: 'Daftar BoM' }
 
 export default async function ProcurementBomList({ searchParams }) {
   const params = await searchParams
@@ -95,7 +96,7 @@ export default async function ProcurementBomList({ searchParams }) {
                           bom.bomStatus === 'PRICED'
                             ? 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200'
                             : 'bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200'
-                        }`}>{bom.bomStatus}</span>
+                        }`}>{getBomStatusLabel(bom.bomStatus)}</span>
                       </td>
                       <td className="px-6 py-4">
                         <Link href={`/procurement/bom/${bom.id}`}
@@ -112,7 +113,7 @@ export default async function ProcurementBomList({ searchParams }) {
         ) : (
           <div className="p-12 text-center">
             <p className="text-4xl mb-4">📋</p>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">No BoMs found</h3>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Tidak ada BoM</h3>
             <p className="text-gray-600 dark:text-gray-400">
               {status === 'ACTIVE' ? 'No BoMs ready for pricing. Wait for Engineer to activate BoMs.' : `No BoMs with status ${status}.`}
             </p>

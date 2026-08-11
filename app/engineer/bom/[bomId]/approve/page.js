@@ -12,8 +12,14 @@ import {
   editRefinedItemByWpo,
   getEngineerSystemList,
 } from '@/actions/engineer'
+import { getBomStatusLabel, getBomItemStatusLabel } from '@/lib/permissions'
 
 const UNITS = ['Pcs', 'Unit', 'Set', 'Kg', 'Gram', 'Ton', 'Liter', 'M³', 'Meter', 'M²', 'Roll', 'Box', 'Lembar']
+
+// Potong hanya bila memang kepanjangan — sebelumnya '...' selalu ditempel
+// sehingga teks pendek pun terlihat seolah ada lanjutannya.
+const truncate = (text, max = 40) =>
+  !text ? '-' : text.length > max ? `${text.substring(0, max)}…` : text
 
 export default function ApproveBomPage({ params }) {
   const router = useRouter()
@@ -55,12 +61,12 @@ export default function ApproveBomPage({ params }) {
         setBom(result.data)
         setItems(result.data.items)
       } else {
-        alert('Failed to load BoM: ' + result.error)
+        alert('Gagal memuat BoM: ' + result.error)
         router.push('/engineer/bom')
       }
     } catch (error) {
-      console.error('Error loading BoM:', error)
-      alert('Error loading BoM')
+      console.error('Terjadi kesalahan saat memuat BoM:', error)
+      alert('Terjadi kesalahan saat memuat BoM')
     } finally {
       setLoading(false)
     }
@@ -385,7 +391,7 @@ export default function ApproveBomPage({ params }) {
           </div>
           <div className="text-right">
             <span className="inline-block px-3 py-1 bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 rounded-full text-sm font-medium">
-              {bom.bomStatus}
+              {getBomStatusLabel(bom.bomStatus)}
             </span>
           </div>
         </div>
@@ -401,19 +407,19 @@ export default function ApproveBomPage({ params }) {
             <thead>
               <tr className="border-b border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-slate-800">
                 <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">
-                  Description
+                  Deskripsi
                 </th>
                 <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">
-                  Refined Qty
+                  Jumlah Rincian
                 </th>
                 <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">
-                  Specifications
+                  Spesifikasi
                 </th>
                 <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">
                   Status
                 </th>
                 <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">
-                  Action
+                  Aksi
                 </th>
               </tr>
             </thead>
@@ -434,15 +440,34 @@ export default function ApproveBomPage({ params }) {
                         )}
                       </div>
                     </td>
+                    {/* Item bermode sub-item tidak punya refinedQty — tanpa cabang
+                        ini approver melihat sel kosong dan menyetujui tanpa tahu isinya. */}
                     <td className="px-6 py-4 text-sm text-gray-900 dark:text-white">
-                      {item.refinedQty} {item.refinedUnit}
+                      {item.hasSubItems ? (
+                        <div>
+                          <p className="font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            📋 {item.subItems?.length || 0} sub-item
+                          </p>
+                          <div className="space-y-0.5">
+                            {item.subItems?.map((s, i) => (
+                              <p key={s.id || i} className="text-xs text-gray-600 dark:text-gray-400">
+                                {i + 1}. {s.description} — <strong>{s.qty} {s.unit}</strong>
+                              </p>
+                            ))}
+                          </div>
+                        </div>
+                      ) : (
+                        `${item.refinedQty ?? '-'} ${item.refinedUnit || ''}`.trim()
+                      )}
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
-                      {item.specifications ? item.specifications.substring(0, 40) + '...' : '-'}
+                      {item.hasSubItems
+                        ? item.subItems?.map((s) => s.specifications).filter(Boolean).join('; ') || '-'
+                        : truncate(item.specifications)}
                     </td>
                     <td className="px-6 py-4">
                       <span className="inline-block px-2 py-1 rounded text-xs font-medium bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">
-                        {item.itemStatus}
+                        {getBomItemStatusLabel(item.itemStatus)}
                       </span>
                     </td>
                     <td className="px-6 py-4">
@@ -452,7 +477,7 @@ export default function ApproveBomPage({ params }) {
                             onClick={() => handleEditItem(item)}
                             className="px-3 py-1 rounded text-xs font-medium bg-blue-200 hover:bg-blue-300 dark:bg-blue-900 dark:hover:bg-blue-800 text-blue-800 dark:text-blue-200"
                           >
-                            Edit
+                            Ubah
                           </button>
                         )}
                         <button
@@ -513,7 +538,7 @@ export default function ApproveBomPage({ params }) {
       {/* Comments Section */}
       <div className="bg-white dark:bg-slate-900 rounded-lg border border-gray-200 dark:border-gray-800 p-6">
         <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-          Overall Approval Remarks
+          Catatan Persetujuan
         </h2>
         <textarea
           value={comments}
@@ -523,7 +548,7 @@ export default function ApproveBomPage({ params }) {
           rows="4"
         />
         <p className="text-xs text-gray-500 dark:text-gray-400">
-          These remarks will be recorded in the approval history.
+          Catatan ini tersimpan di riwayat persetujuan.
         </p>
       </div>
 
@@ -539,7 +564,7 @@ export default function ApproveBomPage({ params }) {
                 onClick={() => setShowCommentForm(showCommentForm === item.id ? null : item.id)}
                 className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
               >
-                {showCommentForm === item.id ? 'Hide' : 'Add Comment'}
+                {showCommentForm === item.id ? 'Hide' : 'Tambah Catatan'}
               </button>
             </div>
 
@@ -581,14 +606,14 @@ export default function ApproveBomPage({ params }) {
           href="/engineer/bom"
           className="px-6 py-2 bg-gray-300 hover:bg-gray-400 dark:bg-gray-600 dark:hover:bg-gray-700 text-gray-900 dark:text-white rounded-lg font-medium"
         >
-          Back
+          Kembali
         </Link>
         <button
           onClick={isWpo ? handleWpoApprovalClick : handleSystemApproval}
           disabled={approving || rejectedItems.size > 0 || pendingApproval}
           className="px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {approving || pendingApproval ? 'Processing...' : isWpo ? 'Approve & Move to System' : 'Activate BoM'}
+          {approving || pendingApproval ? 'Memproses…' : isWpo ? 'Setujui & Teruskan ke System' : 'Activate BoM'}
         </button>
       </div>
 
@@ -656,7 +681,7 @@ export default function ApproveBomPage({ params }) {
                         </select>
                       </div>
                       <div>
-                        <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Specifications</label>
+                        <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Spesifikasi</label>
                         <textarea
                           value={editData.specifications || ''}
                           onChange={(e) => setEditData({ ...editData, specifications: e.target.value })}
@@ -666,7 +691,7 @@ export default function ApproveBomPage({ params }) {
                         />
                       </div>
                       <div>
-                        <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Notes</label>
+                        <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Catatan</label>
                         <textarea
                           value={editData.notes || ''}
                           onChange={(e) => setEditData({ ...editData, notes: e.target.value })}
@@ -783,7 +808,7 @@ export default function ApproveBomPage({ params }) {
                       disabled={approving}
                       className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white rounded font-medium hover:bg-gray-300 dark:hover:bg-gray-600 transition"
                     >
-                      Cancel
+                      Batal
                     </button>
                     <button
                       onClick={() => handleSaveEdit(item)}
@@ -833,7 +858,7 @@ export default function ApproveBomPage({ params }) {
                 disabled={!selectedSystemId || approving}
                 className="px-4 py-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white rounded-lg font-medium disabled:opacity-50 transition"
               >
-                {approving ? 'Processing...' : 'Assign & Approve'}
+                {approving ? 'Memproses…' : 'Assign & Approve'}
               </button>
             </div>
           </div>

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import { useForm, useFieldArray } from 'react-hook-form'
+import { getBomStatusLabel, getBomItemStatusLabel } from '@/lib/permissions'
 import {
   getBomDetail,
   updateBom,
@@ -327,10 +328,10 @@ export default function BoMDetailPage() {
               bom.bomStatus,
             )}`}
           >
-            {formatStatus(bom.bomStatus)}
+            {getBomStatusLabel(bom.bomStatus)}
           </span>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
-            Created {new Date(bom.createdAt).toLocaleDateString('id-ID')}
+            Dibuat {new Date(bom.createdAt).toLocaleDateString('id-ID')}
           </p>
         </div>
       </div>
@@ -354,7 +355,7 @@ export default function BoMDetailPage() {
           {/* Project Info Section */}
           <div className="bg-white dark:bg-slate-900 rounded-lg border border-gray-200 dark:border-gray-800 p-6">
             <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">
-              Project Information
+              Informasi Proyek
             </h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -381,7 +382,7 @@ export default function BoMDetailPage() {
               {/* Project Name */}
               <div>
                 <label className="block text-sm font-medium text-gray-900 dark:text-white mb-2">
-                  Project Name
+                  Nama Proyek
                 </label>
                 <input
                   type="text"
@@ -430,7 +431,7 @@ export default function BoMDetailPage() {
           <div className="bg-white dark:bg-slate-900 rounded-lg border border-gray-200 dark:border-gray-800 p-6">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-                Bill of Materials Items
+                Daftar Item BoM
               </h2>
               <button
                 type="button"
@@ -455,16 +456,16 @@ export default function BoMDetailPage() {
                       No.
                     </th>
                     <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white flex-1 min-w-48">
-                      Description
+                      Deskripsi
                     </th>
                     <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white w-32">
-                      Quantity
+                      Jumlah
                     </th>
                     <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white w-24">
-                      Unit
+                      Satuan
                     </th>
                     <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white w-20">
-                      Action
+                      Aksi
                     </th>
                   </tr>
                 </thead>
@@ -499,7 +500,7 @@ export default function BoMDetailPage() {
                           className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500"
                         >
                           <option>Pcs</option>
-                          <option>Unit</option>
+                          <option>Satuan</option>
                           <option>Set</option>
                           <option>Kg</option>
                           <option>Liter</option>
@@ -513,7 +514,7 @@ export default function BoMDetailPage() {
                             onClick={() => remove(index)}
                             className="px-2 py-1 text-xs bg-red-100 dark:bg-red-900 text-red-600 dark:text-red-200 rounded hover:bg-red-200 dark:hover:bg-red-800 transition"
                           >
-                            Delete
+                            Hapus
                           </button>
                         )}
                       </td>
@@ -545,7 +546,7 @@ export default function BoMDetailPage() {
               }}
               className="px-6 py-2 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-900 dark:text-white rounded-lg font-medium transition"
             >
-              Cancel
+              Batal
             </button>
           </div>
         </form>
@@ -554,7 +555,7 @@ export default function BoMDetailPage() {
           {/* Project Info Section */}
           <div className="bg-white dark:bg-slate-900 rounded-lg border border-gray-200 dark:border-gray-800 p-6">
             <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">
-              Project Information
+              Informasi Proyek
             </h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -576,7 +577,7 @@ export default function BoMDetailPage() {
               </div>
               <div className="md:col-span-2">
                 <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Project Name
+                  Nama Proyek
                 </p>
                 <p className="text-lg font-semibold text-gray-900 dark:text-white">
                   {bom.projectName}
@@ -585,7 +586,7 @@ export default function BoMDetailPage() {
               {bom.contractNo && (
                 <div className="md:col-span-2">
                   <p className="text-sm text-gray-600 dark:text-gray-400">
-                    Contract No
+                    No. Kontrak
                   </p>
                   <p className="text-lg font-semibold text-gray-900 dark:text-white">
                     {bom.contractNo}
@@ -595,7 +596,7 @@ export default function BoMDetailPage() {
               {bom.description && (
                 <div className="md:col-span-2">
                   <p className="text-sm text-gray-600 dark:text-gray-400">
-                    Description
+                    Deskripsi
                   </p>
                   <p className="text-gray-900 dark:text-white whitespace-pre-wrap">
                     {bom.description}
@@ -608,7 +609,7 @@ export default function BoMDetailPage() {
           {/* Items Section */}
           <div className="bg-white dark:bg-slate-900 rounded-lg border border-gray-200 dark:border-gray-800 p-6">
             <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">
-              Bill of Materials Items
+              Daftar Item BoM
             </h2>
 
             <div className="overflow-x-auto">
@@ -619,13 +620,13 @@ export default function BoMDetailPage() {
                       No.
                     </th>
                     <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white flex-1 min-w-48">
-                      Description
+                      Deskripsi
                     </th>
                     <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white w-32">
-                      Quantity
+                      Jumlah
                     </th>
                     <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white w-24">
-                      Unit
+                      Satuan
                     </th>
                     <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white w-24">
                       Status
@@ -656,7 +657,7 @@ export default function BoMDetailPage() {
                             item.itemStatus,
                           )}`}
                         >
-                          {formatItemStatus(item.itemStatus)}
+                          {getBomItemStatusLabel(item.itemStatus)}
                         </span>
                       </td>
                     </tr>
@@ -670,7 +671,7 @@ export default function BoMDetailPage() {
           {bom.histories && bom.histories.length > 0 && (
             <div className="bg-white dark:bg-slate-900 rounded-lg border border-gray-200 dark:border-gray-800 p-6">
               <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">
-                Activity History
+                Riwayat Kegiatan
               </h2>
 
               <div className="space-y-4">
@@ -710,14 +711,14 @@ export default function BoMDetailPage() {
                 onClick={() => setIsEditing(true)}
                 className="px-6 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg font-medium transition"
               >
-                Edit
+                Ubah
               </button>
               <button
                 onClick={handleSubmitClick}
                 disabled={isSubmitting}
                 className="px-6 py-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white rounded-lg font-medium transition"
               >
-                {isSubmitting ? 'Submitting...' : 'Submit for Refinement'}
+                {isSubmitting ? 'Submitting...' : 'Ajukan untuk Perincian'}
               </button>
               <button
                 onClick={handleDelete}
@@ -730,7 +731,7 @@ export default function BoMDetailPage() {
                 onClick={() => router.back()}
                 className="px-6 py-2 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-900 dark:text-white rounded-lg font-medium transition"
               >
-                Back
+                Kembali
               </button>
             </div>
           )}
@@ -740,7 +741,7 @@ export default function BoMDetailPage() {
                 onClick={() => router.back()}
                 className="px-6 py-2 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-900 dark:text-white rounded-lg font-medium transition"
               >
-                Back
+                Kembali
               </button>
             </div>
           )}
@@ -750,22 +751,6 @@ export default function BoMDetailPage() {
   )
 }
 
-function formatStatus(status) {
-  const map = {
-    DRAFT: 'Draft',
-    SUBMITTED: 'Submitted',
-    WPO_REVIEW: 'WPO Review',
-    WPO_APPROVED: 'WPO Approved',
-    WPO_REJECTED: 'WPO Rejected',
-    SYSTEM_REVIEW: 'System Review',
-    SYSTEM_APPROVED: 'System Approved',
-    SYSTEM_REJECTED: 'System Rejected',
-    REJECTED: 'Rejected',
-    ACTIVE: 'Active',
-    ARCHIVED: 'Archived',
-  }
-  return map[status] || status
-}
 
 function getStatusBadgeClasses(status) {
   switch (status) {
@@ -790,16 +775,6 @@ function getStatusBadgeClasses(status) {
   }
 }
 
-function formatItemStatus(status) {
-  const map = {
-    PENDING: 'Pending',
-    REFINED: 'Refined',
-    APPROVED: 'Approved',
-    REJECTED: 'Rejected',
-    PRICED: 'Priced',
-  }
-  return map[status] || status
-}
 
 function getItemStatusBadgeClasses(status) {
   switch (status) {

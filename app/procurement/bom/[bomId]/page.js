@@ -374,7 +374,7 @@ function PriceRow({ label, qty, unit, specs, isPriced, isReadOnly, row, onChange
           </div>
           {row.supplier && (
             <div>
-              <p className="text-xs text-gray-500">Supplier</p>
+              <p className="text-xs text-gray-500">Pemasok</p>
               <p className="text-sm text-gray-700 dark:text-gray-300">{row.supplier}</p>
             </div>
           )}
@@ -383,7 +383,7 @@ function PriceRow({ label, qty, unit, specs, isPriced, isReadOnly, row, onChange
             onClick={onSave}
             className="text-xs text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 underline"
           >
-            Edit
+            Ubah
           </button>
         </div>
       ) : isReadOnly ? (
@@ -415,7 +415,7 @@ function PriceRow({ label, qty, unit, specs, isPriced, isReadOnly, row, onChange
             </div>
           </div>
           <div>
-            <label className="block text-xs text-gray-500 mb-1">Supplier</label>
+            <label className="block text-xs text-gray-500 mb-1">Pemasok</label>
             <input type="text" value={row.supplier || ''} onChange={(e) => onChange('supplier', e.target.value)}
               placeholder="Nama supplier"
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-slate-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-green-500"

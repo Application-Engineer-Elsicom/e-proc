@@ -76,8 +76,8 @@ export default function DashboardProcurementTab() {
                   <thead className="bg-red-50 dark:bg-red-950/50">
                     <tr>
                       <th className="px-3 py-2 text-left font-bold">PO Number</th>
-                      <th className="px-3 py-2 text-left font-bold">Project</th>
-                      <th className="px-3 py-2 text-left font-bold">Supplier</th>
+                      <th className="px-3 py-2 text-left font-bold">Proyek</th>
+                      <th className="px-3 py-2 text-left font-bold">Pemasok</th>
                       <th className="px-3 py-2 text-right font-bold">Days Late</th>
                     </tr>
                   </thead>
@@ -104,7 +104,7 @@ export default function DashboardProcurementTab() {
                   <thead className="bg-orange-50 dark:bg-orange-950/50">
                     <tr>
                       <th className="px-3 py-2 text-left font-bold">PO Number</th>
-                      <th className="px-3 py-2 text-left font-bold">Project</th>
+                      <th className="px-3 py-2 text-left font-bold">Proyek</th>
                       <th className="px-3 py-2 text-left font-bold">Delivery Date</th>
                       <th className="px-3 py-2 text-right font-bold">Days Left</th>
                     </tr>

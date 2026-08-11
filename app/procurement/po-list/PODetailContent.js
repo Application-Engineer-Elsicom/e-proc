@@ -69,7 +69,7 @@ export default function PODetailContent({ po }) {
       {/* Header Info */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="bg-white dark:bg-slate-900 rounded-2xl border border-gray-200 dark:border-gray-800 p-6">
-          <p className="text-xs font-bold text-gray-600 dark:text-gray-400 uppercase">Supplier</p>
+          <p className="text-xs font-bold text-gray-600 dark:text-gray-400 uppercase">Pemasok</p>
           <p className="text-lg font-black text-gray-900 dark:text-white mt-1">{po.supplierName}</p>
         </div>
 
@@ -108,7 +108,7 @@ export default function PODetailContent({ po }) {
           <table className="w-full text-sm">
             <thead className="bg-gray-50 dark:bg-gray-800/50 border-b border-gray-200 dark:border-gray-700">
               <tr>
-                <th className="px-4 py-3 text-left font-bold text-gray-900 dark:text-white text-xs uppercase">Description</th>
+                <th className="px-4 py-3 text-left font-bold text-gray-900 dark:text-white text-xs uppercase">Deskripsi</th>
                 <th className="px-4 py-3 text-right font-bold text-gray-900 dark:text-white text-xs uppercase">Qty</th>
                 <th className="px-4 py-3 text-right font-bold text-gray-900 dark:text-white text-xs uppercase">Unit Price</th>
                 <th className="px-4 py-3 text-right font-bold text-gray-900 dark:text-white text-xs uppercase">Total</th>

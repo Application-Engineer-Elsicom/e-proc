@@ -3,9 +3,10 @@ import { authOptions } from '@/api/auth/[...nextauth]/route'
 import { redirect } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import Link from 'next/link'
+import { getBomStatusLabel } from '@/lib/permissions'
 
 export const metadata = {
-  title: 'Engineer BoM List - Refinement & Approval',
+  title: 'Daftar BoM',
   description: 'View and manage BoM refinement and approvals',
 }
 
@@ -126,7 +127,7 @@ export default async function EngineerBoMListPage({ searchParams }) {
           href="/engineer"
           className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg font-medium transition"
         >
-          ← Back to Dashboard
+          ← Kembali ke Dashboard
         </Link>
       </div>
 
@@ -169,7 +170,7 @@ export default async function EngineerBoMListPage({ searchParams }) {
                     : 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 hover:bg-gray-200 dark:hover:bg-gray-700'
                 }`}
               >
-                All
+                Semua
               </Link>
             </>
           )}
@@ -183,27 +184,27 @@ export default async function EngineerBoMListPage({ searchParams }) {
               <thead className="bg-gray-50 dark:bg-slate-800 border-b border-gray-200 dark:border-gray-700">
                 <tr>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900 dark:text-white">
-                    BoM Number
+                    No. BoM
                   </th>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900 dark:text-white">
-                    Project
+                    Proyek
                   </th>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900 dark:text-white">
-                    Items
+                    Item
                   </th>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900 dark:text-white">
                     Status
                   </th>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900 dark:text-white">
-                    From
+                    Dari
                   </th>
                   {engineerRole === 'STAFF' && (
                     <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900 dark:text-white">
-                      Assigned To
+                      Ditugaskan ke
                     </th>
                   )}
                   <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900 dark:text-white">
-                    Actions
+                    Aksi
                   </th>
                 </tr>
               </thead>
@@ -246,7 +247,7 @@ export default async function EngineerBoMListPage({ searchParams }) {
                       </td>
                       <td className="px-6 py-4">
                         <span className="inline-block px-3 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200">
-                          {bom.bomStatus}
+                          {getBomStatusLabel(bom.bomStatus)}
                         </span>
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
@@ -259,7 +260,7 @@ export default async function EngineerBoMListPage({ searchParams }) {
                               {staffMap[bom.assignedToStaff]}
                             </span>
                           ) : (
-                            <span className="text-gray-400 dark:text-gray-600 italic">Unassigned</span>
+                            <span className="text-gray-400 dark:text-gray-600 italic">Belum ditugaskan</span>
                           )}
                         </td>
                       )}
@@ -288,7 +289,7 @@ export default async function EngineerBoMListPage({ searchParams }) {
             <p className="text-gray-600 dark:text-gray-400">
               {engineerRole === 'STAFF' && isSubmittedTab && mine
                 ? 'Tidak ada BoM yang di-assign kepada kamu.'
-                : 'No Bill of Materials in this status'}
+                : 'Tidak ada Bill of Material pada status ini'}
             </p>
             {engineerRole === 'STAFF' && isSubmittedTab && mine && (
               <Link

@@ -3,11 +3,12 @@ import { getWarehouseReleases } from '../../actions/warehouse-release'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '../../api/auth/[...nextauth]/route'
 import WRApprovalButtons from './WRApprovalButtons'
+import { getStatusLabel } from '@/lib/permissions'
 
 export const dynamic = 'force-dynamic'
 
 export const metadata = {
-  title: 'Warehouse Release - Engineer',
+  title: 'Warehouse Release',
 }
 
 function StatusBadge({ status }) {
@@ -18,16 +19,9 @@ function StatusBadge({ status }) {
     APPROVED:       'bg-green-100 text-green-700',
     REJECTED:       'bg-red-100 text-red-700',
   }
-  const labels = {
-    WAITING_WPO:    'Menunggu WPO',
-    WAITING_SYSTEM: 'Menunggu SYSTEM',
-    WAITING_PM:     'Menunggu PM',
-    APPROVED:       'Disetujui',
-    REJECTED:       'Ditolak',
-  }
   return (
     <span className={`px-2 py-1 rounded text-[10px] font-bold ${styles[status] || 'bg-gray-100 text-gray-600'}`}>
-      {labels[status] || status?.replace(/_/g, ' ')}
+      {getStatusLabel(status)}
     </span>
   )
 }
@@ -109,9 +103,9 @@ export default async function WarehouseReleasePage() {
                 <thead>
                   <tr className="bg-yellow-50 dark:bg-yellow-900/10 border-b border-yellow-100 dark:border-yellow-900/20 text-gray-500 font-black uppercase tracking-widest">
                     <th className="p-4">WR Number</th>
-                    <th className="p-4">Project</th>
+                    <th className="p-4">Proyek</th>
                     <th className="p-4">Dibuat Oleh</th>
-                    <th className="p-4">Items</th>
+                    <th className="p-4">Item</th>
                     <th className="p-4">Tanggal</th>
                     <th className="p-4 text-center">Aksi</th>
                   </tr>
@@ -150,8 +144,8 @@ export default async function WarehouseReleasePage() {
               <tr className="bg-[#2d2d2d] text-white font-black uppercase tracking-widest text-[10px]">
                 <th className="p-5 w-12 text-center opacity-50">NO</th>
                 <th className="p-5">WR Number</th>
-                <th className="p-5">Project</th>
-                <th className="p-5">Items</th>
+                <th className="p-5">Proyek</th>
+                <th className="p-5">Item</th>
                 <th className="p-5 text-center">Status</th>
                 <th className="p-5">Tanggal</th>
               </tr>

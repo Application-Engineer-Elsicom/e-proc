@@ -150,7 +150,7 @@ export default function CreatePOForm() {
       {/* PO Items */}
       <div className="bg-white dark:bg-slate-900 rounded-2xl border border-gray-200 dark:border-gray-800 p-8">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-lg font-black text-gray-900 dark:text-white">Items</h2>
+          <h2 className="text-lg font-black text-gray-900 dark:text-white">Item</h2>
           <button
             type="button"
             onClick={handleAddItem}
@@ -166,7 +166,7 @@ export default function CreatePOForm() {
               <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
                 {/* Description */}
                 <div className="md:col-span-2">
-                  <label className="text-xs font-bold text-gray-600 dark:text-gray-400 block mb-1">Description</label>
+                  <label className="text-xs font-bold text-gray-600 dark:text-gray-400 block mb-1">Deskripsi</label>
                   <input
                     type="text"
                     value={item.description}
@@ -202,7 +202,7 @@ export default function CreatePOForm() {
 
                 {/* Unit */}
                 <div>
-                  <label className="text-xs font-bold text-gray-600 dark:text-gray-400 block mb-1">Unit</label>
+                  <label className="text-xs font-bold text-gray-600 dark:text-gray-400 block mb-1">Satuan</label>
                   <select
                     value={item.unit}
                     onChange={(e) => handleItemChange(idx, 'unit', e.target.value)}
@@ -269,7 +269,7 @@ export default function CreatePOForm() {
           onClick={() => router.back()}
           className="flex-1 px-6 py-3 border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 font-black rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition"
         >
-          Cancel
+          Batal
         </button>
       </div>
     </form>

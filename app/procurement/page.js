@@ -61,14 +61,14 @@ export default async function ProcurementDashboard() {
     <div className="space-y-8">
       {/* Header */}
       <div>
-        <h1 className="text-4xl font-black text-gray-900 dark:text-white">Procurement Dashboard</h1>
-        <p className="text-gray-600 dark:text-gray-400 mt-2">Welcome, {session.user.name} • {year}</p>
+        <h1 className="text-4xl font-black text-gray-900 dark:text-white">Dashboard Procurement</h1>
+        <p className="text-gray-600 dark:text-gray-400 mt-2">Halo, {session.user.name} • {year}</p>
       </div>
 
       {/* Engineer Requests Not Processed */}
       <div>
         <h2 className="text-lg font-black text-gray-900 dark:text-white uppercase tracking-tighter mb-4">
-          Engineer's Requests
+          Permintaan dari Engineer
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {engineerRequests.map((req) => (
@@ -79,7 +79,7 @@ export default async function ProcurementDashboard() {
               <div className="text-4xl mb-2">{req.icon}</div>
               <p className="text-sm font-black uppercase tracking-tight mb-1">{req.label}</p>
               <p className="text-4xl font-black">{req.count}</p>
-              <p className="text-xs font-bold mt-2 opacity-75">Not Processed</p>
+              <p className="text-xs font-bold mt-2 opacity-75">Belum Diproses</p>
             </div>
           ))}
         </div>
@@ -92,9 +92,9 @@ export default async function ProcurementDashboard() {
           <div className="flex justify-between items-start mb-6">
             <div>
               <h2 className="text-xl font-black text-gray-900 dark:text-white uppercase tracking-tighter">
-                Procurement Status
+                Status Pengadaan
               </h2>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Current year overview</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Ringkasan tahun berjalan</p>
             </div>
           </div>
 
@@ -103,8 +103,8 @@ export default async function ProcurementDashboard() {
             <div className="bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-xl p-4">
               <div className="flex justify-between items-center">
                 <div>
-                  <p className="text-xs font-bold text-blue-600 dark:text-blue-300 uppercase">Number of PO</p>
-                  <p className="text-2xl font-black text-blue-900 dark:text-blue-100 mt-1">Released</p>
+                  <p className="text-xs font-bold text-blue-600 dark:text-blue-300 uppercase">Jumlah PO</p>
+                  <p className="text-2xl font-black text-blue-900 dark:text-blue-100 mt-1">Terbit</p>
                 </div>
                 <div className="text-4xl font-black text-blue-600 dark:text-blue-400">{stats.poReleased}</div>
               </div>
@@ -114,8 +114,8 @@ export default async function ProcurementDashboard() {
             <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-xl p-4">
               <div className="flex justify-between items-center">
                 <div>
-                  <p className="text-xs font-bold text-amber-600 dark:text-amber-300 uppercase">Pending PO</p>
-                  <p className="text-2xl font-black text-amber-900 dark:text-amber-100 mt-1">Not Received</p>
+                  <p className="text-xs font-bold text-amber-600 dark:text-amber-300 uppercase">PO Tertunda</p>
+                  <p className="text-2xl font-black text-amber-900 dark:text-amber-100 mt-1">Belum Diterima</p>
                 </div>
                 <div className="text-4xl font-black text-amber-600 dark:text-amber-400">{stats.poPending}</div>
               </div>
@@ -125,8 +125,8 @@ export default async function ProcurementDashboard() {
             <div className="bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 rounded-xl p-4">
               <div className="flex justify-between items-center">
                 <div>
-                  <p className="text-xs font-bold text-red-600 dark:text-red-300 uppercase">Late PO</p>
-                  <p className="text-2xl font-black text-red-900 dark:text-red-100 mt-1">Overdue</p>
+                  <p className="text-xs font-bold text-red-600 dark:text-red-300 uppercase">PO Terlambat</p>
+                  <p className="text-2xl font-black text-red-900 dark:text-red-100 mt-1">Lewat Tenggat</p>
                 </div>
                 <div className="text-4xl font-black text-red-600 dark:text-red-400">{stats.poLate}</div>
               </div>
@@ -139,16 +139,16 @@ export default async function ProcurementDashboard() {
           <div className="flex justify-between items-start mb-6">
             <div>
               <h2 className="text-xl font-black text-gray-900 dark:text-white uppercase tracking-tighter">
-                Financial Overview
+                Ringkasan Keuangan
               </h2>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Budget utilization by project</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Serapan anggaran per proyek</p>
             </div>
           </div>
 
           <div className="space-y-4">
             {/* Total Spent */}
             <div className="bg-orange-50 dark:bg-orange-950/30 border border-orange-200 dark:border-orange-800 rounded-xl p-4">
-              <p className="text-xs font-bold text-orange-600 dark:text-orange-300 uppercase">Total Spending</p>
+              <p className="text-xs font-bold text-orange-600 dark:text-orange-300 uppercase">Total Realisasi</p>
               <p className="text-3xl font-black text-orange-900 dark:text-orange-100 mt-2">
                 {new Intl.NumberFormat('id-ID', {
                   style: 'currency',
@@ -160,7 +160,7 @@ export default async function ProcurementDashboard() {
 
             {/* Total Budget */}
             <div className="bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800 rounded-xl p-4">
-              <p className="text-xs font-bold text-green-600 dark:text-green-300 uppercase">Total Budget</p>
+              <p className="text-xs font-bold text-green-600 dark:text-green-300 uppercase">Total Anggaran</p>
               <p className="text-3xl font-black text-green-900 dark:text-green-100 mt-2">
                 {new Intl.NumberFormat('id-ID', {
                   style: 'currency',
@@ -173,7 +173,7 @@ export default async function ProcurementDashboard() {
             {/* Budget Utilization Progress */}
             <div className="bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
               <div className="flex justify-between items-center mb-2">
-                <p className="text-xs font-bold text-gray-600 dark:text-gray-300 uppercase">Budget Utilization</p>
+                <p className="text-xs font-bold text-gray-600 dark:text-gray-300 uppercase">Serapan Anggaran</p>
                 <span className="text-2xl font-black text-gray-900 dark:text-white">{budgetUtilization}%</span>
               </div>
               <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
@@ -193,14 +193,14 @@ export default async function ProcurementDashboard() {
         </div>
       </div>
 
-      {/* Budget vs Spending Chart */}
+      {/* Anggaran vs Realisasi Chart */}
       <div className="bg-white dark:bg-slate-900 rounded-2xl border border-gray-200 dark:border-gray-800 p-8 shadow-xl shadow-purple-500/5">
         <div className="flex justify-between items-start mb-6">
           <div>
             <h2 className="text-xl font-black text-gray-900 dark:text-white uppercase tracking-tighter">
-              Budget vs Spending
+              Anggaran vs Realisasi
             </h2>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Per project comparison</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Perbandingan per proyek</p>
           </div>
         </div>
 
@@ -208,7 +208,7 @@ export default async function ProcurementDashboard() {
           <DashboardCharts data={financial.financialData} />
         ) : (
           <div className="text-center py-12">
-            <p className="text-gray-500 dark:text-gray-400">No budget data available for {year}</p>
+            <p className="text-gray-500 dark:text-gray-400">Belum ada data anggaran untuk {year}</p>
           </div>
         )}
       </div>

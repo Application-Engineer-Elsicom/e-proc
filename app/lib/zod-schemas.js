@@ -40,42 +40,39 @@ export const CurrencyEnum = z.enum(["IDR", "USD", "EUR", "SGD"]);
 /**
  * Schema untuk create BoM (Marketing)
  */
+// Field opsional pakai .nullish(): kolom DB-nya nullable, jadi server action
+// mengirim null untuk isian kosong. .optional() saja hanya menerima undefined
+// dan membuat field "(Opsional)" jadi wajib diisi.
 export const BomCreateSchema = z.object({
   projectId: z
     .string()
-    .min(1, "Project ID required")
-    .max(50, "Project ID too long"),
+    .min(1, "Project ID wajib diisi")
+    .max(50, "Project ID maksimal 50 karakter"),
   projectName: z
     .string()
-    .min(3, "Project name min 3 characters")
-    .max(255, "Project name max 255 characters"),
+    .min(3, "Nama proyek minimal 3 karakter")
+    .max(255, "Nama proyek maksimal 255 karakter"),
   projectCode: z
     .string()
-    .min(1, "Project code required")
-    .max(50, "Project code too long"),
-  contractNo: z.string().max(100, "Contract no too long").optional(),
+    .min(1, "Project Code wajib diisi")
+    .max(50, "Project Code maksimal 50 karakter"),
+  contractNo: z.string().max(100, "Contract No maksimal 100 karakter").nullish(),
   description: z
     .string()
-    .max(1000, "Description max 1000 characters")
-    .optional(),
+    .max(1000, "Deskripsi maksimal 1000 karakter")
+    .nullish(),
   items: z
     .array(
       z.object({
         marketingDesc: z
           .string()
-          .min(1, "Item description required")
-          .max(500, "Description too long"),
-        marketingQty: z
-          .number()
-          .optional()
-          .nullable(),
-        marketingUnit: z
-          .string()
-          .max(50, "Unit too long")
-          .optional(),
+          .min(1, "Deskripsi item wajib diisi")
+          .max(500, "Deskripsi item maksimal 500 karakter"),
+        marketingQty: z.number().nullish(),
+        marketingUnit: z.string().max(50, "Satuan maksimal 50 karakter").nullish(),
       }),
     )
-    .min(1, "Minimal 1 item harus ada"),
+    .min(1, "Minimal 1 item harus diisi"),
 });
 
 /**
@@ -191,80 +188,32 @@ export const BomFilterSchema = z.object({
  * if (error) throw new Error(error)
  */
 
-export function validateBomCreate(data) {
-  const result = BomCreateSchema.safeParse(data);
-
-  if (!result.success) {
-    const errors = result.error.errors
-      .map((err) => `${err.path.join(".")}: ${err.message}`)
-      .join("; ");
-    return { data: null, error: errors };
-  }
-
-  return { data: result.data, error: null };
+/**
+ * Susun pesan error yang bisa dibaca pengguna.
+ * Sebelumnya tiap validator mencetak `path: message` mentah dari Zod
+ * (mis. "description: Expected string, received null") yang tidak berarti
+ * apa-apa bagi pengguna. Baris item diberi nomor supaya jelas mana yang salah.
+ */
+function formatIssues(issues) {
+  return issues
+    .map((err) => {
+      const [head, index] = err.path;
+      const isItemRow = head === "items" && Number.isInteger(index);
+      return isItemRow ? `Item ${index + 1}: ${err.message}` : err.message;
+    })
+    .join("; ");
 }
 
-export function validateBomItemRefine(data) {
-  const result = BomItemRefineSchema.safeParse(data);
-
-  if (!result.success) {
-    const errors = result.error.errors
-      .map((err) => `${err.path.join(".")}: ${err.message}`)
-      .join("; ");
-    return { data: null, error: errors };
-  }
-
-  return { data: result.data, error: null };
+function runValidation(schema, data) {
+  const result = schema.safeParse(data);
+  return result.success
+    ? { data: result.data, error: null }
+    : { data: null, error: formatIssues(result.error.errors) };
 }
 
-export function validateBomApproval(data) {
-  const result = BomApprovalSchema.safeParse(data);
-
-  if (!result.success) {
-    const errors = result.error.errors
-      .map((err) => `${err.path.join(".")}: ${err.message}`)
-      .join("; ");
-    return { data: null, error: errors };
-  }
-
-  return { data: result.data, error: null };
-}
-
-export function validateBomReject(data) {
-  const result = BomRejectSchema.safeParse(data);
-
-  if (!result.success) {
-    const errors = result.error.errors
-      .map((err) => `${err.path.join(".")}: ${err.message}`)
-      .join("; ");
-    return { data: null, error: errors };
-  }
-
-  return { data: result.data, error: null };
-}
-
-export function validateBomItemPricing(data) {
-  const result = BomItemPricingSchema.safeParse(data);
-
-  if (!result.success) {
-    const errors = result.error.errors
-      .map((err) => `${err.path.join(".")}: ${err.message}`)
-      .join("; ");
-    return { data: null, error: errors };
-  }
-
-  return { data: result.data, error: null };
-}
-
-export function validateBomBatchPricing(data) {
-  const result = BomBatchPricingSchema.safeParse(data);
-
-  if (!result.success) {
-    const errors = result.error.errors
-      .map((err) => `${err.path.join(".")}: ${err.message}`)
-      .join("; ");
-    return { data: null, error: errors };
-  }
-
-  return { data: result.data, error: null };
-}
+export const validateBomCreate = (data) => runValidation(BomCreateSchema, data);
+export const validateBomItemRefine = (data) => runValidation(BomItemRefineSchema, data);
+export const validateBomApproval = (data) => runValidation(BomApprovalSchema, data);
+export const validateBomReject = (data) => runValidation(BomRejectSchema, data);
+export const validateBomItemPricing = (data) => runValidation(BomItemPricingSchema, data);
+export const validateBomBatchPricing = (data) => runValidation(BomBatchPricingSchema, data);

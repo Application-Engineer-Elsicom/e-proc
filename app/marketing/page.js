@@ -3,9 +3,10 @@ import { authOptions } from '@/api/auth/[...nextauth]/route'
 import { redirect } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import Link from 'next/link'
+import { getBomStatusLabel } from '@/lib/permissions'
 
 export const metadata = {
-  title: 'Marketing Dashboard - BoM Management',
+  title: 'Dashboard Marketing',
   description: 'Dashboard untuk marketing team',
 }
 
@@ -25,13 +26,23 @@ export default async function MarketingDashboard() {
     orderBy: { createdAt: 'desc' },
   })
 
-  // Calculate statistics
+  // Setiap status BoM harus masuk tepat satu kotak, kalau tidak jumlah kotak
+  // tidak akan sama dengan Total dan pengguna kehilangan jejak dokumennya.
+  // Status yang sedang berjalan di Engineer/Procurement digabung jadi "Diproses".
+  const REJECTED_STATUSES = ['REJECTED', 'WPO_REJECTED', 'SYSTEM_REJECTED']
+  const countOf = (...statuses) =>
+    boms.filter((b) => statuses.includes(b.bomStatus)).length
+
   const stats = {
     total: boms.length,
-    draft: boms.filter((b) => b.bomStatus === 'DRAFT').length,
-    submitted: boms.filter((b) => b.bomStatus === 'SUBMITTED').length,
-    active: boms.filter((b) => b.bomStatus === 'ACTIVE').length,
-    archived: boms.filter((b) => b.bomStatus === 'ARCHIVED').length,
+    draft: countOf('DRAFT'),
+    diproses: countOf(
+      'SUBMITTED', 'WPO_REVIEW', 'WPO_APPROVED',
+      'SYSTEM_REVIEW', 'SYSTEM_APPROVED', 'ACTIVE',
+    ),
+    priced: countOf('PRICED'),
+    ditolak: countOf(...REJECTED_STATUSES),
+    archived: countOf('ARCHIVED'),
   }
 
   const recentBoms = boms.slice(0, 5)
@@ -41,111 +52,47 @@ export default async function MarketingDashboard() {
       {/* Welcome Section */}
       <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950 dark:to-indigo-950 rounded-lg p-8 border border-blue-200 dark:border-blue-800">
         <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-          Welcome, {session.user.name}!
+          Halo, {session.user.name}!
         </h2>
         <p className="text-gray-600 dark:text-gray-400">
-          Manage your Bill of Materials and track their approval status
+          Kelola Bill of Material dan pantau status persetujuannya
         </p>
       </div>
 
-      {/* Statistics Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-        {/* Total BoMs */}
-        <div className="bg-white dark:bg-slate-900 rounded-lg border border-gray-200 dark:border-gray-800 p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                Total BoMs
-              </p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white mt-2">
-                {stats.total}
-              </p>
-            </div>
-            <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center">
-              <span className="text-xl">📋</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Draft */}
-        <div className="bg-white dark:bg-slate-900 rounded-lg border border-gray-200 dark:border-gray-800 p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                Draft
-              </p>
-              <p className="text-2xl font-bold text-gray-500 dark:text-gray-300 mt-2">
-                {stats.draft}
-              </p>
-            </div>
-            <div className="w-12 h-12 bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center">
-              <span className="text-xl">📝</span>
+      {/* Kartu statistik — Draft + Diproses + Sudah Diharga + Ditolak + Arsip = Total */}
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+        {[
+          { label: 'Total BoM',     value: stats.total,     icon: '📋', tone: 'text-gray-900 dark:text-white',      bg: 'bg-blue-100 dark:bg-blue-900' },
+          { label: 'Draft',         value: stats.draft,     icon: '📝', tone: 'text-gray-500 dark:text-gray-300',   bg: 'bg-gray-100 dark:bg-gray-700' },
+          { label: 'Diproses',      value: stats.diproses,  icon: '⏳', tone: 'text-blue-600 dark:text-blue-400',   bg: 'bg-blue-100 dark:bg-blue-900' },
+          { label: 'Sudah Diharga', value: stats.priced,    icon: '✅', tone: 'text-green-600 dark:text-green-400', bg: 'bg-green-100 dark:bg-green-900' },
+          { label: 'Ditolak',       value: stats.ditolak,   icon: '↩️', tone: 'text-red-600 dark:text-red-400',     bg: 'bg-red-100 dark:bg-red-900' },
+          { label: 'Diarsipkan',    value: stats.archived,  icon: '📦', tone: 'text-gray-400 dark:text-gray-500',   bg: 'bg-gray-100 dark:bg-gray-700' },
+        ].map((card) => (
+          <div key={card.label} className="bg-white dark:bg-slate-900 rounded-lg border border-gray-200 dark:border-gray-800 p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">{card.label}</p>
+                <p className={`text-2xl font-bold mt-2 ${card.tone}`}>{card.value}</p>
+              </div>
+              <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${card.bg}`}>
+                <span className="text-xl">{card.icon}</span>
+              </div>
             </div>
           </div>
-        </div>
-
-        {/* Submitted */}
-        <div className="bg-white dark:bg-slate-900 rounded-lg border border-gray-200 dark:border-gray-800 p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                Submitted
-              </p>
-              <p className="text-2xl font-bold text-blue-600 dark:text-blue-400 mt-2">
-                {stats.submitted}
-              </p>
-            </div>
-            <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center">
-              <span className="text-xl">⏳</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Active */}
-        <div className="bg-white dark:bg-slate-900 rounded-lg border border-gray-200 dark:border-gray-800 p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                Active
-              </p>
-              <p className="text-2xl font-bold text-green-600 dark:text-green-400 mt-2">
-                {stats.active}
-              </p>
-            </div>
-            <div className="w-12 h-12 bg-green-100 dark:bg-green-900 rounded-lg flex items-center justify-center">
-              <span className="text-xl">✅</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Archived */}
-        <div className="bg-white dark:bg-slate-900 rounded-lg border border-gray-200 dark:border-gray-800 p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                Archived
-              </p>
-              <p className="text-2xl font-bold text-gray-400 dark:text-gray-500 mt-2">
-                {stats.archived}
-              </p>
-            </div>
-            <div className="w-12 h-12 bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center">
-              <span className="text-xl">📦</span>
-            </div>
-          </div>
-        </div>
+        ))}
       </div>
 
       {/* Action Button */}
       <div className="flex justify-between items-center">
         <h3 className="text-lg font-bold text-gray-900 dark:text-white">
-          Recent BoMs
+          BoM Terbaru
         </h3>
         <Link
           href="/marketing/bom/create"
           className="px-4 py-2 bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600 text-white rounded-lg font-medium transition"
         >
-          + Create New BoM
+          + Buat BoM Baru
         </Link>
       </div>
 
@@ -157,22 +104,22 @@ export default async function MarketingDashboard() {
               <thead className="bg-gray-50 dark:bg-slate-800 border-b border-gray-200 dark:border-gray-700">
                 <tr>
                   <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">
-                    BoM No
+                    No. BoM
                   </th>
                   <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">
-                    Project
+                    Proyek
                   </th>
                   <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">
-                    Items
+                    Item
                   </th>
                   <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">
                     Status
                   </th>
                   <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">
-                    Created
+                    Dibuat
                   </th>
                   <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">
-                    Actions
+                    Aksi
                   </th>
                 </tr>
               </thead>
@@ -208,7 +155,7 @@ export default async function MarketingDashboard() {
                                 : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200'
                         }`}
                       >
-                        {bom.bomStatus}
+                        {getBomStatusLabel(bom.bomStatus)}
                       </span>
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
@@ -219,7 +166,7 @@ export default async function MarketingDashboard() {
                         href={`/marketing/bom/${bom.id}`}
                         className="text-blue-600 dark:text-blue-400 hover:underline"
                       >
-                        View
+                        Lihat
                       </Link>
                     </td>
                   </tr>

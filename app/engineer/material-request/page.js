@@ -3,11 +3,12 @@ import { getMaterialRequests } from '../../actions/material-request'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '../../api/auth/[...nextauth]/route'
 import MRApprovalButtons from './MRApprovalButtons'
+import { getStatusLabel } from '@/lib/permissions'
 
 export const dynamic = 'force-dynamic'
 
 export const metadata = {
-  title: 'Material Request - Engineer',
+  title: 'Material Request',
 }
 
 function StatusBadge({ status }) {
@@ -19,17 +20,9 @@ function StatusBadge({ status }) {
     REJECTED:       'bg-red-100 text-red-700 border-red-200',
     PROCUREMENT_PROCESS: 'bg-purple-100 text-purple-700 border-purple-200',
   }
-  const label = {
-    WAITING_WPO:    'Menunggu WPO',
-    WAITING_SYSTEM: 'Menunggu SYSTEM',
-    WAITING_PM:     'Menunggu PM',
-    APPROVED:       'Disetujui',
-    REJECTED:       'Ditolak',
-    PROCUREMENT_PROCESS: 'Proses Pengadaan',
-  }
   return (
     <span className={`px-2 py-1 rounded text-[10px] font-bold border ${styles[status] || 'bg-gray-100 text-gray-600 border-gray-200'}`}>
-      {label[status] || status.replace(/_/g, ' ')}
+      {getStatusLabel(status)}
     </span>
   )
 }
@@ -113,9 +106,9 @@ export default async function MaterialRequestPage() {
                 <thead>
                   <tr className="bg-orange-50 dark:bg-orange-900/10 border-b border-orange-100 dark:border-orange-900/20 text-gray-500 font-black uppercase tracking-widest">
                     <th className="p-4">Doc No</th>
-                    <th className="p-4">Project</th>
+                    <th className="p-4">Proyek</th>
                     <th className="p-4">Dibuat Oleh</th>
-                    <th className="p-4">Items</th>
+                    <th className="p-4">Item</th>
                     <th className="p-4">Tanggal</th>
                     <th className="p-4 text-center">Aksi</th>
                   </tr>
@@ -154,7 +147,7 @@ export default async function MaterialRequestPage() {
               <tr className="bg-gray-50 dark:bg-slate-800 border-b border-gray-200 dark:border-gray-700 text-gray-500 font-black uppercase tracking-widest">
                 <th className="p-4 w-8 text-center">No</th>
                 <th className="p-4">Doc No</th>
-                <th className="p-4">Project</th>
+                <th className="p-4">Proyek</th>
                 <th className="p-4">WPO</th>
                 <th className="p-4">Status</th>
                 <th className="p-4">Tanggal</th>

@@ -94,7 +94,7 @@ export default function CreateSupplierPriceForm({ onSuccess }) {
 
         <div>
           <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">
-            Unit
+            Satuan
           </label>
           <select
             name="unit"

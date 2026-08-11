@@ -62,10 +62,10 @@ export default function BorrowedContent() {
               <th className="px-4 py-3 text-left font-black text-gray-900 dark:text-white text-xs uppercase tracking-tight">Doc No</th>
               <th className="px-4 py-3 text-left font-black text-gray-900 dark:text-white text-xs uppercase tracking-tight">From Project</th>
               <th className="px-4 py-3 text-left font-black text-gray-900 dark:text-white text-xs uppercase tracking-tight">To Project</th>
-              <th className="px-4 py-3 text-left font-black text-gray-900 dark:text-white text-xs uppercase tracking-tight">Description</th>
+              <th className="px-4 py-3 text-left font-black text-gray-900 dark:text-white text-xs uppercase tracking-tight">Deskripsi</th>
               <th className="px-4 py-3 text-right font-black text-gray-900 dark:text-white text-xs uppercase tracking-tight">Qty</th>
               <th className="px-4 py-3 text-left font-black text-gray-900 dark:text-white text-xs uppercase tracking-tight">Due Date</th>
-              <th className="px-4 py-3 text-center font-black text-gray-900 dark:text-white text-xs uppercase tracking-tight">Action</th>
+              <th className="px-4 py-3 text-center font-black text-gray-900 dark:text-white text-xs uppercase tracking-tight">Aksi</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200 dark:divide-gray-800">
@@ -105,7 +105,7 @@ export default function BorrowedContent() {
                       disabled={actionLoading === item.id}
                       className="px-3 py-1 bg-green-600 hover:bg-green-700 text-white text-xs font-bold rounded transition disabled:opacity-50"
                     >
-                      {actionLoading === item.id ? 'Processing...' : 'Mark Returned'}
+                      {actionLoading === item.id ? 'Memproses…' : 'Mark Returned'}
                     </button>
                   </td>
                 </tr>
