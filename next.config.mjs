@@ -13,6 +13,11 @@ const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "";
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   ...(basePath ? { basePath, assetPrefix: basePath } : {}),
+  // Server cPanel tidak punya "sharp" (dan tidak dipasang sengaja — host ini
+  // sudah berkali-kali bermasalah dengan dependency native/WASM), jadi
+  // /_next/image bawaan Next 500 tanpa ini. Gambar di app ini cuma logo dan
+  // ilustrasi statis, tidak butuh resizing server-side.
+  images: { unoptimized: true },
 };
 
 export default nextConfig;
