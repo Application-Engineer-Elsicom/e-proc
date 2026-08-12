@@ -29,7 +29,19 @@
  * yang tidak dikenal di suatu platform HANYA mencetak peringatan ke stderr,
  * tidak pernah menghentikan proses — jadi tidak ada resiko mencoba lebih dari
  * satu di sini, yang penting cocok akan langsung terpakai.
+ *
+ * --wasm-enforce-bounds-checks (percobaan kedua) TERBUKTI diterima V8 (tidak
+ * ada lagi "unrecognized flag" untuknya) TAPI OOM tetap terjadi. Kesimpulan:
+ * flag itu cuma mengatur CARA pengecekan batas memori saat WASM DIAKSES,
+ * bukan UKURAN cadangan ruang alamat yang direservasi di muka saat
+ * WebAssembly.Instance dibuat — jadi tidak menyentuh akar masalahnya sama
+ * sekali. --wasm-max-mem-pages (percobaan ketiga) menyasar itu langsung:
+ * membatasi jumlah halaman 64KiB yang boleh dicadangkan per memori WASM,
+ * jauh di bawah kebutuhan sebenarnya schema-parser Prisma (cukup beberapa
+ * MB), dengan harapan V8 mencadangkan sesuai batas ini alih-alih ruang
+ * alamat besar bawaannya.
  */
 const v8 = require("v8");
+v8.setFlagsFromString("--wasm-max-mem-pages=2048");
 v8.setFlagsFromString("--wasm-enforce-bounds-checks");
 v8.setFlagsFromString("--no-wasm-trap-handler");
