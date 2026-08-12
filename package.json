@@ -9,7 +9,7 @@
     "lint": "biome check",
     "format": "biome format --write",
     "seed": "node seed.cjs",
-    "postinstall": "node -e \"require(require('path').join(require('path').dirname(process.env.npm_package_json), 'scripts', 'cpanel-postinstall.cjs'))\""
+    "postinstall": "node -e \"var r=process.env.CPANEL_APP_ROOT; if(r){require(require('path').join(r,'scripts','cpanel-postinstall.cjs'))}else{console.log('[postinstall] CPANEL_APP_ROOT tidak diset - dilewati (normal untuk npm install lokal/Railway).')}\""
   },
   "dependencies": {
     "@prisma/client": "^6.19.2",

@@ -12,17 +12,23 @@
  * Saat aktif, urutannya sama persis dengan `npm run build`:
  * prisma generate → prisma migrate deploy → next build.
  *
- * PENTING — jangan percaya process.cwd() di sini. Terbukti di lapangan,
- * "Run NPM Install" cPanel bisa memanggil npm dengan working directory yang
- * BUKAN root aplikasi (contoh nyata: cwd tertinggal di folder nodevenv,
- * bukan folder git clone), sehingga argumen path relatif ke `node`/`prisma`
- * gagal "Cannot find module". package.json sengaja memanggil berkas ini lewat
- * npm_package_json (env var yang SELALU diisi npm dengan lokasi package.json
- * yang sedang diproses, terlepas dari cwd) — dan appRoot di bawah dipakai
- * ulang sebagai `cwd` eksplisit di setiap spawnSync, supaya prisma/next juga
- * tidak ikut tersesat.
+ * PENTING — terbukti di lapangan (dua kali) bahwa TIDAK ADA cara otomatis
+ * yang bisa dipercaya untuk menebak lokasi aplikasi di host ini:
+ *   - process.cwd() salah: "Run NPM Install" cPanel menjalankan npm dari
+ *     folder nodevenv (~/nodevenv/e-proc/22/lib), bukan dari root aplikasi.
+ *   - process.env.npm_package_json JUGA salah: nilainya ikut menunjuk ke
+ *     folder nodevenv itu juga — bukan sekadar cwd yang keliru, tapi npm
+ *     sendiri di host ini memang tidak pernah tahu di mana root aplikasi
+ *     yang benar. Folder nodevenv itu bukan leluhur dari root aplikasi,
+ *     jadi menyusuri ke atas dari cwd pun tidak akan pernah sampai ke sana.
+ *
+ * Karena itu appRoot di sini WAJIB diisi eksplisit lewat env var
+ * CPANEL_APP_ROOT (nilainya: field "Application root" yang sama persis
+ * seperti yang ditampilkan di halaman Setup Node.js App) — tidak ada lagi
+ * yang ditebak.
  */
 const path = require("node:path");
+const fs = require("node:fs");
 const { spawnSync } = require("node:child_process");
 
 if (process.env.CPANEL_DEPLOY !== "1") {
@@ -32,7 +38,25 @@ if (process.env.CPANEL_DEPLOY !== "1") {
   process.exit(0);
 }
 
-const appRoot = path.dirname(process.env.npm_package_json || path.join(__dirname, "..", "package.json"));
+const appRoot = process.env.CPANEL_APP_ROOT;
+
+if (!appRoot) {
+  console.error(
+    "[cpanel-postinstall] CPANEL_APP_ROOT belum diisi. Tambahkan Environment Variable " +
+      'CPANEL_APP_ROOT berisi path "Application root" persis seperti yang tertulis di ' +
+      "halaman Setup Node.js App (contoh: /home/elsicomc/e-proc), lalu Run NPM Install lagi.",
+  );
+  process.exit(1);
+}
+
+if (!fs.existsSync(path.join(appRoot, "package.json"))) {
+  console.error(
+    `[cpanel-postinstall] Tidak ada package.json di "${appRoot}". CPANEL_APP_ROOT sepertinya salah — ` +
+      'salin ulang persis dari field "Application root" di halaman Setup Node.js App.',
+  );
+  process.exit(1);
+}
+
 console.log(`[cpanel-postinstall] Root aplikasi: ${appRoot}`);
 console.log("[cpanel-postinstall] CPANEL_DEPLOY=1 — menjalankan: prisma generate, migrate deploy, next build");
 
