@@ -4,44 +4,24 @@
  * Prisma memuat modul WebAssembly-nya (prisma_schema_build_bg.wasm).
  *
  * Kenapa lewat --require, bukan NODE_OPTIONS: sudah dibuktikan di lapangan
- * Node menolak flag ini lewat NODE_OPTIONS ("is not allowed in NODE_OPTIONS")
- * — itu proteksi keamanan bawaan Node untuk flag V8 yang menyentuh tata letak
- * memori/JIT, supaya env var dari luar tidak bisa mengubah perilaku proses
- * yang tidak diminta pemanggilnya. v8.setFlagsFromString() dari skrip yang
- * memang kita tulis sendiri tidak kena batasan itu.
+ * Node menolak flag ini lewat NODE_OPTIONS ("is not allowed in NODE_OPTIONS").
+ * v8.setFlagsFromString() dari skrip yang kita tulis sendiri tidak kena
+ * batasan itu.
  *
- * Kenapa flag ini perlu: `ulimit -a` di server terbukti membatasi virtual
- * memory ke 4GB (CloudLinux LVE) — bukan RAM fisik, yang longgar (8GB, nyaris
- * tidak terpakai). Mesin WASM V8 secara default mencadangkan ruang alamat
- * virtual sampai ~4GB sekaligus per WebAssembly.Instance (trik lama supaya
- * pengecekan batas memori gratis lewat page-fault hardware), dan itu sendirian
- * sudah menghabiskan seluruh jatah 4GB sebelum proses sempat melakukan apa-apa
- * lagi.
+ * Riwayat percobaan (lihat tmp/cpanel-deploy.log di server untuk buktinya):
+ * 1. --no-wasm-trap-handler — TIDAK ADA di build V8 host ini sama sekali
+ *    (dump lengkap --v8-options tidak memuat satu pun flag "trap-handler").
+ * 2. --wasm-enforce-bounds-checks — diterima tapi tidak berpengaruh, karena
+ *    tanpa mekanisme trap-handler di build ini, bounds-check eksplisit sudah
+ *    jadi satu-satunya mode (--wasm-bounds-checks sudah default aktif).
+ * 3. --wasm-max-mem-pages rendah — diterima tapi OOM tetap terjadi. Artinya
+ *    ukuran *linear memory* WASM bukan biang keroknya.
  *
- * --no-wasm-trap-handler (percobaan pertama) TERBUKTI tidak dikenal di build
- * V8 Node 20 CloudLinux ini ("unrecognized flag"). --wasm-enforce-bounds-checks
- * di bawah adalah percobaan kedua, dengan deskripsi resmi V8 yang jauh lebih
- * cocok: "enforce explicit bounds check even if the trap handler is
- * available" — memaksa V8 memakai pengecekan eksplisit per akses memori,
- * mem-bypass trap-handler yang butuh cadangan ruang alamat besar itu.
- *
- * Beberapa nama dicoba sekaligus dengan aman: setFlagsFromString untuk flag
- * yang tidak dikenal di suatu platform HANYA mencetak peringatan ke stderr,
- * tidak pernah menghentikan proses — jadi tidak ada resiko mencoba lebih dari
- * satu di sini, yang penting cocok akan langsung terpakai.
- *
- * --wasm-enforce-bounds-checks (percobaan kedua) TERBUKTI diterima V8 (tidak
- * ada lagi "unrecognized flag" untuknya) TAPI OOM tetap terjadi. Kesimpulan:
- * flag itu cuma mengatur CARA pengecekan batas memori saat WASM DIAKSES,
- * bukan UKURAN cadangan ruang alamat yang direservasi di muka saat
- * WebAssembly.Instance dibuat — jadi tidak menyentuh akar masalahnya sama
- * sekali. --wasm-max-mem-pages (percobaan ketiga) menyasar itu langsung:
- * membatasi jumlah halaman 64KiB yang boleh dicadangkan per memori WASM,
- * jauh di bawah kebutuhan sebenarnya schema-parser Prisma (cukup beberapa
- * MB), dengan harapan V8 mencadangkan sesuai batas ini alih-alih ruang
- * alamat besar bawaannya.
+ * Titik curiga baru: --wasm-max-committed-code-mb, batas *ruang kode*
+ * ter-kompilasi WASM, defaultnya 4095 MB — nyaris persis sama dengan
+ * ulimit -v host ini (4194304 KB = 4096 MB, lihat log ulimit -a). Diturunkan
+ * jauh di bawah itu; schema-parser Prisma cuma perlu beberapa MB kode.
  */
 const v8 = require("v8");
+v8.setFlagsFromString("--wasm-max-committed-code-mb=64");
 v8.setFlagsFromString("--wasm-max-mem-pages=2048");
-v8.setFlagsFromString("--wasm-enforce-bounds-checks");
-v8.setFlagsFromString("--no-wasm-trap-handler");
