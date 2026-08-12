@@ -39,7 +39,12 @@ export default function LoginPage() {
     // Navigasi dokumen penuh mengirim cookie sesi yang baru dibuat dan membiarkan
     // server menjawab dengan redirect HTTP biasa, sehingga tidak ada balapan dan
     // tidak perlu menebak-nebak dengan setTimeout.
-    window.location.href = '/';
+    //
+    // window.location tidak lewat router Next.js, jadi tidak ikut di-prefix
+    // basePath secara otomatis seperti <Link>/redirect() — di deploy cPanel
+    // (NEXT_PUBLIC_BASE_PATH="/e-proc") ini wajib ditambahkan manual, kalau
+    // tidak browser akan lompat ke domain root dan sesi terlihat hilang.
+    window.location.href = `${process.env.NEXT_PUBLIC_BASE_PATH || ''}/`;
   };
 
   return (
