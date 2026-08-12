@@ -14,18 +14,35 @@
  * satu pun env var bawaan npm yang bisa dipercaya di host ini untuk menebak
  * lokasi aplikasi.
  *
- * CLI Prisma (prisma generate / migrate deploy) TIDAK PERNAH dijalankan di
- * server ini — terbukti selalu crash "WebAssembly.Instance(): Out of memory"
- * karena CloudLinux LVE membatasi ulimit -v akun ini ke 4GB, dan beberapa
- * flag V8 yang dicoba (lihat riwayat di git log file ini) tidak menyelesaikan
- * akar masalahnya. Sebagai gantinya:
+ * Baik CLI Prisma (generate/migrate) MAUPUN "next build" TIDAK PERNAH
+ * dijalankan di server ini — keduanya sama-sama terbukti crash
+ * "WebAssembly.Instance/instantiate(): Out of memory" karena CloudLinux LVE
+ * membatasi ulimit -v akun ini ke 4GB (Prisma lewat WASM schema-engine-nya,
+ * Next lewat fallback WASM utamanya kalau native SWC/lightningcss binary
+ * tidak cocok dengan platform host). Beberapa flag V8 yang dicoba untuk kasus
+ * Prisma (lihat riwayat di git log file ini) tidak menyelesaikan akar
+ * masalahnya, jadi solusinya BUKAN flag, tapi: jangan pernah jalankan
+ * toolchain berbasis WASM/Rust apa pun di server ini. Sebagai gantinya:
  *  - "prisma generate" dijalankan di komputer developer (tidak kena batas
  *    itu), hasilnya di-commit ke prisma/generated-client/ (lihat schema.prisma
- *    untuk binaryTargets rhel-openssl yang dipakai), lalu di sini TINGGAL
+ *    untuk binaryTargets debian-openssl yang dipakai), lalu di sini TINGGAL
  *    DISALIN ke node_modules/.prisma/client — operasi file biasa, tanpa WASM.
  *  - "prisma migrate deploy" dijalankan dari komputer developer langsung ke
  *    database production (MySQL Remote Access sudah diaktifkan untuk akun
  *    ini), jadi tidak perlu dijalankan di sini sama sekali.
+ *  - "next build" JUGA dijalankan di komputer developer
+ *    (NEXT_PUBLIC_BASE_PATH=/e-proc npx next build), hasil yang dibutuhkan
+ *    saat runtime (server/, static/, manifest — BUKAN .next/cache yang cuma
+ *    cache build ~230MB) di-commit ke deploy-artifacts/next-build/, lalu di
+ *    sini TINGGAL DISALIN ke .next/ — juga operasi file biasa.
+ *
+ * KONSEKUENSI: setiap ada perubahan kode atau schema, developer WAJIB
+ * menjalankan ulang kedua build itu secara lokal dan commit ulang folder
+ * generated-client/ + next-build/ sebelum push — "Run NPM Install" di cPanel
+ * sendirian TIDAK CUKUP lagi untuk memperbarui build. Ini konsekuensi nyata
+ * dari batas ulimit -v host ini, bukan pilihan desain — kalau providernya
+ * bersedia menaikkan batas itu, seluruh langkah build bisa dikembalikan
+ * berjalan otomatis di server lagi.
  */
 const path = require("node:path");
 const fs = require("node:fs");
@@ -78,24 +95,32 @@ try {
 }
 
 log(`Root aplikasi: ${appRoot}`);
-log("CPANEL_DEPLOY=1 — menyalin Prisma Client hasil generate lokal, lalu next build");
+log("CPANEL_DEPLOY=1 — menyalin Prisma Client + next build hasil generate lokal");
 log(`Log lengkap tersimpan di: ${logPath} (buka lewat File Manager kalau ada yang gagal)`);
 
-const generatedClientSrc = path.join(appRoot, "prisma", "generated-client");
-const prismaClientDest = path.join(appRoot, "node_modules", ".prisma", "client");
-
-if (!fs.existsSync(generatedClientSrc)) {
-  log(
-    `GAGAL: ${generatedClientSrc} tidak ada. Prisma Client harus di-generate dari komputer ` +
-      "developer (npx prisma generate) dan hasilnya di-commit ke prisma/generated-client/ " +
-      "sebelum push — lihat scripts/cpanel-postinstall.cjs untuk penjelasannya.",
-  );
-  process.exit(1);
+function copyBuildArtifact(label, src, dest) {
+  if (!fs.existsSync(src)) {
+    log(
+      `GAGAL: ${src} tidak ada. Lihat komentar di scripts/cpanel-postinstall.cjs — ` +
+        `${label} harus disiapkan dari komputer developer dan di-commit sebelum push.`,
+    );
+    process.exit(1);
+  }
+  fs.rmSync(dest, { recursive: true, force: true });
+  fs.cpSync(src, dest, { recursive: true });
+  log(`${label} disalin: ${src} -> ${dest}`);
 }
 
-fs.rmSync(prismaClientDest, { recursive: true, force: true });
-fs.cpSync(generatedClientSrc, prismaClientDest, { recursive: true });
-log(`Prisma Client disalin: ${generatedClientSrc} -> ${prismaClientDest}`);
+copyBuildArtifact(
+  "Prisma Client",
+  path.join(appRoot, "prisma", "generated-client"),
+  path.join(appRoot, "node_modules", ".prisma", "client"),
+);
+copyBuildArtifact(
+  "Next build",
+  path.join(appRoot, "deploy-artifacts", "next-build"),
+  path.join(appRoot, ".next"),
+);
 
 // Opsional dan terpisah dari CPANEL_DEPLOY: hanya membuat akun PROJECT_MANAGER
 // pertama saat database masih kosong. Lihat cpanel-seed-admin.cjs untuk alasan
@@ -104,7 +129,6 @@ const steps = [];
 if (process.env.SEED_FIRST_ADMIN === "1") {
   steps.push(["node", [path.join(appRoot, "scripts", "cpanel-seed-admin.cjs")]]);
 }
-steps.push(["npx", ["next", "build"]]);
 
 for (const [cmd, args] of steps) {
   log(`$ ${cmd} ${args.join(" ")}`);

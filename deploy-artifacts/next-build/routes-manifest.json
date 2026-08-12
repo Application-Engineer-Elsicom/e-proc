@@ -1,0 +1,236 @@
+{
+  "version": 3,
+  "pages404": true,
+  "caseSensitive": false,
+  "basePath": "/e-proc",
+  "redirects": [
+    {
+      "source": "/e-proc/",
+      "destination": "/e-proc",
+      "basePath": false,
+      "internal": true,
+      "statusCode": 308,
+      "regex": "^/e-proc/$"
+    },
+    {
+      "source": "/:path+/",
+      "destination": "/:path+",
+      "internal": true,
+      "statusCode": 308,
+      "regex": "^(?:/((?:[^/]+?)(?:/(?:[^/]+?))*))/$"
+    }
+  ],
+  "headers": [],
+  "rewrites": {
+    "beforeFiles": [],
+    "afterFiles": [],
+    "fallback": []
+  },
+  "dynamicRoutes": [
+    {
+      "page": "/api/auth/[...nextauth]",
+      "regex": "^/api/auth/(.+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPnextauth": "nxtPnextauth"
+      },
+      "namedRegex": "^/api/auth/(?<nxtPnextauth>.+?)(?:/)?$"
+    },
+    {
+      "page": "/engineer/bom/[bomId]/approve",
+      "regex": "^/engineer/bom/([^/]+?)/approve(?:/)?$",
+      "routeKeys": {
+        "nxtPbomId": "nxtPbomId"
+      },
+      "namedRegex": "^/engineer/bom/(?<nxtPbomId>[^/]+?)/approve(?:/)?$"
+    },
+    {
+      "page": "/engineer/bom/[bomId]/refine",
+      "regex": "^/engineer/bom/([^/]+?)/refine(?:/)?$",
+      "routeKeys": {
+        "nxtPbomId": "nxtPbomId"
+      },
+      "namedRegex": "^/engineer/bom/(?<nxtPbomId>[^/]+?)/refine(?:/)?$"
+    },
+    {
+      "page": "/marketing/bom/[bomId]",
+      "regex": "^/marketing/bom/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPbomId": "nxtPbomId"
+      },
+      "namedRegex": "^/marketing/bom/(?<nxtPbomId>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/procurement/bom/[bomId]",
+      "regex": "^/procurement/bom/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPbomId": "nxtPbomId"
+      },
+      "namedRegex": "^/procurement/bom/(?<nxtPbomId>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/procurement/po-list/[poId]",
+      "regex": "^/procurement/po\\-list/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPpoId": "nxtPpoId"
+      },
+      "namedRegex": "^/procurement/po\\-list/(?<nxtPpoId>[^/]+?)(?:/)?$"
+    }
+  ],
+  "staticRoutes": [
+    {
+      "page": "/",
+      "regex": "^/(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/(?:/)?$"
+    },
+    {
+      "page": "/_not-found",
+      "regex": "^/_not\\-found(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/_not\\-found(?:/)?$"
+    },
+    {
+      "page": "/engineer",
+      "regex": "^/engineer(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/engineer(?:/)?$"
+    },
+    {
+      "page": "/engineer/bom",
+      "regex": "^/engineer/bom(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/engineer/bom(?:/)?$"
+    },
+    {
+      "page": "/engineer/fault-report",
+      "regex": "^/engineer/fault\\-report(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/engineer/fault\\-report(?:/)?$"
+    },
+    {
+      "page": "/engineer/fault-report/create",
+      "regex": "^/engineer/fault\\-report/create(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/engineer/fault\\-report/create(?:/)?$"
+    },
+    {
+      "page": "/engineer/material-request",
+      "regex": "^/engineer/material\\-request(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/engineer/material\\-request(?:/)?$"
+    },
+    {
+      "page": "/engineer/material-request/create",
+      "regex": "^/engineer/material\\-request/create(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/engineer/material\\-request/create(?:/)?$"
+    },
+    {
+      "page": "/engineer/warehouse-release",
+      "regex": "^/engineer/warehouse\\-release(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/engineer/warehouse\\-release(?:/)?$"
+    },
+    {
+      "page": "/engineer/warehouse-release/create",
+      "regex": "^/engineer/warehouse\\-release/create(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/engineer/warehouse\\-release/create(?:/)?$"
+    },
+    {
+      "page": "/favicon.ico",
+      "regex": "^/favicon\\.ico(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/favicon\\.ico(?:/)?$"
+    },
+    {
+      "page": "/login",
+      "regex": "^/login(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/login(?:/)?$"
+    },
+    {
+      "page": "/marketing",
+      "regex": "^/marketing(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/marketing(?:/)?$"
+    },
+    {
+      "page": "/marketing/bom",
+      "regex": "^/marketing/bom(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/marketing/bom(?:/)?$"
+    },
+    {
+      "page": "/marketing/bom/create",
+      "regex": "^/marketing/bom/create(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/marketing/bom/create(?:/)?$"
+    },
+    {
+      "page": "/pm",
+      "regex": "^/pm(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/pm(?:/)?$"
+    },
+    {
+      "page": "/procurement",
+      "regex": "^/procurement(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/procurement(?:/)?$"
+    },
+    {
+      "page": "/procurement/bom",
+      "regex": "^/procurement/bom(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/procurement/bom(?:/)?$"
+    },
+    {
+      "page": "/procurement/po-list",
+      "regex": "^/procurement/po\\-list(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/procurement/po\\-list(?:/)?$"
+    },
+    {
+      "page": "/procurement/po-plan",
+      "regex": "^/procurement/po\\-plan(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/procurement/po\\-plan(?:/)?$"
+    },
+    {
+      "page": "/procurement/po-plan/create",
+      "regex": "^/procurement/po\\-plan/create(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/procurement/po\\-plan/create(?:/)?$"
+    },
+    {
+      "page": "/register",
+      "regex": "^/register(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/register(?:/)?$"
+    },
+    {
+      "page": "/wpo",
+      "regex": "^/wpo(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/wpo(?:/)?$"
+    }
+  ],
+  "dataRoutes": [],
+  "rsc": {
+    "header": "rsc",
+    "varyHeader": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch",
+    "prefetchHeader": "next-router-prefetch",
+    "didPostponeHeader": "x-nextjs-postponed",
+    "contentTypeHeader": "text/x-component",
+    "suffix": ".rsc",
+    "prefetchSuffix": ".prefetch.rsc",
+    "prefetchSegmentHeader": "next-router-segment-prefetch",
+    "prefetchSegmentSuffix": ".segment.rsc",
+    "prefetchSegmentDirSuffix": ".segments"
+  },
+  "rewriteHeaders": {
+    "pathHeader": "x-nextjs-rewritten-path",
+    "queryHeader": "x-nextjs-rewritten-query"
+  }
+}
