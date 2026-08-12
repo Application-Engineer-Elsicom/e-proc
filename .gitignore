@@ -30,6 +30,10 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
+# log deploy cPanel (lihat scripts/cpanel-postinstall.cjs) — dibuat di server,
+# tidak pernah dari sini, tapi diabaikan untuk jaga-jaga.
+/tmp/cpanel-deploy.log
+
 # env files (can opt-in for committing if needed)
 .env*
 

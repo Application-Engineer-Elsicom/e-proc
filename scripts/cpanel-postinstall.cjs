@@ -12,20 +12,18 @@
  * Saat aktif, urutannya sama persis dengan `npm run build`:
  * prisma generate → prisma migrate deploy → next build.
  *
- * PENTING — terbukti di lapangan (dua kali) bahwa TIDAK ADA cara otomatis
- * yang bisa dipercaya untuk menebak lokasi aplikasi di host ini:
- *   - process.cwd() salah: "Run NPM Install" cPanel menjalankan npm dari
- *     folder nodevenv (~/nodevenv/e-proc/22/lib), bukan dari root aplikasi.
- *   - process.env.npm_package_json JUGA salah: nilainya ikut menunjuk ke
- *     folder nodevenv itu juga — bukan sekadar cwd yang keliru, tapi npm
- *     sendiri di host ini memang tidak pernah tahu di mana root aplikasi
- *     yang benar. Folder nodevenv itu bukan leluhur dari root aplikasi,
- *     jadi menyusuri ke atas dari cwd pun tidak akan pernah sampai ke sana.
+ * PENTING — appRoot WAJIB diisi eksplisit lewat env var CPANEL_APP_ROOT
+ * (isi field "Application root" apa adanya). Terbukti di lapangan, tidak ada
+ * satu pun env var bawaan npm (npm_package_json, dll) yang bisa dipercaya di
+ * host ini untuk menebak lokasi aplikasi — semuanya ikut menunjuk ke folder
+ * nodevenv, yang bukan leluhur dari root aplikasi.
  *
- * Karena itu appRoot di sini WAJIB diisi eksplisit lewat env var
- * CPANEL_APP_ROOT (nilainya: field "Application root" yang sama persis
- * seperti yang ditampilkan di halaman Setup Node.js App) — tidak ada lagi
- * yang ditebak.
+ * PENTING JUGA — seluruh output tiap langkah ditulis ke tmp/cpanel-deploy.log
+ * di root aplikasi, bukan cuma dicetak ke layar. Kotak "Run NPM Install" di
+ * cPanel memotong baris panjang jadi "...", dan npm debug log TIDAK menyimpan
+ * stdout/stderr proses anak (prisma, next) sama sekali — cuma jejak internal
+ * npm sendiri. Tanpa berkas log terpisah ini, pesan error sesungguhnya dari
+ * prisma/next tidak pernah benar-benar terbaca lewat cPanel.
  */
 const path = require("node:path");
 const fs = require("node:fs");
@@ -57,8 +55,29 @@ if (!fs.existsSync(path.join(appRoot, "package.json"))) {
   process.exit(1);
 }
 
-console.log(`[cpanel-postinstall] Root aplikasi: ${appRoot}`);
-console.log("[cpanel-postinstall] CPANEL_DEPLOY=1 — menjalankan: prisma generate, migrate deploy, next build");
+// tmp/ sudah ada sejak app dibuat (dipakai Passenger untuk tmp/restart.txt),
+// jadi aman ditulisi dan sudah pasti punya izin tulis untuk user yang sama.
+const logPath = path.join(appRoot, "tmp", "cpanel-deploy.log");
+
+function log(line) {
+  const stamped = `[${new Date().toISOString()}] ${line}\n`;
+  process.stdout.write(stamped);
+  try {
+    fs.appendFileSync(logPath, stamped);
+  } catch {
+    // Jangan sampai kegagalan menulis log menghentikan proses deploy itu sendiri.
+  }
+}
+
+try {
+  fs.writeFileSync(logPath, `=== cpanel-postinstall mulai: ${new Date().toISOString()} ===\n`);
+} catch (err) {
+  console.error(`[cpanel-postinstall] Tidak bisa menulis ${logPath}: ${err.message}`);
+}
+
+log(`Root aplikasi: ${appRoot}`);
+log("CPANEL_DEPLOY=1 — menjalankan: prisma generate, migrate deploy, next build");
+log(`Log lengkap tersimpan di: ${logPath} (buka lewat File Manager kalau ada yang gagal)`);
 
 const steps = [
   ["npx", ["prisma", "generate"]],
@@ -75,12 +94,19 @@ if (process.env.SEED_FIRST_ADMIN === "1") {
 steps.push(["npx", ["next", "build"]]);
 
 for (const [cmd, args] of steps) {
-  console.log(`[cpanel-postinstall] $ ${cmd} ${args.join(" ")}`);
-  const result = spawnSync(cmd, args, { stdio: "inherit", shell: true, cwd: appRoot });
+  log(`$ ${cmd} ${args.join(" ")}`);
+  // encoding:'utf8' (bukan stdio:'inherit') supaya stdout/stderr proses anak
+  // bisa ditangkap sebagai string dan ditulis ke logPath, bukan cuma mengalir
+  // langsung ke kotak output cPanel yang memotong baris panjang.
+  const result = spawnSync(cmd, args, { shell: true, cwd: appRoot, encoding: "utf8" });
+  if (result.stdout) log(`--- stdout ---\n${result.stdout}`);
+  if (result.stderr) log(`--- stderr ---\n${result.stderr}`);
+
   if (result.status !== 0) {
-    console.error(`[cpanel-postinstall] Gagal pada: ${cmd} ${args.join(" ")}`);
+    log(`GAGAL pada: ${cmd} ${args.join(" ")} (exit ${result.status})`);
+    log(`Baca detailnya di: ${logPath}`);
     process.exit(result.status || 1);
   }
 }
 
-console.log("[cpanel-postinstall] Selesai.");
+log("Selesai.");
