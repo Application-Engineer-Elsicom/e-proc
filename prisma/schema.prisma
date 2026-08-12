@@ -1,13 +1,13 @@
 generator client {
   provider      = "prisma-client-js"
-  // "native" untuk dev lokal (Windows/Mac). Dua target rhel-openssl untuk
-  // server cPanel (CloudLinux/AlmaLinux, RHEL-based) — dua versi OpenSSL
-  // disertakan karena versi OS host tidak bisa dipastikan tanpa Terminal.
+  // "native" untuk dev lokal (Windows/Mac). "debian-openssl-1.1.x" untuk
+  // server cPanel — dikonfirmasi LANGSUNG dari pesan error Prisma Client di
+  // server (bukan tebakan), jadi ini nilai yang pasti benar untuk host ini.
   // Dipakai supaya `prisma generate` bisa dijalankan dari komputer manapun
   // (lihat scripts/cpanel-postinstall.cjs) dan tetap menghasilkan query
   // engine yang jalan di server, tanpa CLI Prisma pernah dijalankan DI
   // server itu sendiri (yang crash OOM karena batas ulimit -v CloudLinux).
-  binaryTargets = ["native", "rhel-openssl-3.0.x", "rhel-openssl-1.1.x"]
+  binaryTargets = ["native", "debian-openssl-1.1.x"]
 }
 
 datasource db {
