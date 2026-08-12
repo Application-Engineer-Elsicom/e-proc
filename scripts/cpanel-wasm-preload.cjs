@@ -16,12 +16,20 @@
  * virtual sampai ~4GB sekaligus per WebAssembly.Instance (trik lama supaya
  * pengecekan batas memori gratis lewat page-fault hardware), dan itu sendirian
  * sudah menghabiskan seluruh jatah 4GB sebelum proses sempat melakukan apa-apa
- * lagi. --no-wasm-trap-handler memaksa V8 memakai pengecekan eksplisit per
- * akses memori alih-alih trik itu — sedikit lebih lambat, tapi tidak masalah
- * untuk prisma generate/migrate deploy yang cuma jalan sekali per deploy.
+ * lagi.
  *
- * Kalau flag ini tidak dikenali di suatu platform, V8 hanya mencetak
- * peringatan ke stderr dan proses tetap lanjut normal — sudah diverifikasi
- * tidak fatal, aman dibiarkan berjalan di semua lingkungan.
+ * --no-wasm-trap-handler (percobaan pertama) TERBUKTI tidak dikenal di build
+ * V8 Node 20 CloudLinux ini ("unrecognized flag"). --wasm-enforce-bounds-checks
+ * di bawah adalah percobaan kedua, dengan deskripsi resmi V8 yang jauh lebih
+ * cocok: "enforce explicit bounds check even if the trap handler is
+ * available" — memaksa V8 memakai pengecekan eksplisit per akses memori,
+ * mem-bypass trap-handler yang butuh cadangan ruang alamat besar itu.
+ *
+ * Beberapa nama dicoba sekaligus dengan aman: setFlagsFromString untuk flag
+ * yang tidak dikenal di suatu platform HANYA mencetak peringatan ke stderr,
+ * tidak pernah menghentikan proses — jadi tidak ada resiko mencoba lebih dari
+ * satu di sini, yang penting cocok akan langsung terpakai.
  */
-require("v8").setFlagsFromString("--no-wasm-trap-handler");
+const v8 = require("v8");
+v8.setFlagsFromString("--wasm-enforce-bounds-checks");
+v8.setFlagsFromString("--no-wasm-trap-handler");

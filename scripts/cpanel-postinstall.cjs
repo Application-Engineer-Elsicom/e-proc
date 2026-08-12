@@ -89,6 +89,26 @@ log(`Log lengkap tersimpan di: ${logPath} (buka lewat File Manager kalau ada yan
   log(`--- ulimit -a (diagnostik batas resource) ---\n${ulimitResult.stdout || ulimitResult.stderr || "(tidak bisa dibaca)"}`);
 }
 
+// Diagnostik lapis kedua: percobaan pertama (--no-wasm-trap-handler) terbukti
+// bukan nama flag yang dikenal di build V8 host ini. Daripada menebak nama
+// flag satu-satu lagi (satu putaran percobaan = satu kali klik Run NPM
+// Install dari pengguna), daftar LENGKAP flag WASM yang benar-benar ada di
+// V8 server ini dicatat sekarang — supaya kalau tebakan di
+// cpanel-wasm-preload.cjs meleset lagi, jawaban yang benar sudah ada di log
+// yang sama, tidak perlu putaran percobaan baru.
+{
+  const flagsResult = spawnSync(
+    "node",
+    ["--v8-options"],
+    { shell: false, encoding: "utf8" },
+  );
+  const wasmFlags = (flagsResult.stdout || flagsResult.stderr || "")
+    .split("\n")
+    .filter((line) => /wasm|trap.handler|bounds.check/i.test(line))
+    .join("\n");
+  log(`--- flag WASM yang tersedia di V8 host ini ---\n${wasmFlags || "(tidak ada/tidak bisa dibaca)"}`);
+}
+
 // "npx prisma ..." dijalankan lewat WebAssembly untuk membaca schema.prisma,
 // dan WASM V8 mencadangkan ruang alamat virtual besar di muka — kebentur
 // ulimit -v 4GB LVE server ini (lihat log ulimit -a di atas). Solusinya:
