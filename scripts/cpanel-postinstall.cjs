@@ -6,24 +6,26 @@
  * Sengaja tidak melakukan apa pun kecuali CPANEL_DEPLOY=1 diset (lewat
  * Environment Variables di cPanel Node App). Tanpa penjaga ini, "npm install"
  * biasa di komputer developer — atau langkah "npm install" pada buildCommand
- * Railway — ikut menjalankan build produksi penuh dan prisma migrate deploy
- * terhadap DATABASE_URL yang sedang aktif, yang mengejutkan dan berisiko.
- *
- * Saat aktif, urutannya sama persis dengan `npm run build`:
- * prisma generate → prisma migrate deploy → next build.
+ * Railway — ikut menjalankan build produksi penuh terhadap DATABASE_URL yang
+ * sedang aktif, yang mengejutkan dan berisiko.
  *
  * PENTING — appRoot WAJIB diisi eksplisit lewat env var CPANEL_APP_ROOT
  * (isi field "Application root" apa adanya). Terbukti di lapangan, tidak ada
- * satu pun env var bawaan npm (npm_package_json, dll) yang bisa dipercaya di
- * host ini untuk menebak lokasi aplikasi — semuanya ikut menunjuk ke folder
- * nodevenv, yang bukan leluhur dari root aplikasi.
+ * satu pun env var bawaan npm yang bisa dipercaya di host ini untuk menebak
+ * lokasi aplikasi.
  *
- * PENTING JUGA — seluruh output tiap langkah ditulis ke tmp/cpanel-deploy.log
- * di root aplikasi, bukan cuma dicetak ke layar. Kotak "Run NPM Install" di
- * cPanel memotong baris panjang jadi "...", dan npm debug log TIDAK menyimpan
- * stdout/stderr proses anak (prisma, next) sama sekali — cuma jejak internal
- * npm sendiri. Tanpa berkas log terpisah ini, pesan error sesungguhnya dari
- * prisma/next tidak pernah benar-benar terbaca lewat cPanel.
+ * CLI Prisma (prisma generate / migrate deploy) TIDAK PERNAH dijalankan di
+ * server ini — terbukti selalu crash "WebAssembly.Instance(): Out of memory"
+ * karena CloudLinux LVE membatasi ulimit -v akun ini ke 4GB, dan beberapa
+ * flag V8 yang dicoba (lihat riwayat di git log file ini) tidak menyelesaikan
+ * akar masalahnya. Sebagai gantinya:
+ *  - "prisma generate" dijalankan di komputer developer (tidak kena batas
+ *    itu), hasilnya di-commit ke prisma/generated-client/ (lihat schema.prisma
+ *    untuk binaryTargets rhel-openssl yang dipakai), lalu di sini TINGGAL
+ *    DISALIN ke node_modules/.prisma/client — operasi file biasa, tanpa WASM.
+ *  - "prisma migrate deploy" dijalankan dari komputer developer langsung ke
+ *    database production (MySQL Remote Access sudah diaktifkan untuk akun
+ *    ini), jadi tidak perlu dijalankan di sini sama sekali.
  */
 const path = require("node:path");
 const fs = require("node:fs");
@@ -76,85 +78,37 @@ try {
 }
 
 log(`Root aplikasi: ${appRoot}`);
-log("CPANEL_DEPLOY=1 — menjalankan: prisma generate, migrate deploy, next build");
+log("CPANEL_DEPLOY=1 — menyalin Prisma Client hasil generate lokal, lalu next build");
 log(`Log lengkap tersimpan di: ${logPath} (buka lewat File Manager kalau ada yang gagal)`);
 
-// Diagnostik: "prisma generate" gagal dengan RangeError WASM out-of-memory
-// meski Physical Memory Usage cPanel menunjukkan RAM masih longgar. Dugaan:
-// batas *virtual memory* (ulimit -v) dari CloudLinux LVE — angka yang TIDAK
-// ditampilkan di widget Resource Usage cPanel sama sekali. `ulimit -a` murah
-// dan aman dijalankan duluan supaya dugaan ini punya bukti, bukan tebakan.
-{
-  const ulimitResult = spawnSync("sh", ["-c", "ulimit -a"], { encoding: "utf8" });
-  log(`--- ulimit -a (diagnostik batas resource) ---\n${ulimitResult.stdout || ulimitResult.stderr || "(tidak bisa dibaca)"}`);
-}
+const generatedClientSrc = path.join(appRoot, "prisma", "generated-client");
+const prismaClientDest = path.join(appRoot, "node_modules", ".prisma", "client");
 
-// Diagnostik lapis kedua: percobaan pertama (--no-wasm-trap-handler) terbukti
-// bukan nama flag yang dikenal di build V8 host ini. Daripada menebak nama
-// flag satu-satu lagi (satu putaran percobaan = satu kali klik Run NPM
-// Install dari pengguna), daftar LENGKAP flag WASM yang benar-benar ada di
-// V8 server ini dicatat sekarang — supaya kalau tebakan di
-// cpanel-wasm-preload.cjs meleset lagi, jawaban yang benar sudah ada di log
-// yang sama, tidak perlu putaran percobaan baru.
-{
-  const flagsResult = spawnSync(
-    "node",
-    ["--v8-options"],
-    { shell: false, encoding: "utf8" },
+if (!fs.existsSync(generatedClientSrc)) {
+  log(
+    `GAGAL: ${generatedClientSrc} tidak ada. Prisma Client harus di-generate dari komputer ` +
+      "developer (npx prisma generate) dan hasilnya di-commit ke prisma/generated-client/ " +
+      "sebelum push — lihat scripts/cpanel-postinstall.cjs untuk penjelasannya.",
   );
-  const wasmFlags = (flagsResult.stdout || flagsResult.stderr || "")
-    .split("\n")
-    .filter((line) => /wasm|trap.handler|bounds.check/i.test(line))
-    .join("\n");
-  log(`--- flag WASM yang tersedia di V8 host ini ---\n${wasmFlags || "(tidak ada/tidak bisa dibaca)"}`);
-}
-
-// "npx prisma ..." dijalankan lewat WebAssembly untuk membaca schema.prisma,
-// dan WASM V8 mencadangkan ruang alamat virtual besar di muka — kebentur
-// ulimit -v 4GB LVE server ini (lihat log ulimit -a di atas). Solusinya:
-// panggil node LANGSUNG ke berkas index.js Prisma dengan --require memuat
-// cpanel-wasm-preload.cjs duluan, supaya v8.setFlagsFromString mematikan
-// trik itu SEBELUM modul WASM Prisma sempat dimuat. NODE_OPTIONS tidak bisa
-// dipakai untuk ini — sudah terbukti Node menolaknya lewat env var.
-//
-// require.resolve dengan paths:[appRoot], bukan path hardcoded — supaya
-// yang dipanggil pasti salinan prisma yang ter-install di node_modules
-// aplikasi ini, bukan salinan lain yang mungkin ketemu duluan lewat PATH.
-let prismaEntry;
-try {
-  prismaEntry = require.resolve("prisma/build/index.js", { paths: [appRoot] });
-} catch (err) {
-  log(`GAGAL menemukan paket prisma di node_modules: ${err.message}`);
   process.exit(1);
 }
-const wasmPreload = path.join(appRoot, "scripts", "cpanel-wasm-preload.cjs");
-const runPrisma = (...prismaArgs) => [
-  "node",
-  ["--require", wasmPreload, prismaEntry, ...prismaArgs],
-];
 
-const steps = [runPrisma("generate"), runPrisma("migrate", "deploy")];
+fs.rmSync(prismaClientDest, { recursive: true, force: true });
+fs.cpSync(generatedClientSrc, prismaClientDest, { recursive: true });
+log(`Prisma Client disalin: ${generatedClientSrc} -> ${prismaClientDest}`);
 
 // Opsional dan terpisah dari CPANEL_DEPLOY: hanya membuat akun PROJECT_MANAGER
 // pertama saat database masih kosong. Lihat cpanel-seed-admin.cjs untuk alasan
 // kenapa ini perlu ada. Cabut SEED_FIRST_ADMIN setelah berhasil login sekali.
+const steps = [];
 if (process.env.SEED_FIRST_ADMIN === "1") {
   steps.push(["node", [path.join(appRoot, "scripts", "cpanel-seed-admin.cjs")]]);
 }
-
 steps.push(["npx", ["next", "build"]]);
 
 for (const [cmd, args] of steps) {
   log(`$ ${cmd} ${args.join(" ")}`);
-  // encoding:'utf8' (bukan stdio:'inherit') supaya stdout/stderr proses anak
-  // bisa ditangkap sebagai string dan ditulis ke logPath, bukan cuma mengalir
-  // langsung ke kotak output cPanel yang memotong baris panjang.
-  //
-  // shell:false khusus untuk "node" — argumennya sudah array token utuh
-  // (--require, path preload, path entry prisma, dst) dan tidak butuh fitur
-  // shell apa pun. Terbukti lewat pengujian: shell:true memecah path yang
-  // mengandung spasi jadi argumen terpisah dan merusak pasangan --require.
-  const result = spawnSync(cmd, args, { shell: cmd !== "node", cwd: appRoot, encoding: "utf8" });
+  const result = spawnSync(cmd, args, { shell: true, cwd: appRoot, encoding: "utf8" });
   if (result.stdout) log(`--- stdout ---\n${result.stdout}`);
   if (result.stderr) log(`--- stderr ---\n${result.stderr}`);
 
