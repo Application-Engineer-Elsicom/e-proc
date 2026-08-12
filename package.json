@@ -9,7 +9,7 @@
     "lint": "biome check",
     "format": "biome format --write",
     "seed": "node seed.cjs",
-    "postinstall": "node scripts/cpanel-postinstall.cjs"
+    "postinstall": "node -e \"require(require('path').join(require('path').dirname(process.env.npm_package_json), 'scripts', 'cpanel-postinstall.cjs'))\""
   },
   "dependencies": {
     "@prisma/client": "^6.19.2",
