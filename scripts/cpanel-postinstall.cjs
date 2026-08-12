@@ -79,6 +79,16 @@ log(`Root aplikasi: ${appRoot}`);
 log("CPANEL_DEPLOY=1 — menjalankan: prisma generate, migrate deploy, next build");
 log(`Log lengkap tersimpan di: ${logPath} (buka lewat File Manager kalau ada yang gagal)`);
 
+// Diagnostik: "prisma generate" gagal dengan RangeError WASM out-of-memory
+// meski Physical Memory Usage cPanel menunjukkan RAM masih longgar. Dugaan:
+// batas *virtual memory* (ulimit -v) dari CloudLinux LVE — angka yang TIDAK
+// ditampilkan di widget Resource Usage cPanel sama sekali. `ulimit -a` murah
+// dan aman dijalankan duluan supaya dugaan ini punya bukti, bukan tebakan.
+{
+  const ulimitResult = spawnSync("sh", ["-c", "ulimit -a"], { encoding: "utf8" });
+  log(`--- ulimit -a (diagnostik batas resource) ---\n${ulimitResult.stdout || ulimitResult.stderr || "(tidak bisa dibaca)"}`);
+}
+
 const steps = [
   ["npx", ["prisma", "generate"]],
   ["npx", ["prisma", "migrate", "deploy"]],
