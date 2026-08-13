@@ -13,11 +13,11 @@ const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "";
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   ...(basePath ? { basePath, assetPrefix: basePath } : {}),
-  // Server cPanel tidak punya "sharp" (dan tidak dipasang sengaja — host ini
-  // sudah berkali-kali bermasalah dengan dependency native/WASM), jadi
-  // /_next/image bawaan Next 500 tanpa ini. Gambar di app ini cuma logo dan
-  // ilustrasi statis, tidak butuh resizing server-side.
-  images: { unoptimized: true },
+  // Loader gambar kustom (lihat image-loader.js): mem-bypass optimizer bawaan
+  // Next (server tidak punya "sharp") DAN menambahkan prefix basePath /e-proc
+  // ke src gambar — yang tidak dilakukan mode "unoptimized" sehingga gambar
+  // public sebelumnya 404 di subpath. Satu tempat, berlaku untuk semua gambar.
+  images: { loader: "custom", loaderFile: "./image-loader.js" },
   // Default Next untuk halaman terprerender adalah "s-maxage=31536000" (cache
   // 1 tahun) — di host LiteSpeed/Passenger ini itu bikin halaman lama nyangkut
   // di cache dan versi baru tidak pernah muncul setelah deploy. Paksa semua
