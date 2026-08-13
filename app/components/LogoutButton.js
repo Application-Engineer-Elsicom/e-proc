@@ -23,7 +23,13 @@ export default function LogoutButton({ className, children }) {
 
   const handleLogout = async () => {
     setIsLoading(true)
-    await signOut({ redirect: true, callbackUrl: '/login' })
+    // callbackUrl NextAuth TIDAK ikut di-prefix basePath otomatis (beda dengan
+    // redirect()/<Link>), jadi harus ditambah manual — kalau tidak, logout di
+    // cPanel melempar ke /login (root domain), bukan /e-proc/login.
+    await signOut({
+      redirect: true,
+      callbackUrl: `${process.env.NEXT_PUBLIC_BASE_PATH || ''}/login`,
+    })
   }
 
   return (

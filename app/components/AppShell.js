@@ -175,7 +175,13 @@ export default function AppShell({ moduleName, moduleSubtitle, navItems, user, c
                   <span className="block text-xs text-muted-foreground">{user.roleLabel}</span>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onSelect={() => signOut({ callbackUrl: "/login" })}>
+                <DropdownMenuItem
+                  onSelect={() =>
+                    signOut({
+                      callbackUrl: `${process.env.NEXT_PUBLIC_BASE_PATH || ""}/login`,
+                    })
+                  }
+                >
                   <LogOut />
                   Keluar
                 </DropdownMenuItem>
