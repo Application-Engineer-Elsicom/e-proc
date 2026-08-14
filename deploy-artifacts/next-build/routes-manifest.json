@@ -85,6 +85,14 @@
         "nxtPpoId": "nxtPpoId"
       },
       "namedRegex": "^/procurement/po\\-list/(?<nxtPpoId>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/procurement/po-list/[poId]/pdf",
+      "regex": "^/procurement/po\\-list/([^/]+?)/pdf(?:/)?$",
+      "routeKeys": {
+        "nxtPpoId": "nxtPpoId"
+      },
+      "namedRegex": "^/procurement/po\\-list/(?<nxtPpoId>[^/]+?)/pdf(?:/)?$"
     }
   ],
   "staticRoutes": [
@@ -215,10 +223,46 @@
       "namedRegex": "^/procurement/po\\-plan/create(?:/)?$"
     },
     {
+      "page": "/procurement/warehouse-release",
+      "regex": "^/procurement/warehouse\\-release(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/procurement/warehouse\\-release(?:/)?$"
+    },
+    {
       "page": "/register",
       "regex": "^/register(?:/)?$",
       "routeKeys": {},
       "namedRegex": "^/register(?:/)?$"
+    },
+    {
+      "page": "/warehouse",
+      "regex": "^/warehouse(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/warehouse(?:/)?$"
+    },
+    {
+      "page": "/warehouse/goods-receipt",
+      "regex": "^/warehouse/goods\\-receipt(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/warehouse/goods\\-receipt(?:/)?$"
+    },
+    {
+      "page": "/warehouse/inventory",
+      "regex": "^/warehouse/inventory(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/warehouse/inventory(?:/)?$"
+    },
+    {
+      "page": "/warehouse/shipment",
+      "regex": "^/warehouse/shipment(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/warehouse/shipment(?:/)?$"
+    },
+    {
+      "page": "/warehouse/warehouse-release",
+      "regex": "^/warehouse/warehouse\\-release(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/warehouse/warehouse\\-release(?:/)?$"
     },
     {
       "page": "/wpo",

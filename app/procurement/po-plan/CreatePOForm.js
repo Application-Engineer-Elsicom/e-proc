@@ -4,7 +4,24 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createPurchaseOrder, generatePONumber } from '../../actions/purchase-order'
 
-export default function CreatePOForm() {
+// Cari stok gudang yang cocok dengan item PO — Tahap 3 minimal (info saja).
+// Cocokkan by SKU (=Part No) dulu, lalu fallback ke nama item mengandung
+// deskripsi. Case-insensitive.
+function findStock(inventory, item) {
+  if (!inventory?.length) return null
+  const part = (item.partNumber || "").trim().toLowerCase()
+  const desc = (item.description || "").trim().toLowerCase()
+  if (part) {
+    const bySku = inventory.find((inv) => inv.sku.toLowerCase() === part)
+    if (bySku) return bySku
+  }
+  if (desc.length >= 3) {
+    return inventory.find((inv) => inv.itemName.toLowerCase().includes(desc)) || null
+  }
+  return null
+}
+
+export default function CreatePOForm({ inventory = [] }) {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [poNumber, setPoNumber] = useState('')
@@ -161,8 +178,22 @@ export default function CreatePOForm() {
         </div>
 
         <div className="space-y-4">
-          {items.map((item, idx) => (
+          {items.map((item, idx) => {
+            const stock = findStock(inventory, item)
+            return (
             <div key={idx} className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-gray-50 dark:bg-gray-800/50">
+              {stock && (
+                <div className="mb-3 flex items-center gap-2 rounded-md bg-amber-50 dark:bg-amber-900/20 px-3 py-1.5 text-xs font-medium text-amber-700 dark:text-amber-300">
+                  <span>📦 Stok gudang tersedia:</span>
+                  <span className="font-bold">{stock.stockQty} {stock.unit}</span>
+                  <span className="text-amber-600/70">({stock.itemName})</span>
+                  {stock.stockQty >= parseInt(item.qty || 0) && (
+                    <span className="ml-auto rounded-full bg-amber-200 dark:bg-amber-800 px-2 py-0.5 text-[10px] font-bold">
+                      cukup untuk qty ini — pertimbangkan ambil dari stok
+                    </span>
+                  )}
+                </div>
+              )}
               <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
                 {/* Description */}
                 <div className="md:col-span-2">
@@ -251,7 +282,8 @@ export default function CreatePOForm() {
                 </div>
               </div>
             </div>
-          ))}
+            )
+          })}
         </div>
       </div>
 

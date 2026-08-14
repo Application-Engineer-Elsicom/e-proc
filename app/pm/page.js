@@ -1,11 +1,10 @@
-import { getPendingPMRequests, getPendingFRForPM, getPendingWRForPM } from '../actions/pm'
+import { getPendingPMRequests, getPendingFRForPM } from '../actions/pm'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '../api/auth/[...nextauth]/route'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import PMApprovalButtons from './PMApprovalButtons'
 import FRApprovalButtons from './FRApprovalButtons'
-import WRApprovalButtons from './WRApprovalButtons'
 
 export const dynamic = 'force-dynamic'
 
@@ -29,21 +28,19 @@ export default async function PMDashboard({ searchParams }) {
   // Next 15: searchParams adalah Promise, harus di-await sebelum dibaca.
   const tab = (await searchParams)?.tab || 'mr'
 
-  // Fetch all pending items in parallel
-  const [mrResult, frResult, wrResult] = await Promise.all([
+  // Fetch all pending items in parallel. WR tidak lagi di PM — approval-nya
+  // pindah ke Warehouse + Procurement (dua sisi independen).
+  const [mrResult, frResult] = await Promise.all([
     getPendingPMRequests(),
     getPendingFRForPM(),
-    getPendingWRForPM(),
   ])
 
   const mrRequests = mrResult.success ? mrResult.data : []
   const frReports  = frResult.success  ? frResult.data  : []
-  const wrReleases = wrResult.success  ? wrResult.data  : []
 
   const tabs = [
     { id: 'mr', label: 'Material Request', count: mrRequests.length, color: 'blue' },
     { id: 'fr', label: 'Fault Report',     count: frReports.length,  color: 'red'  },
-    { id: 'wr', label: 'Warehouse Release',count: wrReleases.length, color: 'yellow' },
   ]
 
   return (
@@ -204,59 +201,6 @@ export default async function PMDashboard({ searchParams }) {
         </div>
       )}
 
-      {/* Tab: Warehouse Release */}
-      {tab === 'wr' && (
-        <div>
-          {wrReleases.length === 0 ? (
-            <EmptyState label="Warehouse Release" />
-          ) : (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {wrReleases.map((wr) => (
-                <div key={wr.id} className="bg-white dark:bg-slate-900 rounded-3xl border border-gray-100 dark:border-gray-800 shadow-xl shadow-yellow-500/5 p-8 flex flex-col justify-between">
-                  <div>
-                    <div className="flex justify-between items-start mb-6">
-                      <div>
-                        <span className="text-[10px] bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full font-bold uppercase mb-2 inline-block">WAITING PM</span>
-                        <h3 className="text-2xl font-black text-gray-800 dark:text-yellow-400 leading-none mb-1">{wr.docNo}</h3>
-                        <p className="text-sm font-bold text-yellow-600 mb-1">{wr.projectName || wr.projectId}</p>
-                        <p className="text-xs text-gray-400">Oleh {wr.requester?.name}</p>
-                      </div>
-                    </div>
-                    <div className="space-y-3 mb-6">
-                      <div className="flex justify-between text-xs border-b dark:border-gray-800 pb-2">
-                        <span className="text-gray-400">Delivery Target:</span>
-                        <span className="font-bold text-gray-700 dark:text-gray-300">{wr.deliveryTarget || '—'}</span>
-                      </div>
-                      <div className="flex justify-between text-xs border-b dark:border-gray-800 pb-2">
-                        <span className="text-gray-400">WPO Approver:</span>
-                        <span className="font-bold text-green-600">{approverLabel(wr.wpoApprover)}</span>
-                      </div>
-                      <div className="flex justify-between text-xs border-b dark:border-gray-800 pb-2">
-                        <span className="text-gray-400">SYSTEM Approver:</span>
-                        <span className="font-bold text-violet-600">{approverLabel(wr.systemApprover)}</span>
-                      </div>
-                      <div className="pt-2">
-                        <p className="text-[10px] uppercase font-black text-gray-300 mb-2">Items ({wr.items?.length})</p>
-                        <div className="max-h-28 overflow-y-auto pr-2 space-y-1">
-                          {wr.items?.map((item, i) => (
-                            <div key={i} className="bg-gray-50 dark:bg-gray-800/50 p-2 rounded-lg flex justify-between text-[11px]">
-                              <span className="text-gray-600 dark:text-gray-400 line-clamp-1">{item.description}</span>
-                              <span className="font-black text-gray-800 dark:text-gray-200 whitespace-nowrap ml-4">{item.qty} {item.unit}</span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="pt-4 border-t dark:border-gray-800">
-                    <WRApprovalButtons wrId={wr.id} />
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
     </div>
   )
 }

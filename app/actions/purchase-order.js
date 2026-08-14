@@ -4,6 +4,7 @@ import { prisma } from "../lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../api/auth/[...nextauth]/route";
 import { revalidatePath } from "next/cache";
+import { notify } from "./notification";
 
 // ─── Helper: Calculate PO Health ──────────────────────────────────────────────
 
@@ -123,12 +124,18 @@ export async function createPurchaseOrder(data) {
       include: { items: true, creator: true },
     });
 
-    // If from MR, update MR status to PROCUREMENT_PROCESS
+    // If from MR, update MR status to PROCUREMENT_PROCESS + beri tahu Requestor.
     if (materialRequestId) {
-      await prisma.materialRequest.update({
+      const mr = await prisma.materialRequest.update({
         where: { id: materialRequestId },
         data: { status: "PROCUREMENT_PROCESS" },
+        select: { docControlNo: true, requestedBy: true },
       });
+      await notify(
+        mr.requestedBy,
+        `Pengadaan dimulai untuk MR ${mr.docControlNo} (PO ${po.poNumber}).`,
+        "/engineer/material-request",
+      );
     }
 
     revalidatePath("/procurement");
@@ -219,7 +226,7 @@ export async function getPurchaseOrderById(id) {
       include: {
         items: true,
         invoices: true,
-        creator: { select: { name: true, email: true } },
+        creator: { select: { name: true } }, // User tak punya field email
         materialRequest: { select: { docControlNo: true } },
       },
     });
@@ -245,75 +252,111 @@ export async function getPurchaseOrderById(id) {
 /**
  * Update PO item (price, qty, Mat In date, etc.)
  */
+// Inti update item PO tanpa cek role — dipakai bersama updatePOItem
+// (guard PROCUREMENT) dan markItemReceived (guard PROCUREMENT|WAREHOUSE).
+// Sebelumnya markItemReceived memanggil updatePOItem, sehingga guard
+// PROCUREMENT di dalam updatePOItem MENOLAK role WAREHOUSE — Goods Receipt
+// oleh gudang selalu gagal. Guard dipindah ke pemanggil, logika di sini.
+async function applyPOItemUpdate(itemId, data) {
+  const {
+    description,
+    partNumber,
+    qty,
+    unit,
+    unitPrice,
+    totalPrice,
+    prNo,
+    prDate,
+    prProcessDate,
+    matIn,
+    receivedQty,
+  } = data;
+
+  const updateData = {};
+  if (description !== undefined) updateData.description = description;
+  if (partNumber !== undefined) updateData.partNumber = partNumber;
+  if (qty !== undefined) updateData.qty = parseInt(qty);
+  if (unit !== undefined) updateData.unit = unit;
+  if (unitPrice !== undefined) updateData.unitPrice = parseFloat(unitPrice);
+  if (totalPrice !== undefined) updateData.totalPrice = parseFloat(totalPrice);
+  if (prNo !== undefined) updateData.prNo = prNo;
+  if (prDate !== undefined) updateData.prDate = prDate ? new Date(prDate) : null;
+  if (prProcessDate !== undefined) updateData.prProcessDate = prProcessDate ? new Date(prProcessDate) : null;
+  if (matIn !== undefined) updateData.matIn = matIn ? new Date(matIn) : null;
+  if (receivedQty !== undefined) updateData.receivedQty = parseInt(receivedQty);
+
+  const updatedItem = await prisma.pOItem.update({
+    where: { id: itemId },
+    data: updateData,
+    include: { po: { include: { items: true } } },
+  });
+
+  // Recalculate PO health
+  const po = updatedItem.po;
+  const health = calculatePOHealth(po);
+
+  // Update PO status based on received items
+  const allItemsReceived = po.items.every(item => item.matIn);
+  const someItemsReceived = po.items.some(item => item.matIn);
+
+  let newStatus = po.status;
+  if (allItemsReceived && po.status !== "FULL_RECEIVED") {
+    newStatus = "FULL_RECEIVED";
+  } else if (someItemsReceived && po.status === "RELEASED") {
+    newStatus = "PARTIAL_RECEIVED";
+  }
+
+  if (newStatus !== po.status || health !== po.poHealth) {
+    await prisma.purchaseOrder.update({
+      where: { id: po.id },
+      data: {
+        poHealth: health,
+        status: newStatus,
+      },
+    });
+  }
+
+  // Saat PO baru saja jadi (sebagian/penuh) diterima dan berasal dari MR:
+  // wire status MR → AVAILABLE_IN_WAREHOUSE + beri tahu Requestor & pembuat PO.
+  // Digating pada perubahan status (bukan tiap edit) agar notifikasi tidak dobel.
+  const becameReceived =
+    newStatus !== po.status &&
+    (newStatus === "PARTIAL_RECEIVED" || newStatus === "FULL_RECEIVED");
+  if (becameReceived && po.materialRequestId) {
+    const mr = await prisma.materialRequest.update({
+      where: { id: po.materialRequestId },
+      data: { status: "AVAILABLE_IN_WAREHOUSE" },
+      select: { docControlNo: true, requestedBy: true },
+    });
+    const label = newStatus === "FULL_RECEIVED" ? "seluruhnya" : "sebagian";
+    await notify(
+      mr.requestedBy,
+      `Barang untuk MR ${mr.docControlNo} sudah ${label} tersedia di gudang.`,
+      "/engineer/material-request",
+    );
+    await notify(
+      po.createdBy,
+      `Goods Receipt ${label} untuk PO ${po.poNumber} (MR ${mr.docControlNo}).`,
+      "/procurement/po-list",
+    );
+    revalidatePath("/engineer/material-request");
+  }
+
+  revalidatePath("/procurement/po-plan");
+  revalidatePath("/procurement/po-list");
+  revalidatePath("/warehouse/goods-receipt");
+  revalidatePath("/warehouse");
+
+  return { success: true, data: updatedItem };
+}
+
 export async function updatePOItem(itemId, data) {
   try {
     const session = await getServerSession(authOptions);
     if (!session || session.user.role !== "PROCUREMENT") {
       throw new Error("Unauthorized: Only Procurement can update items.");
     }
-
-    const {
-      description,
-      partNumber,
-      qty,
-      unit,
-      unitPrice,
-      totalPrice,
-      prNo,
-      prDate,
-      prProcessDate,
-      matIn,
-      receivedQty,
-    } = data;
-
-    const updateData = {};
-    if (description !== undefined) updateData.description = description;
-    if (partNumber !== undefined) updateData.partNumber = partNumber;
-    if (qty !== undefined) updateData.qty = parseInt(qty);
-    if (unit !== undefined) updateData.unit = unit;
-    if (unitPrice !== undefined) updateData.unitPrice = parseFloat(unitPrice);
-    if (totalPrice !== undefined) updateData.totalPrice = parseFloat(totalPrice);
-    if (prNo !== undefined) updateData.prNo = prNo;
-    if (prDate !== undefined) updateData.prDate = prDate ? new Date(prDate) : null;
-    if (prProcessDate !== undefined) updateData.prProcessDate = prProcessDate ? new Date(prProcessDate) : null;
-    if (matIn !== undefined) updateData.matIn = matIn ? new Date(matIn) : null;
-    if (receivedQty !== undefined) updateData.receivedQty = parseInt(receivedQty);
-
-    const updatedItem = await prisma.poItem.update({
-      where: { id: itemId },
-      data: updateData,
-      include: { po: { include: { items: true } } },
-    });
-
-    // Recalculate PO health
-    const po = updatedItem.po;
-    const health = calculatePOHealth(po);
-
-    // Update PO status based on received items
-    const allItemsReceived = po.items.every(item => item.matIn);
-    const someItemsReceived = po.items.some(item => item.matIn);
-
-    let newStatus = po.status;
-    if (allItemsReceived && po.status !== "FULL_RECEIVED") {
-      newStatus = "FULL_RECEIVED";
-    } else if (someItemsReceived && po.status === "RELEASED") {
-      newStatus = "PARTIAL_RECEIVED";
-    }
-
-    if (newStatus !== po.status || health !== po.poHealth) {
-      await prisma.purchaseOrder.update({
-        where: { id: po.id },
-        data: {
-          poHealth: health,
-          status: newStatus,
-        },
-      });
-    }
-
-    revalidatePath("/procurement/po-plan");
-    revalidatePath("/procurement/po-list");
-
-    return { success: true, data: updatedItem };
+    return await applyPOItemUpdate(itemId, data);
   } catch (error) {
     console.error("Error updating PO item:", error);
     return { success: false, error: error.message };
@@ -323,7 +366,8 @@ export async function updatePOItem(itemId, data) {
 // ─── Mark Item Received ───────────────────────────────────────────────────────
 
 /**
- * Mark item as received with matIn date
+ * Mark item as received with matIn date. Diizinkan untuk Procurement DAN
+ * Warehouse (Goods Receipt di modul /warehouse).
  */
 export async function markItemReceived(itemId, matInDate) {
   try {
@@ -331,8 +375,7 @@ export async function markItemReceived(itemId, matInDate) {
     if (!session || (session.user.role !== "PROCUREMENT" && session.user.role !== "WAREHOUSE")) {
       throw new Error("Unauthorized: Only Procurement/Warehouse can mark items received.");
     }
-
-    return updatePOItem(itemId, { matIn: matInDate });
+    return await applyPOItemUpdate(itemId, { matIn: matInDate });
   } catch (error) {
     console.error("Error marking item received:", error);
     return { success: false, error: error.message };
@@ -353,7 +396,7 @@ export async function addInvoice(poId, invoiceData) {
 
     const { invoiceNo, invoiceDate, amount, notes } = invoiceData;
 
-    const invoice = await prisma.poInvoice.create({
+    const invoice = await prisma.pOInvoice.create({
       data: {
         poId,
         invoiceNo,
@@ -402,11 +445,11 @@ export async function updateInvoice(invoiceId, invoiceData) {
     if (paidAt !== undefined) updateData.paidAt = paidAt ? new Date(paidAt) : null;
     if (notes !== undefined) updateData.notes = notes;
 
-    const invoice = await prisma.poInvoice.findUnique({
+    const invoice = await prisma.pOInvoice.findUnique({
       where: { id: invoiceId },
     });
 
-    const updatedInvoice = await prisma.poInvoice.update({
+    const updatedInvoice = await prisma.pOInvoice.update({
       where: { id: invoiceId },
       data: updateData,
     });

@@ -2,8 +2,7 @@ import Link from 'next/link'
 import { getWarehouseReleases } from '../../actions/warehouse-release'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '../../api/auth/[...nextauth]/route'
-import WRApprovalButtons from './WRApprovalButtons'
-import { getStatusLabel } from '@/lib/permissions'
+import { getWrStatusLabel } from '@/lib/permissions'
 
 export const dynamic = 'force-dynamic'
 
@@ -11,39 +10,34 @@ export const metadata = {
   title: 'Warehouse Release',
 }
 
+// Approval WR kini di modul Warehouse & Procurement (dua sisi independen).
+// Engineer (Requestor) hanya membuat dan memantau WR miliknya sendiri.
 function StatusBadge({ status }) {
   const styles = {
-    WAITING_WPO:    'bg-orange-100 text-orange-700',
-    WAITING_SYSTEM: 'bg-violet-100 text-violet-700',
-    WAITING_PM:     'bg-blue-100 text-blue-700',
-    APPROVED:       'bg-green-100 text-green-700',
-    REJECTED:       'bg-red-100 text-red-700',
+    PENDING_APPROVAL:     'bg-orange-100 text-orange-700',
+    WAREHOUSE_APPROVED:   'bg-sky-100 text-sky-700',
+    PROCUREMENT_APPROVED: 'bg-violet-100 text-violet-700',
+    APPROVED:             'bg-green-100 text-green-700',
+    SHIPPED:              'bg-emerald-100 text-emerald-700',
+    REJECTED:             'bg-red-100 text-red-700',
   }
   return (
     <span className={`px-2 py-1 rounded text-[10px] font-bold ${styles[status] || 'bg-gray-100 text-gray-600'}`}>
-      {getStatusLabel(status)}
+      {getWrStatusLabel(status)}
     </span>
   )
 }
 
 export default async function WarehouseReleasePage() {
   const session = await getServerSession(authOptions)
-  const { engineerRole, id: userId } = session.user
+  const { id: userId } = session.user
 
   const result = await getWarehouseReleases()
-  const allReleases = result.success ? result.data : []
+  const mySubmissions = (result.success ? result.data : []).filter(r => r.requesterId === userId)
 
-  // Split: my submissions vs pending my approval
-  const pendingApprovalStatus = engineerRole === 'WPO' ? 'WAITING_WPO'
-                               : engineerRole === 'SYSTEM' ? 'WAITING_SYSTEM'
-                               : null
-
-  const pendingApproval = pendingApprovalStatus
-    ? allReleases.filter(r => r.status === pendingApprovalStatus && r.requesterId !== userId)
-    : []
-
-  const mySubmissions = allReleases.filter(r => r.requesterId === userId)
-  const canApprove = engineerRole === 'WPO' || engineerRole === 'SYSTEM'
+  const pendingCount = mySubmissions.filter(r =>
+    ['PENDING_APPROVAL', 'WAREHOUSE_APPROVED', 'PROCUREMENT_APPROVED'].includes(r.status)
+  ).length
 
   return (
     <div className="space-y-8">
@@ -52,9 +46,7 @@ export default async function WarehouseReleasePage() {
         <div>
           <h1 className="text-4xl font-black text-[#FFC107] dark:text-[#FFC107] italic uppercase leading-none">Warehouse Release</h1>
           <p className="text-gray-500 font-bold text-sm tracking-tight uppercase">
-            {engineerRole === 'STAFF'  && 'Monitoring pergerakan material dari gudang'}
-            {engineerRole === 'WPO'    && 'Approval Level 1 — Engineer WPO'}
-            {engineerRole === 'SYSTEM' && 'Approval Level 2 — Engineer SYSTEM'}
+            Monitoring pergerakan material dari gudang
           </p>
         </div>
         <Link
@@ -68,10 +60,10 @@ export default async function WarehouseReleasePage() {
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[
-          { label: 'Total',          count: mySubmissions.length,                                               color: 'text-gray-800 dark:text-[#FFC107]' },
-          { label: 'Pending WPO',    count: mySubmissions.filter(r => r.status === 'WAITING_WPO').length,      color: 'text-orange-500' },
-          { label: 'Pending System', count: mySubmissions.filter(r => r.status === 'WAITING_SYSTEM').length,   color: 'text-violet-500' },
-          { label: 'Disetujui',      count: mySubmissions.filter(r => r.status === 'APPROVED').length,         color: 'text-green-500' },
+          { label: 'Total',             count: mySubmissions.length,                                        color: 'text-gray-800 dark:text-[#FFC107]' },
+          { label: 'Menunggu Approval', count: pendingCount,                                                color: 'text-orange-500' },
+          { label: 'Disetujui',         count: mySubmissions.filter(r => r.status === 'APPROVED').length,   color: 'text-green-500' },
+          { label: 'Ditolak',           count: mySubmissions.filter(r => r.status === 'REJECTED').length,   color: 'text-red-500' },
         ].map((stat, i) => (
           <div key={i} className="bg-yellow-50 dark:bg-yellow-900/10 p-5 rounded-2xl border border-yellow-100 dark:border-yellow-800 flex justify-between items-center">
             <span className="text-[10px] font-black text-yellow-600 uppercase tracking-widest">{stat.label}</span>
@@ -79,59 +71,6 @@ export default async function WarehouseReleasePage() {
           </div>
         ))}
       </div>
-
-      {/* Pending Approval Section (WPO/SYSTEM only) */}
-      {canApprove && (
-        <div>
-          <h2 className="text-lg font-black text-gray-700 dark:text-gray-300 uppercase tracking-tight mb-4 flex items-center gap-2">
-            <span className="w-3 h-3 bg-yellow-400 rounded-full animate-pulse inline-block"></span>
-            Menunggu Approval Saya
-            {pendingApproval.length > 0 && (
-              <span className="ml-2 px-2 py-0.5 bg-yellow-100 text-yellow-700 rounded-full text-xs font-black">
-                {pendingApproval.length}
-              </span>
-            )}
-          </h2>
-
-          {pendingApproval.length === 0 ? (
-            <div className="bg-gray-50 dark:bg-slate-800 rounded-2xl p-8 text-center border border-dashed border-gray-200 dark:border-gray-700">
-              <p className="text-gray-400 font-bold">Tidak ada Warehouse Release yang menunggu approval Anda.</p>
-            </div>
-          ) : (
-            <div className="overflow-x-auto bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm">
-              <table className="w-full text-left border-collapse text-xs">
-                <thead>
-                  <tr className="bg-yellow-50 dark:bg-yellow-900/10 border-b border-yellow-100 dark:border-yellow-900/20 text-gray-500 font-black uppercase tracking-widest">
-                    <th className="p-4">WR Number</th>
-                    <th className="p-4">Proyek</th>
-                    <th className="p-4">Dibuat Oleh</th>
-                    <th className="p-4">Item</th>
-                    <th className="p-4">Tanggal</th>
-                    <th className="p-4 text-center">Aksi</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {pendingApproval.map((wr) => (
-                    <tr key={wr.id} className="border-b dark:border-gray-800 hover:bg-yellow-50/30 transition-colors">
-                      <td className="p-4 font-black text-gray-800 dark:text-[#FFC107]">{wr.docNo}</td>
-                      <td className="p-4">
-                        <p className="font-bold text-gray-700 dark:text-gray-300">{wr.projectName}</p>
-                        <p className="text-[10px] text-gray-400">{wr.projectId}</p>
-                      </td>
-                      <td className="p-4 font-medium text-gray-600 dark:text-gray-400">{wr.requester?.name}</td>
-                      <td className="p-4 font-bold text-gray-700">{wr.items?.length} item</td>
-                      <td className="p-4 text-gray-400">{new Date(wr.createdAt).toLocaleDateString('id-ID')}</td>
-                      <td className="p-4 w-48">
-                        <WRApprovalButtons wrId={wr.id} engineerRole={engineerRole} />
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
-      )}
 
       {/* My Submissions */}
       <div>

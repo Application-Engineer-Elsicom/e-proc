@@ -19,6 +19,11 @@ export type PrismaPromise<T> = $Public.PrismaPromise<T>
  */
 export type User = $Result.DefaultSelection<Prisma.$UserPayload>
 /**
+ * Model Notification
+ * 
+ */
+export type Notification = $Result.DefaultSelection<Prisma.$NotificationPayload>
+/**
  * Model MaterialRequest
  * 
  */
@@ -183,6 +188,18 @@ export const FaultStatus: {
 export type FaultStatus = (typeof FaultStatus)[keyof typeof FaultStatus]
 
 
+export const WrStatus: {
+  PENDING_APPROVAL: 'PENDING_APPROVAL',
+  WAREHOUSE_APPROVED: 'WAREHOUSE_APPROVED',
+  PROCUREMENT_APPROVED: 'PROCUREMENT_APPROVED',
+  APPROVED: 'APPROVED',
+  REJECTED: 'REJECTED',
+  SHIPPED: 'SHIPPED'
+};
+
+export type WrStatus = (typeof WrStatus)[keyof typeof WrStatus]
+
+
 export const Priority: {
   LOW: 'LOW',
   MEDIUM: 'MEDIUM',
@@ -247,6 +264,10 @@ export const Status: typeof $Enums.Status
 export type FaultStatus = $Enums.FaultStatus
 
 export const FaultStatus: typeof $Enums.FaultStatus
+
+export type WrStatus = $Enums.WrStatus
+
+export const WrStatus: typeof $Enums.WrStatus
 
 export type Priority = $Enums.Priority
 
@@ -391,6 +412,16 @@ export class PrismaClient<
     * ```
     */
   get user(): Prisma.UserDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.notification`: Exposes CRUD operations for the **Notification** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Notifications
+    * const notifications = await prisma.notification.findMany()
+    * ```
+    */
+  get notification(): Prisma.NotificationDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.materialRequest`: Exposes CRUD operations for the **MaterialRequest** model.
@@ -1003,6 +1034,7 @@ export namespace Prisma {
 
   export const ModelName: {
     User: 'User',
+    Notification: 'Notification',
     MaterialRequest: 'MaterialRequest',
     MaterialRequestItem: 'MaterialRequestItem',
     FaultReport: 'FaultReport',
@@ -1038,7 +1070,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "materialRequest" | "materialRequestItem" | "faultReport" | "warehouseRelease" | "warehouseReleaseItem" | "inventory" | "suratJalan" | "purchaseOrder" | "pOItem" | "pOInvoice" | "borrowedItem" | "projectBudget" | "supplierPrice" | "billOfMaterial" | "bomItem" | "bomSubItem" | "bomHistory"
+      modelProps: "user" | "notification" | "materialRequest" | "materialRequestItem" | "faultReport" | "warehouseRelease" | "warehouseReleaseItem" | "inventory" | "suratJalan" | "purchaseOrder" | "pOItem" | "pOInvoice" | "borrowedItem" | "projectBudget" | "supplierPrice" | "billOfMaterial" | "bomItem" | "bomSubItem" | "bomHistory"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1105,6 +1137,72 @@ export namespace Prisma {
           count: {
             args: Prisma.UserCountArgs<ExtArgs>
             result: $Utils.Optional<UserCountAggregateOutputType> | number
+          }
+        }
+      }
+      Notification: {
+        payload: Prisma.$NotificationPayload<ExtArgs>
+        fields: Prisma.NotificationFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.NotificationFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$NotificationPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.NotificationFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$NotificationPayload>
+          }
+          findFirst: {
+            args: Prisma.NotificationFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$NotificationPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.NotificationFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$NotificationPayload>
+          }
+          findMany: {
+            args: Prisma.NotificationFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$NotificationPayload>[]
+          }
+          create: {
+            args: Prisma.NotificationCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$NotificationPayload>
+          }
+          createMany: {
+            args: Prisma.NotificationCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          delete: {
+            args: Prisma.NotificationDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$NotificationPayload>
+          }
+          update: {
+            args: Prisma.NotificationUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$NotificationPayload>
+          }
+          deleteMany: {
+            args: Prisma.NotificationDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.NotificationUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.NotificationUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$NotificationPayload>
+          }
+          aggregate: {
+            args: Prisma.NotificationAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateNotification>
+          }
+          groupBy: {
+            args: Prisma.NotificationGroupByArgs<ExtArgs>
+            result: $Utils.Optional<NotificationGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.NotificationCountArgs<ExtArgs>
+            result: $Utils.Optional<NotificationCountAggregateOutputType> | number
           }
         }
       }
@@ -2327,6 +2425,7 @@ export namespace Prisma {
   }
   export type GlobalOmitConfig = {
     user?: UserOmit
+    notification?: NotificationOmit
     materialRequest?: MaterialRequestOmit
     materialRequestItem?: MaterialRequestItemOmit
     faultReport?: FaultReportOmit
@@ -2433,9 +2532,8 @@ export namespace Prisma {
     faultReportsSysApproved: number
     faultReportsPmApproved: number
     warehouseReleases: number
-    wrWpoApproved: number
-    wrSysApproved: number
-    wrPmApproved: number
+    wrWarehouseApproved: number
+    wrProcurementApproved: number
     bomsCreated: number
     bomsSubmitted: number
     bomsWpoApproved: number
@@ -2448,6 +2546,7 @@ export namespace Prisma {
     borrowedProcessed: number
     projectBudgets: number
     supplierPrices: number
+    notifications: number
   }
 
   export type UserCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -2460,9 +2559,8 @@ export namespace Prisma {
     faultReportsSysApproved?: boolean | UserCountOutputTypeCountFaultReportsSysApprovedArgs
     faultReportsPmApproved?: boolean | UserCountOutputTypeCountFaultReportsPmApprovedArgs
     warehouseReleases?: boolean | UserCountOutputTypeCountWarehouseReleasesArgs
-    wrWpoApproved?: boolean | UserCountOutputTypeCountWrWpoApprovedArgs
-    wrSysApproved?: boolean | UserCountOutputTypeCountWrSysApprovedArgs
-    wrPmApproved?: boolean | UserCountOutputTypeCountWrPmApprovedArgs
+    wrWarehouseApproved?: boolean | UserCountOutputTypeCountWrWarehouseApprovedArgs
+    wrProcurementApproved?: boolean | UserCountOutputTypeCountWrProcurementApprovedArgs
     bomsCreated?: boolean | UserCountOutputTypeCountBomsCreatedArgs
     bomsSubmitted?: boolean | UserCountOutputTypeCountBomsSubmittedArgs
     bomsWpoApproved?: boolean | UserCountOutputTypeCountBomsWpoApprovedArgs
@@ -2475,6 +2573,7 @@ export namespace Prisma {
     borrowedProcessed?: boolean | UserCountOutputTypeCountBorrowedProcessedArgs
     projectBudgets?: boolean | UserCountOutputTypeCountProjectBudgetsArgs
     supplierPrices?: boolean | UserCountOutputTypeCountSupplierPricesArgs
+    notifications?: boolean | UserCountOutputTypeCountNotificationsArgs
   }
 
   // Custom InputTypes
@@ -2554,21 +2653,14 @@ export namespace Prisma {
   /**
    * UserCountOutputType without action
    */
-  export type UserCountOutputTypeCountWrWpoApprovedArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type UserCountOutputTypeCountWrWarehouseApprovedArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: WarehouseReleaseWhereInput
   }
 
   /**
    * UserCountOutputType without action
    */
-  export type UserCountOutputTypeCountWrSysApprovedArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: WarehouseReleaseWhereInput
-  }
-
-  /**
-   * UserCountOutputType without action
-   */
-  export type UserCountOutputTypeCountWrPmApprovedArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type UserCountOutputTypeCountWrProcurementApprovedArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: WarehouseReleaseWhereInput
   }
 
@@ -2654,6 +2746,13 @@ export namespace Prisma {
    */
   export type UserCountOutputTypeCountSupplierPricesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: SupplierPriceWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountNotificationsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: NotificationWhereInput
   }
 
 
@@ -3058,9 +3157,8 @@ export namespace Prisma {
     faultReportsSysApproved?: boolean | User$faultReportsSysApprovedArgs<ExtArgs>
     faultReportsPmApproved?: boolean | User$faultReportsPmApprovedArgs<ExtArgs>
     warehouseReleases?: boolean | User$warehouseReleasesArgs<ExtArgs>
-    wrWpoApproved?: boolean | User$wrWpoApprovedArgs<ExtArgs>
-    wrSysApproved?: boolean | User$wrSysApprovedArgs<ExtArgs>
-    wrPmApproved?: boolean | User$wrPmApprovedArgs<ExtArgs>
+    wrWarehouseApproved?: boolean | User$wrWarehouseApprovedArgs<ExtArgs>
+    wrProcurementApproved?: boolean | User$wrProcurementApprovedArgs<ExtArgs>
     bomsCreated?: boolean | User$bomsCreatedArgs<ExtArgs>
     bomsSubmitted?: boolean | User$bomsSubmittedArgs<ExtArgs>
     bomsWpoApproved?: boolean | User$bomsWpoApprovedArgs<ExtArgs>
@@ -3073,6 +3171,7 @@ export namespace Prisma {
     borrowedProcessed?: boolean | User$borrowedProcessedArgs<ExtArgs>
     projectBudgets?: boolean | User$projectBudgetsArgs<ExtArgs>
     supplierPrices?: boolean | User$supplierPricesArgs<ExtArgs>
+    notifications?: boolean | User$notificationsArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
@@ -3100,9 +3199,8 @@ export namespace Prisma {
     faultReportsSysApproved?: boolean | User$faultReportsSysApprovedArgs<ExtArgs>
     faultReportsPmApproved?: boolean | User$faultReportsPmApprovedArgs<ExtArgs>
     warehouseReleases?: boolean | User$warehouseReleasesArgs<ExtArgs>
-    wrWpoApproved?: boolean | User$wrWpoApprovedArgs<ExtArgs>
-    wrSysApproved?: boolean | User$wrSysApprovedArgs<ExtArgs>
-    wrPmApproved?: boolean | User$wrPmApprovedArgs<ExtArgs>
+    wrWarehouseApproved?: boolean | User$wrWarehouseApprovedArgs<ExtArgs>
+    wrProcurementApproved?: boolean | User$wrProcurementApprovedArgs<ExtArgs>
     bomsCreated?: boolean | User$bomsCreatedArgs<ExtArgs>
     bomsSubmitted?: boolean | User$bomsSubmittedArgs<ExtArgs>
     bomsWpoApproved?: boolean | User$bomsWpoApprovedArgs<ExtArgs>
@@ -3115,6 +3213,7 @@ export namespace Prisma {
     borrowedProcessed?: boolean | User$borrowedProcessedArgs<ExtArgs>
     projectBudgets?: boolean | User$projectBudgetsArgs<ExtArgs>
     supplierPrices?: boolean | User$supplierPricesArgs<ExtArgs>
+    notifications?: boolean | User$notificationsArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }
 
@@ -3130,9 +3229,8 @@ export namespace Prisma {
       faultReportsSysApproved: Prisma.$FaultReportPayload<ExtArgs>[]
       faultReportsPmApproved: Prisma.$FaultReportPayload<ExtArgs>[]
       warehouseReleases: Prisma.$WarehouseReleasePayload<ExtArgs>[]
-      wrWpoApproved: Prisma.$WarehouseReleasePayload<ExtArgs>[]
-      wrSysApproved: Prisma.$WarehouseReleasePayload<ExtArgs>[]
-      wrPmApproved: Prisma.$WarehouseReleasePayload<ExtArgs>[]
+      wrWarehouseApproved: Prisma.$WarehouseReleasePayload<ExtArgs>[]
+      wrProcurementApproved: Prisma.$WarehouseReleasePayload<ExtArgs>[]
       bomsCreated: Prisma.$BillOfMaterialPayload<ExtArgs>[]
       bomsSubmitted: Prisma.$BillOfMaterialPayload<ExtArgs>[]
       bomsWpoApproved: Prisma.$BillOfMaterialPayload<ExtArgs>[]
@@ -3145,6 +3243,7 @@ export namespace Prisma {
       borrowedProcessed: Prisma.$BorrowedItemPayload<ExtArgs>[]
       projectBudgets: Prisma.$ProjectBudgetPayload<ExtArgs>[]
       supplierPrices: Prisma.$SupplierPricePayload<ExtArgs>[]
+      notifications: Prisma.$NotificationPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -3504,9 +3603,8 @@ export namespace Prisma {
     faultReportsSysApproved<T extends User$faultReportsSysApprovedArgs<ExtArgs> = {}>(args?: Subset<T, User$faultReportsSysApprovedArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FaultReportPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     faultReportsPmApproved<T extends User$faultReportsPmApprovedArgs<ExtArgs> = {}>(args?: Subset<T, User$faultReportsPmApprovedArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FaultReportPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     warehouseReleases<T extends User$warehouseReleasesArgs<ExtArgs> = {}>(args?: Subset<T, User$warehouseReleasesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$WarehouseReleasePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-    wrWpoApproved<T extends User$wrWpoApprovedArgs<ExtArgs> = {}>(args?: Subset<T, User$wrWpoApprovedArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$WarehouseReleasePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-    wrSysApproved<T extends User$wrSysApprovedArgs<ExtArgs> = {}>(args?: Subset<T, User$wrSysApprovedArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$WarehouseReleasePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-    wrPmApproved<T extends User$wrPmApprovedArgs<ExtArgs> = {}>(args?: Subset<T, User$wrPmApprovedArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$WarehouseReleasePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    wrWarehouseApproved<T extends User$wrWarehouseApprovedArgs<ExtArgs> = {}>(args?: Subset<T, User$wrWarehouseApprovedArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$WarehouseReleasePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    wrProcurementApproved<T extends User$wrProcurementApprovedArgs<ExtArgs> = {}>(args?: Subset<T, User$wrProcurementApprovedArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$WarehouseReleasePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     bomsCreated<T extends User$bomsCreatedArgs<ExtArgs> = {}>(args?: Subset<T, User$bomsCreatedArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BillOfMaterialPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     bomsSubmitted<T extends User$bomsSubmittedArgs<ExtArgs> = {}>(args?: Subset<T, User$bomsSubmittedArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BillOfMaterialPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     bomsWpoApproved<T extends User$bomsWpoApprovedArgs<ExtArgs> = {}>(args?: Subset<T, User$bomsWpoApprovedArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BillOfMaterialPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -3519,6 +3617,7 @@ export namespace Prisma {
     borrowedProcessed<T extends User$borrowedProcessedArgs<ExtArgs> = {}>(args?: Subset<T, User$borrowedProcessedArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BorrowedItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     projectBudgets<T extends User$projectBudgetsArgs<ExtArgs> = {}>(args?: Subset<T, User$projectBudgetsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ProjectBudgetPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     supplierPrices<T extends User$supplierPricesArgs<ExtArgs> = {}>(args?: Subset<T, User$supplierPricesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SupplierPricePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    notifications<T extends User$notificationsArgs<ExtArgs> = {}>(args?: Subset<T, User$notificationsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$NotificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -4115,9 +4214,9 @@ export namespace Prisma {
   }
 
   /**
-   * User.wrWpoApproved
+   * User.wrWarehouseApproved
    */
-  export type User$wrWpoApprovedArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type User$wrWarehouseApprovedArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the WarehouseRelease
      */
@@ -4139,33 +4238,9 @@ export namespace Prisma {
   }
 
   /**
-   * User.wrSysApproved
+   * User.wrProcurementApproved
    */
-  export type User$wrSysApprovedArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the WarehouseRelease
-     */
-    select?: WarehouseReleaseSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the WarehouseRelease
-     */
-    omit?: WarehouseReleaseOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: WarehouseReleaseInclude<ExtArgs> | null
-    where?: WarehouseReleaseWhereInput
-    orderBy?: WarehouseReleaseOrderByWithRelationInput | WarehouseReleaseOrderByWithRelationInput[]
-    cursor?: WarehouseReleaseWhereUniqueInput
-    take?: number
-    skip?: number
-    distinct?: WarehouseReleaseScalarFieldEnum | WarehouseReleaseScalarFieldEnum[]
-  }
-
-  /**
-   * User.wrPmApproved
-   */
-  export type User$wrPmApprovedArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type User$wrProcurementApprovedArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the WarehouseRelease
      */
@@ -4475,6 +4550,30 @@ export namespace Prisma {
   }
 
   /**
+   * User.notifications
+   */
+  export type User$notificationsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Notification
+     */
+    select?: NotificationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Notification
+     */
+    omit?: NotificationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: NotificationInclude<ExtArgs> | null
+    where?: NotificationWhereInput
+    orderBy?: NotificationOrderByWithRelationInput | NotificationOrderByWithRelationInput[]
+    cursor?: NotificationWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: NotificationScalarFieldEnum | NotificationScalarFieldEnum[]
+  }
+
+  /**
    * User without action
    */
   export type UserDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -4490,6 +4589,946 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: UserInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model Notification
+   */
+
+  export type AggregateNotification = {
+    _count: NotificationCountAggregateOutputType | null
+    _min: NotificationMinAggregateOutputType | null
+    _max: NotificationMaxAggregateOutputType | null
+  }
+
+  export type NotificationMinAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    message: string | null
+    link: string | null
+    isRead: boolean | null
+    createdAt: Date | null
+  }
+
+  export type NotificationMaxAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    message: string | null
+    link: string | null
+    isRead: boolean | null
+    createdAt: Date | null
+  }
+
+  export type NotificationCountAggregateOutputType = {
+    id: number
+    userId: number
+    message: number
+    link: number
+    isRead: number
+    createdAt: number
+    _all: number
+  }
+
+
+  export type NotificationMinAggregateInputType = {
+    id?: true
+    userId?: true
+    message?: true
+    link?: true
+    isRead?: true
+    createdAt?: true
+  }
+
+  export type NotificationMaxAggregateInputType = {
+    id?: true
+    userId?: true
+    message?: true
+    link?: true
+    isRead?: true
+    createdAt?: true
+  }
+
+  export type NotificationCountAggregateInputType = {
+    id?: true
+    userId?: true
+    message?: true
+    link?: true
+    isRead?: true
+    createdAt?: true
+    _all?: true
+  }
+
+  export type NotificationAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Notification to aggregate.
+     */
+    where?: NotificationWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Notifications to fetch.
+     */
+    orderBy?: NotificationOrderByWithRelationInput | NotificationOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: NotificationWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Notifications from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Notifications.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned Notifications
+    **/
+    _count?: true | NotificationCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: NotificationMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: NotificationMaxAggregateInputType
+  }
+
+  export type GetNotificationAggregateType<T extends NotificationAggregateArgs> = {
+        [P in keyof T & keyof AggregateNotification]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateNotification[P]>
+      : GetScalarType<T[P], AggregateNotification[P]>
+  }
+
+
+
+
+  export type NotificationGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: NotificationWhereInput
+    orderBy?: NotificationOrderByWithAggregationInput | NotificationOrderByWithAggregationInput[]
+    by: NotificationScalarFieldEnum[] | NotificationScalarFieldEnum
+    having?: NotificationScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: NotificationCountAggregateInputType | true
+    _min?: NotificationMinAggregateInputType
+    _max?: NotificationMaxAggregateInputType
+  }
+
+  export type NotificationGroupByOutputType = {
+    id: string
+    userId: string
+    message: string
+    link: string | null
+    isRead: boolean
+    createdAt: Date
+    _count: NotificationCountAggregateOutputType | null
+    _min: NotificationMinAggregateOutputType | null
+    _max: NotificationMaxAggregateOutputType | null
+  }
+
+  type GetNotificationGroupByPayload<T extends NotificationGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<NotificationGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof NotificationGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], NotificationGroupByOutputType[P]>
+            : GetScalarType<T[P], NotificationGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type NotificationSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    message?: boolean
+    link?: boolean
+    isRead?: boolean
+    createdAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["notification"]>
+
+
+
+  export type NotificationSelectScalar = {
+    id?: boolean
+    userId?: boolean
+    message?: boolean
+    link?: boolean
+    isRead?: boolean
+    createdAt?: boolean
+  }
+
+  export type NotificationOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "message" | "link" | "isRead" | "createdAt", ExtArgs["result"]["notification"]>
+  export type NotificationInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+
+  export type $NotificationPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "Notification"
+    objects: {
+      user: Prisma.$UserPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      userId: string
+      message: string
+      link: string | null
+      isRead: boolean
+      createdAt: Date
+    }, ExtArgs["result"]["notification"]>
+    composites: {}
+  }
+
+  type NotificationGetPayload<S extends boolean | null | undefined | NotificationDefaultArgs> = $Result.GetResult<Prisma.$NotificationPayload, S>
+
+  type NotificationCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<NotificationFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: NotificationCountAggregateInputType | true
+    }
+
+  export interface NotificationDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['Notification'], meta: { name: 'Notification' } }
+    /**
+     * Find zero or one Notification that matches the filter.
+     * @param {NotificationFindUniqueArgs} args - Arguments to find a Notification
+     * @example
+     * // Get one Notification
+     * const notification = await prisma.notification.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends NotificationFindUniqueArgs>(args: SelectSubset<T, NotificationFindUniqueArgs<ExtArgs>>): Prisma__NotificationClient<$Result.GetResult<Prisma.$NotificationPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one Notification that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {NotificationFindUniqueOrThrowArgs} args - Arguments to find a Notification
+     * @example
+     * // Get one Notification
+     * const notification = await prisma.notification.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends NotificationFindUniqueOrThrowArgs>(args: SelectSubset<T, NotificationFindUniqueOrThrowArgs<ExtArgs>>): Prisma__NotificationClient<$Result.GetResult<Prisma.$NotificationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Notification that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {NotificationFindFirstArgs} args - Arguments to find a Notification
+     * @example
+     * // Get one Notification
+     * const notification = await prisma.notification.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends NotificationFindFirstArgs>(args?: SelectSubset<T, NotificationFindFirstArgs<ExtArgs>>): Prisma__NotificationClient<$Result.GetResult<Prisma.$NotificationPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Notification that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {NotificationFindFirstOrThrowArgs} args - Arguments to find a Notification
+     * @example
+     * // Get one Notification
+     * const notification = await prisma.notification.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends NotificationFindFirstOrThrowArgs>(args?: SelectSubset<T, NotificationFindFirstOrThrowArgs<ExtArgs>>): Prisma__NotificationClient<$Result.GetResult<Prisma.$NotificationPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more Notifications that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {NotificationFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all Notifications
+     * const notifications = await prisma.notification.findMany()
+     * 
+     * // Get first 10 Notifications
+     * const notifications = await prisma.notification.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const notificationWithIdOnly = await prisma.notification.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends NotificationFindManyArgs>(args?: SelectSubset<T, NotificationFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$NotificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a Notification.
+     * @param {NotificationCreateArgs} args - Arguments to create a Notification.
+     * @example
+     * // Create one Notification
+     * const Notification = await prisma.notification.create({
+     *   data: {
+     *     // ... data to create a Notification
+     *   }
+     * })
+     * 
+     */
+    create<T extends NotificationCreateArgs>(args: SelectSubset<T, NotificationCreateArgs<ExtArgs>>): Prisma__NotificationClient<$Result.GetResult<Prisma.$NotificationPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many Notifications.
+     * @param {NotificationCreateManyArgs} args - Arguments to create many Notifications.
+     * @example
+     * // Create many Notifications
+     * const notification = await prisma.notification.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends NotificationCreateManyArgs>(args?: SelectSubset<T, NotificationCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Delete a Notification.
+     * @param {NotificationDeleteArgs} args - Arguments to delete one Notification.
+     * @example
+     * // Delete one Notification
+     * const Notification = await prisma.notification.delete({
+     *   where: {
+     *     // ... filter to delete one Notification
+     *   }
+     * })
+     * 
+     */
+    delete<T extends NotificationDeleteArgs>(args: SelectSubset<T, NotificationDeleteArgs<ExtArgs>>): Prisma__NotificationClient<$Result.GetResult<Prisma.$NotificationPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one Notification.
+     * @param {NotificationUpdateArgs} args - Arguments to update one Notification.
+     * @example
+     * // Update one Notification
+     * const notification = await prisma.notification.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends NotificationUpdateArgs>(args: SelectSubset<T, NotificationUpdateArgs<ExtArgs>>): Prisma__NotificationClient<$Result.GetResult<Prisma.$NotificationPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more Notifications.
+     * @param {NotificationDeleteManyArgs} args - Arguments to filter Notifications to delete.
+     * @example
+     * // Delete a few Notifications
+     * const { count } = await prisma.notification.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends NotificationDeleteManyArgs>(args?: SelectSubset<T, NotificationDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Notifications.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {NotificationUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many Notifications
+     * const notification = await prisma.notification.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends NotificationUpdateManyArgs>(args: SelectSubset<T, NotificationUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one Notification.
+     * @param {NotificationUpsertArgs} args - Arguments to update or create a Notification.
+     * @example
+     * // Update or create a Notification
+     * const notification = await prisma.notification.upsert({
+     *   create: {
+     *     // ... data to create a Notification
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the Notification we want to update
+     *   }
+     * })
+     */
+    upsert<T extends NotificationUpsertArgs>(args: SelectSubset<T, NotificationUpsertArgs<ExtArgs>>): Prisma__NotificationClient<$Result.GetResult<Prisma.$NotificationPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of Notifications.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {NotificationCountArgs} args - Arguments to filter Notifications to count.
+     * @example
+     * // Count the number of Notifications
+     * const count = await prisma.notification.count({
+     *   where: {
+     *     // ... the filter for the Notifications we want to count
+     *   }
+     * })
+    **/
+    count<T extends NotificationCountArgs>(
+      args?: Subset<T, NotificationCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], NotificationCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a Notification.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {NotificationAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends NotificationAggregateArgs>(args: Subset<T, NotificationAggregateArgs>): Prisma.PrismaPromise<GetNotificationAggregateType<T>>
+
+    /**
+     * Group by Notification.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {NotificationGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends NotificationGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: NotificationGroupByArgs['orderBy'] }
+        : { orderBy?: NotificationGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, NotificationGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetNotificationGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the Notification model
+   */
+  readonly fields: NotificationFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for Notification.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__NotificationClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the Notification model
+   */
+  interface NotificationFieldRefs {
+    readonly id: FieldRef<"Notification", 'String'>
+    readonly userId: FieldRef<"Notification", 'String'>
+    readonly message: FieldRef<"Notification", 'String'>
+    readonly link: FieldRef<"Notification", 'String'>
+    readonly isRead: FieldRef<"Notification", 'Boolean'>
+    readonly createdAt: FieldRef<"Notification", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * Notification findUnique
+   */
+  export type NotificationFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Notification
+     */
+    select?: NotificationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Notification
+     */
+    omit?: NotificationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: NotificationInclude<ExtArgs> | null
+    /**
+     * Filter, which Notification to fetch.
+     */
+    where: NotificationWhereUniqueInput
+  }
+
+  /**
+   * Notification findUniqueOrThrow
+   */
+  export type NotificationFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Notification
+     */
+    select?: NotificationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Notification
+     */
+    omit?: NotificationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: NotificationInclude<ExtArgs> | null
+    /**
+     * Filter, which Notification to fetch.
+     */
+    where: NotificationWhereUniqueInput
+  }
+
+  /**
+   * Notification findFirst
+   */
+  export type NotificationFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Notification
+     */
+    select?: NotificationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Notification
+     */
+    omit?: NotificationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: NotificationInclude<ExtArgs> | null
+    /**
+     * Filter, which Notification to fetch.
+     */
+    where?: NotificationWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Notifications to fetch.
+     */
+    orderBy?: NotificationOrderByWithRelationInput | NotificationOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Notifications.
+     */
+    cursor?: NotificationWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Notifications from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Notifications.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Notifications.
+     */
+    distinct?: NotificationScalarFieldEnum | NotificationScalarFieldEnum[]
+  }
+
+  /**
+   * Notification findFirstOrThrow
+   */
+  export type NotificationFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Notification
+     */
+    select?: NotificationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Notification
+     */
+    omit?: NotificationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: NotificationInclude<ExtArgs> | null
+    /**
+     * Filter, which Notification to fetch.
+     */
+    where?: NotificationWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Notifications to fetch.
+     */
+    orderBy?: NotificationOrderByWithRelationInput | NotificationOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Notifications.
+     */
+    cursor?: NotificationWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Notifications from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Notifications.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Notifications.
+     */
+    distinct?: NotificationScalarFieldEnum | NotificationScalarFieldEnum[]
+  }
+
+  /**
+   * Notification findMany
+   */
+  export type NotificationFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Notification
+     */
+    select?: NotificationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Notification
+     */
+    omit?: NotificationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: NotificationInclude<ExtArgs> | null
+    /**
+     * Filter, which Notifications to fetch.
+     */
+    where?: NotificationWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Notifications to fetch.
+     */
+    orderBy?: NotificationOrderByWithRelationInput | NotificationOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing Notifications.
+     */
+    cursor?: NotificationWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Notifications from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Notifications.
+     */
+    skip?: number
+    distinct?: NotificationScalarFieldEnum | NotificationScalarFieldEnum[]
+  }
+
+  /**
+   * Notification create
+   */
+  export type NotificationCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Notification
+     */
+    select?: NotificationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Notification
+     */
+    omit?: NotificationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: NotificationInclude<ExtArgs> | null
+    /**
+     * The data needed to create a Notification.
+     */
+    data: XOR<NotificationCreateInput, NotificationUncheckedCreateInput>
+  }
+
+  /**
+   * Notification createMany
+   */
+  export type NotificationCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many Notifications.
+     */
+    data: NotificationCreateManyInput | NotificationCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * Notification update
+   */
+  export type NotificationUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Notification
+     */
+    select?: NotificationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Notification
+     */
+    omit?: NotificationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: NotificationInclude<ExtArgs> | null
+    /**
+     * The data needed to update a Notification.
+     */
+    data: XOR<NotificationUpdateInput, NotificationUncheckedUpdateInput>
+    /**
+     * Choose, which Notification to update.
+     */
+    where: NotificationWhereUniqueInput
+  }
+
+  /**
+   * Notification updateMany
+   */
+  export type NotificationUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update Notifications.
+     */
+    data: XOR<NotificationUpdateManyMutationInput, NotificationUncheckedUpdateManyInput>
+    /**
+     * Filter which Notifications to update
+     */
+    where?: NotificationWhereInput
+    /**
+     * Limit how many Notifications to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * Notification upsert
+   */
+  export type NotificationUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Notification
+     */
+    select?: NotificationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Notification
+     */
+    omit?: NotificationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: NotificationInclude<ExtArgs> | null
+    /**
+     * The filter to search for the Notification to update in case it exists.
+     */
+    where: NotificationWhereUniqueInput
+    /**
+     * In case the Notification found by the `where` argument doesn't exist, create a new Notification with this data.
+     */
+    create: XOR<NotificationCreateInput, NotificationUncheckedCreateInput>
+    /**
+     * In case the Notification was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<NotificationUpdateInput, NotificationUncheckedUpdateInput>
+  }
+
+  /**
+   * Notification delete
+   */
+  export type NotificationDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Notification
+     */
+    select?: NotificationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Notification
+     */
+    omit?: NotificationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: NotificationInclude<ExtArgs> | null
+    /**
+     * Filter which Notification to delete.
+     */
+    where: NotificationWhereUniqueInput
+  }
+
+  /**
+   * Notification deleteMany
+   */
+  export type NotificationDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Notifications to delete
+     */
+    where?: NotificationWhereInput
+    /**
+     * Limit how many Notifications to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * Notification without action
+   */
+  export type NotificationDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Notification
+     */
+    select?: NotificationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Notification
+     */
+    omit?: NotificationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: NotificationInclude<ExtArgs> | null
   }
 
 
@@ -8009,13 +9048,13 @@ export namespace Prisma {
     releaseDate: Date | null
     dateReleased: Date | null
     requesterId: string | null
-    status: $Enums.Status | null
-    wpoApprovedBy: string | null
-    wpoApprovedAt: Date | null
-    systemApprovedBy: string | null
-    systemApprovedAt: Date | null
-    pmApprovedBy: string | null
-    pmApprovedAt: Date | null
+    status: $Enums.WrStatus | null
+    warehouseApprovedBy: string | null
+    warehouseApprovedAt: Date | null
+    procurementApprovedBy: string | null
+    procurementApprovedAt: Date | null
+    rejectedSide: string | null
+    rejectedReason: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -8031,13 +9070,13 @@ export namespace Prisma {
     releaseDate: Date | null
     dateReleased: Date | null
     requesterId: string | null
-    status: $Enums.Status | null
-    wpoApprovedBy: string | null
-    wpoApprovedAt: Date | null
-    systemApprovedBy: string | null
-    systemApprovedAt: Date | null
-    pmApprovedBy: string | null
-    pmApprovedAt: Date | null
+    status: $Enums.WrStatus | null
+    warehouseApprovedBy: string | null
+    warehouseApprovedAt: Date | null
+    procurementApprovedBy: string | null
+    procurementApprovedAt: Date | null
+    rejectedSide: string | null
+    rejectedReason: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -8054,12 +9093,12 @@ export namespace Prisma {
     dateReleased: number
     requesterId: number
     status: number
-    wpoApprovedBy: number
-    wpoApprovedAt: number
-    systemApprovedBy: number
-    systemApprovedAt: number
-    pmApprovedBy: number
-    pmApprovedAt: number
+    warehouseApprovedBy: number
+    warehouseApprovedAt: number
+    procurementApprovedBy: number
+    procurementApprovedAt: number
+    rejectedSide: number
+    rejectedReason: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -8078,12 +9117,12 @@ export namespace Prisma {
     dateReleased?: true
     requesterId?: true
     status?: true
-    wpoApprovedBy?: true
-    wpoApprovedAt?: true
-    systemApprovedBy?: true
-    systemApprovedAt?: true
-    pmApprovedBy?: true
-    pmApprovedAt?: true
+    warehouseApprovedBy?: true
+    warehouseApprovedAt?: true
+    procurementApprovedBy?: true
+    procurementApprovedAt?: true
+    rejectedSide?: true
+    rejectedReason?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -8100,12 +9139,12 @@ export namespace Prisma {
     dateReleased?: true
     requesterId?: true
     status?: true
-    wpoApprovedBy?: true
-    wpoApprovedAt?: true
-    systemApprovedBy?: true
-    systemApprovedAt?: true
-    pmApprovedBy?: true
-    pmApprovedAt?: true
+    warehouseApprovedBy?: true
+    warehouseApprovedAt?: true
+    procurementApprovedBy?: true
+    procurementApprovedAt?: true
+    rejectedSide?: true
+    rejectedReason?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -8122,12 +9161,12 @@ export namespace Prisma {
     dateReleased?: true
     requesterId?: true
     status?: true
-    wpoApprovedBy?: true
-    wpoApprovedAt?: true
-    systemApprovedBy?: true
-    systemApprovedAt?: true
-    pmApprovedBy?: true
-    pmApprovedAt?: true
+    warehouseApprovedBy?: true
+    warehouseApprovedAt?: true
+    procurementApprovedBy?: true
+    procurementApprovedAt?: true
+    rejectedSide?: true
+    rejectedReason?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -8216,13 +9255,13 @@ export namespace Prisma {
     releaseDate: Date
     dateReleased: Date | null
     requesterId: string
-    status: $Enums.Status
-    wpoApprovedBy: string | null
-    wpoApprovedAt: Date | null
-    systemApprovedBy: string | null
-    systemApprovedAt: Date | null
-    pmApprovedBy: string | null
-    pmApprovedAt: Date | null
+    status: $Enums.WrStatus
+    warehouseApprovedBy: string | null
+    warehouseApprovedAt: Date | null
+    procurementApprovedBy: string | null
+    procurementApprovedAt: Date | null
+    rejectedSide: string | null
+    rejectedReason: string | null
     createdAt: Date
     updatedAt: Date
     _count: WarehouseReleaseCountAggregateOutputType | null
@@ -8256,19 +9295,18 @@ export namespace Prisma {
     dateReleased?: boolean
     requesterId?: boolean
     status?: boolean
-    wpoApprovedBy?: boolean
-    wpoApprovedAt?: boolean
-    systemApprovedBy?: boolean
-    systemApprovedAt?: boolean
-    pmApprovedBy?: boolean
-    pmApprovedAt?: boolean
+    warehouseApprovedBy?: boolean
+    warehouseApprovedAt?: boolean
+    procurementApprovedBy?: boolean
+    procurementApprovedAt?: boolean
+    rejectedSide?: boolean
+    rejectedReason?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     materialRequest?: boolean | WarehouseRelease$materialRequestArgs<ExtArgs>
     requester?: boolean | UserDefaultArgs<ExtArgs>
-    wpoApprover?: boolean | WarehouseRelease$wpoApproverArgs<ExtArgs>
-    systemApprover?: boolean | WarehouseRelease$systemApproverArgs<ExtArgs>
-    pmApprover?: boolean | WarehouseRelease$pmApproverArgs<ExtArgs>
+    warehouseApprover?: boolean | WarehouseRelease$warehouseApproverArgs<ExtArgs>
+    procurementApprover?: boolean | WarehouseRelease$procurementApproverArgs<ExtArgs>
     items?: boolean | WarehouseRelease$itemsArgs<ExtArgs>
     _count?: boolean | WarehouseReleaseCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["warehouseRelease"]>
@@ -8287,23 +9325,22 @@ export namespace Prisma {
     dateReleased?: boolean
     requesterId?: boolean
     status?: boolean
-    wpoApprovedBy?: boolean
-    wpoApprovedAt?: boolean
-    systemApprovedBy?: boolean
-    systemApprovedAt?: boolean
-    pmApprovedBy?: boolean
-    pmApprovedAt?: boolean
+    warehouseApprovedBy?: boolean
+    warehouseApprovedAt?: boolean
+    procurementApprovedBy?: boolean
+    procurementApprovedAt?: boolean
+    rejectedSide?: boolean
+    rejectedReason?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type WarehouseReleaseOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "docNo" | "materialRequestId" | "projectId" | "projectName" | "deliveryTarget" | "deliveryLocation" | "releaseDate" | "dateReleased" | "requesterId" | "status" | "wpoApprovedBy" | "wpoApprovedAt" | "systemApprovedBy" | "systemApprovedAt" | "pmApprovedBy" | "pmApprovedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["warehouseRelease"]>
+  export type WarehouseReleaseOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "docNo" | "materialRequestId" | "projectId" | "projectName" | "deliveryTarget" | "deliveryLocation" | "releaseDate" | "dateReleased" | "requesterId" | "status" | "warehouseApprovedBy" | "warehouseApprovedAt" | "procurementApprovedBy" | "procurementApprovedAt" | "rejectedSide" | "rejectedReason" | "createdAt" | "updatedAt", ExtArgs["result"]["warehouseRelease"]>
   export type WarehouseReleaseInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     materialRequest?: boolean | WarehouseRelease$materialRequestArgs<ExtArgs>
     requester?: boolean | UserDefaultArgs<ExtArgs>
-    wpoApprover?: boolean | WarehouseRelease$wpoApproverArgs<ExtArgs>
-    systemApprover?: boolean | WarehouseRelease$systemApproverArgs<ExtArgs>
-    pmApprover?: boolean | WarehouseRelease$pmApproverArgs<ExtArgs>
+    warehouseApprover?: boolean | WarehouseRelease$warehouseApproverArgs<ExtArgs>
+    procurementApprover?: boolean | WarehouseRelease$procurementApproverArgs<ExtArgs>
     items?: boolean | WarehouseRelease$itemsArgs<ExtArgs>
     _count?: boolean | WarehouseReleaseCountOutputTypeDefaultArgs<ExtArgs>
   }
@@ -8313,9 +9350,8 @@ export namespace Prisma {
     objects: {
       materialRequest: Prisma.$MaterialRequestPayload<ExtArgs> | null
       requester: Prisma.$UserPayload<ExtArgs>
-      wpoApprover: Prisma.$UserPayload<ExtArgs> | null
-      systemApprover: Prisma.$UserPayload<ExtArgs> | null
-      pmApprover: Prisma.$UserPayload<ExtArgs> | null
+      warehouseApprover: Prisma.$UserPayload<ExtArgs> | null
+      procurementApprover: Prisma.$UserPayload<ExtArgs> | null
       items: Prisma.$WarehouseReleaseItemPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
@@ -8329,13 +9365,13 @@ export namespace Prisma {
       releaseDate: Date
       dateReleased: Date | null
       requesterId: string
-      status: $Enums.Status
-      wpoApprovedBy: string | null
-      wpoApprovedAt: Date | null
-      systemApprovedBy: string | null
-      systemApprovedAt: Date | null
-      pmApprovedBy: string | null
-      pmApprovedAt: Date | null
+      status: $Enums.WrStatus
+      warehouseApprovedBy: string | null
+      warehouseApprovedAt: Date | null
+      procurementApprovedBy: string | null
+      procurementApprovedAt: Date | null
+      rejectedSide: string | null
+      rejectedReason: string | null
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["warehouseRelease"]>
@@ -8680,9 +9716,8 @@ export namespace Prisma {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     materialRequest<T extends WarehouseRelease$materialRequestArgs<ExtArgs> = {}>(args?: Subset<T, WarehouseRelease$materialRequestArgs<ExtArgs>>): Prisma__MaterialRequestClient<$Result.GetResult<Prisma.$MaterialRequestPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     requester<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-    wpoApprover<T extends WarehouseRelease$wpoApproverArgs<ExtArgs> = {}>(args?: Subset<T, WarehouseRelease$wpoApproverArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-    systemApprover<T extends WarehouseRelease$systemApproverArgs<ExtArgs> = {}>(args?: Subset<T, WarehouseRelease$systemApproverArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-    pmApprover<T extends WarehouseRelease$pmApproverArgs<ExtArgs> = {}>(args?: Subset<T, WarehouseRelease$pmApproverArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    warehouseApprover<T extends WarehouseRelease$warehouseApproverArgs<ExtArgs> = {}>(args?: Subset<T, WarehouseRelease$warehouseApproverArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    procurementApprover<T extends WarehouseRelease$procurementApproverArgs<ExtArgs> = {}>(args?: Subset<T, WarehouseRelease$procurementApproverArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     items<T extends WarehouseRelease$itemsArgs<ExtArgs> = {}>(args?: Subset<T, WarehouseRelease$itemsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$WarehouseReleaseItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -8723,13 +9758,13 @@ export namespace Prisma {
     readonly releaseDate: FieldRef<"WarehouseRelease", 'DateTime'>
     readonly dateReleased: FieldRef<"WarehouseRelease", 'DateTime'>
     readonly requesterId: FieldRef<"WarehouseRelease", 'String'>
-    readonly status: FieldRef<"WarehouseRelease", 'Status'>
-    readonly wpoApprovedBy: FieldRef<"WarehouseRelease", 'String'>
-    readonly wpoApprovedAt: FieldRef<"WarehouseRelease", 'DateTime'>
-    readonly systemApprovedBy: FieldRef<"WarehouseRelease", 'String'>
-    readonly systemApprovedAt: FieldRef<"WarehouseRelease", 'DateTime'>
-    readonly pmApprovedBy: FieldRef<"WarehouseRelease", 'String'>
-    readonly pmApprovedAt: FieldRef<"WarehouseRelease", 'DateTime'>
+    readonly status: FieldRef<"WarehouseRelease", 'WrStatus'>
+    readonly warehouseApprovedBy: FieldRef<"WarehouseRelease", 'String'>
+    readonly warehouseApprovedAt: FieldRef<"WarehouseRelease", 'DateTime'>
+    readonly procurementApprovedBy: FieldRef<"WarehouseRelease", 'String'>
+    readonly procurementApprovedAt: FieldRef<"WarehouseRelease", 'DateTime'>
+    readonly rejectedSide: FieldRef<"WarehouseRelease", 'String'>
+    readonly rejectedReason: FieldRef<"WarehouseRelease", 'String'>
     readonly createdAt: FieldRef<"WarehouseRelease", 'DateTime'>
     readonly updatedAt: FieldRef<"WarehouseRelease", 'DateTime'>
   }
@@ -9094,9 +10129,9 @@ export namespace Prisma {
   }
 
   /**
-   * WarehouseRelease.wpoApprover
+   * WarehouseRelease.warehouseApprover
    */
-  export type WarehouseRelease$wpoApproverArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type WarehouseRelease$warehouseApproverArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the User
      */
@@ -9113,28 +10148,9 @@ export namespace Prisma {
   }
 
   /**
-   * WarehouseRelease.systemApprover
+   * WarehouseRelease.procurementApprover
    */
-  export type WarehouseRelease$systemApproverArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the User
-     */
-    select?: UserSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the User
-     */
-    omit?: UserOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: UserInclude<ExtArgs> | null
-    where?: UserWhereInput
-  }
-
-  /**
-   * WarehouseRelease.pmApprover
-   */
-  export type WarehouseRelease$pmApproverArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type WarehouseRelease$procurementApproverArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the User
      */
@@ -23242,6 +24258,18 @@ export namespace Prisma {
   export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
 
 
+  export const NotificationScalarFieldEnum: {
+    id: 'id',
+    userId: 'userId',
+    message: 'message',
+    link: 'link',
+    isRead: 'isRead',
+    createdAt: 'createdAt'
+  };
+
+  export type NotificationScalarFieldEnum = (typeof NotificationScalarFieldEnum)[keyof typeof NotificationScalarFieldEnum]
+
+
   export const MaterialRequestScalarFieldEnum: {
     id: 'id',
     docControlNo: 'docControlNo',
@@ -23325,12 +24353,12 @@ export namespace Prisma {
     dateReleased: 'dateReleased',
     requesterId: 'requesterId',
     status: 'status',
-    wpoApprovedBy: 'wpoApprovedBy',
-    wpoApprovedAt: 'wpoApprovedAt',
-    systemApprovedBy: 'systemApprovedBy',
-    systemApprovedAt: 'systemApprovedAt',
-    pmApprovedBy: 'pmApprovedBy',
-    pmApprovedAt: 'pmApprovedAt',
+    warehouseApprovedBy: 'warehouseApprovedBy',
+    warehouseApprovedAt: 'warehouseApprovedAt',
+    procurementApprovedBy: 'procurementApprovedBy',
+    procurementApprovedAt: 'procurementApprovedAt',
+    rejectedSide: 'rejectedSide',
+    rejectedReason: 'rejectedReason',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -23624,6 +24652,16 @@ export namespace Prisma {
   export type UserOrderByRelevanceFieldEnum = (typeof UserOrderByRelevanceFieldEnum)[keyof typeof UserOrderByRelevanceFieldEnum]
 
 
+  export const NotificationOrderByRelevanceFieldEnum: {
+    id: 'id',
+    userId: 'userId',
+    message: 'message',
+    link: 'link'
+  };
+
+  export type NotificationOrderByRelevanceFieldEnum = (typeof NotificationOrderByRelevanceFieldEnum)[keyof typeof NotificationOrderByRelevanceFieldEnum]
+
+
   export const MaterialRequestOrderByRelevanceFieldEnum: {
     id: 'id',
     docControlNo: 'docControlNo',
@@ -23685,9 +24723,10 @@ export namespace Prisma {
     deliveryTarget: 'deliveryTarget',
     deliveryLocation: 'deliveryLocation',
     requesterId: 'requesterId',
-    wpoApprovedBy: 'wpoApprovedBy',
-    systemApprovedBy: 'systemApprovedBy',
-    pmApprovedBy: 'pmApprovedBy'
+    warehouseApprovedBy: 'warehouseApprovedBy',
+    procurementApprovedBy: 'procurementApprovedBy',
+    rejectedSide: 'rejectedSide',
+    rejectedReason: 'rejectedReason'
   };
 
   export type WarehouseReleaseOrderByRelevanceFieldEnum = (typeof WarehouseReleaseOrderByRelevanceFieldEnum)[keyof typeof WarehouseReleaseOrderByRelevanceFieldEnum]
@@ -23914,6 +24953,13 @@ export namespace Prisma {
 
 
   /**
+   * Reference to a field of type 'Boolean'
+   */
+  export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
+    
+
+
+  /**
    * Reference to a field of type 'Status'
    */
   export type EnumStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Status'>
@@ -23942,6 +24988,13 @@ export namespace Prisma {
 
 
   /**
+   * Reference to a field of type 'WrStatus'
+   */
+  export type EnumWrStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'WrStatus'>
+    
+
+
+  /**
    * Reference to a field of type 'POStatus'
    */
   export type EnumPOStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'POStatus'>
@@ -23959,13 +25012,6 @@ export namespace Prisma {
    * Reference to a field of type 'Decimal'
    */
   export type DecimalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Decimal'>
-    
-
-
-  /**
-   * Reference to a field of type 'Boolean'
-   */
-  export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
     
 
 
@@ -24021,9 +25067,8 @@ export namespace Prisma {
     faultReportsSysApproved?: FaultReportListRelationFilter
     faultReportsPmApproved?: FaultReportListRelationFilter
     warehouseReleases?: WarehouseReleaseListRelationFilter
-    wrWpoApproved?: WarehouseReleaseListRelationFilter
-    wrSysApproved?: WarehouseReleaseListRelationFilter
-    wrPmApproved?: WarehouseReleaseListRelationFilter
+    wrWarehouseApproved?: WarehouseReleaseListRelationFilter
+    wrProcurementApproved?: WarehouseReleaseListRelationFilter
     bomsCreated?: BillOfMaterialListRelationFilter
     bomsSubmitted?: BillOfMaterialListRelationFilter
     bomsWpoApproved?: BillOfMaterialListRelationFilter
@@ -24036,6 +25081,7 @@ export namespace Prisma {
     borrowedProcessed?: BorrowedItemListRelationFilter
     projectBudgets?: ProjectBudgetListRelationFilter
     supplierPrices?: SupplierPriceListRelationFilter
+    notifications?: NotificationListRelationFilter
   }
 
   export type UserOrderByWithRelationInput = {
@@ -24056,9 +25102,8 @@ export namespace Prisma {
     faultReportsSysApproved?: FaultReportOrderByRelationAggregateInput
     faultReportsPmApproved?: FaultReportOrderByRelationAggregateInput
     warehouseReleases?: WarehouseReleaseOrderByRelationAggregateInput
-    wrWpoApproved?: WarehouseReleaseOrderByRelationAggregateInput
-    wrSysApproved?: WarehouseReleaseOrderByRelationAggregateInput
-    wrPmApproved?: WarehouseReleaseOrderByRelationAggregateInput
+    wrWarehouseApproved?: WarehouseReleaseOrderByRelationAggregateInput
+    wrProcurementApproved?: WarehouseReleaseOrderByRelationAggregateInput
     bomsCreated?: BillOfMaterialOrderByRelationAggregateInput
     bomsSubmitted?: BillOfMaterialOrderByRelationAggregateInput
     bomsWpoApproved?: BillOfMaterialOrderByRelationAggregateInput
@@ -24071,6 +25116,7 @@ export namespace Prisma {
     borrowedProcessed?: BorrowedItemOrderByRelationAggregateInput
     projectBudgets?: ProjectBudgetOrderByRelationAggregateInput
     supplierPrices?: SupplierPriceOrderByRelationAggregateInput
+    notifications?: NotificationOrderByRelationAggregateInput
     _relevance?: UserOrderByRelevanceInput
   }
 
@@ -24095,9 +25141,8 @@ export namespace Prisma {
     faultReportsSysApproved?: FaultReportListRelationFilter
     faultReportsPmApproved?: FaultReportListRelationFilter
     warehouseReleases?: WarehouseReleaseListRelationFilter
-    wrWpoApproved?: WarehouseReleaseListRelationFilter
-    wrSysApproved?: WarehouseReleaseListRelationFilter
-    wrPmApproved?: WarehouseReleaseListRelationFilter
+    wrWarehouseApproved?: WarehouseReleaseListRelationFilter
+    wrProcurementApproved?: WarehouseReleaseListRelationFilter
     bomsCreated?: BillOfMaterialListRelationFilter
     bomsSubmitted?: BillOfMaterialListRelationFilter
     bomsWpoApproved?: BillOfMaterialListRelationFilter
@@ -24110,6 +25155,7 @@ export namespace Prisma {
     borrowedProcessed?: BorrowedItemListRelationFilter
     projectBudgets?: ProjectBudgetListRelationFilter
     supplierPrices?: SupplierPriceListRelationFilter
+    notifications?: NotificationListRelationFilter
   }, "id" | "username">
 
   export type UserOrderByWithAggregationInput = {
@@ -24138,6 +25184,67 @@ export namespace Prisma {
     engineerRole?: EnumEngineerRoleNullableWithAggregatesFilter<"User"> | $Enums.EngineerRole | null
     position?: StringNullableWithAggregatesFilter<"User"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
+  }
+
+  export type NotificationWhereInput = {
+    AND?: NotificationWhereInput | NotificationWhereInput[]
+    OR?: NotificationWhereInput[]
+    NOT?: NotificationWhereInput | NotificationWhereInput[]
+    id?: StringFilter<"Notification"> | string
+    userId?: StringFilter<"Notification"> | string
+    message?: StringFilter<"Notification"> | string
+    link?: StringNullableFilter<"Notification"> | string | null
+    isRead?: BoolFilter<"Notification"> | boolean
+    createdAt?: DateTimeFilter<"Notification"> | Date | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }
+
+  export type NotificationOrderByWithRelationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    message?: SortOrder
+    link?: SortOrderInput | SortOrder
+    isRead?: SortOrder
+    createdAt?: SortOrder
+    user?: UserOrderByWithRelationInput
+    _relevance?: NotificationOrderByRelevanceInput
+  }
+
+  export type NotificationWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: NotificationWhereInput | NotificationWhereInput[]
+    OR?: NotificationWhereInput[]
+    NOT?: NotificationWhereInput | NotificationWhereInput[]
+    userId?: StringFilter<"Notification"> | string
+    message?: StringFilter<"Notification"> | string
+    link?: StringNullableFilter<"Notification"> | string | null
+    isRead?: BoolFilter<"Notification"> | boolean
+    createdAt?: DateTimeFilter<"Notification"> | Date | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }, "id">
+
+  export type NotificationOrderByWithAggregationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    message?: SortOrder
+    link?: SortOrderInput | SortOrder
+    isRead?: SortOrder
+    createdAt?: SortOrder
+    _count?: NotificationCountOrderByAggregateInput
+    _max?: NotificationMaxOrderByAggregateInput
+    _min?: NotificationMinOrderByAggregateInput
+  }
+
+  export type NotificationScalarWhereWithAggregatesInput = {
+    AND?: NotificationScalarWhereWithAggregatesInput | NotificationScalarWhereWithAggregatesInput[]
+    OR?: NotificationScalarWhereWithAggregatesInput[]
+    NOT?: NotificationScalarWhereWithAggregatesInput | NotificationScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"Notification"> | string
+    userId?: StringWithAggregatesFilter<"Notification"> | string
+    message?: StringWithAggregatesFilter<"Notification"> | string
+    link?: StringNullableWithAggregatesFilter<"Notification"> | string | null
+    isRead?: BoolWithAggregatesFilter<"Notification"> | boolean
+    createdAt?: DateTimeWithAggregatesFilter<"Notification"> | Date | string
   }
 
   export type MaterialRequestWhereInput = {
@@ -24544,20 +25651,19 @@ export namespace Prisma {
     releaseDate?: DateTimeFilter<"WarehouseRelease"> | Date | string
     dateReleased?: DateTimeNullableFilter<"WarehouseRelease"> | Date | string | null
     requesterId?: StringFilter<"WarehouseRelease"> | string
-    status?: EnumStatusFilter<"WarehouseRelease"> | $Enums.Status
-    wpoApprovedBy?: StringNullableFilter<"WarehouseRelease"> | string | null
-    wpoApprovedAt?: DateTimeNullableFilter<"WarehouseRelease"> | Date | string | null
-    systemApprovedBy?: StringNullableFilter<"WarehouseRelease"> | string | null
-    systemApprovedAt?: DateTimeNullableFilter<"WarehouseRelease"> | Date | string | null
-    pmApprovedBy?: StringNullableFilter<"WarehouseRelease"> | string | null
-    pmApprovedAt?: DateTimeNullableFilter<"WarehouseRelease"> | Date | string | null
+    status?: EnumWrStatusFilter<"WarehouseRelease"> | $Enums.WrStatus
+    warehouseApprovedBy?: StringNullableFilter<"WarehouseRelease"> | string | null
+    warehouseApprovedAt?: DateTimeNullableFilter<"WarehouseRelease"> | Date | string | null
+    procurementApprovedBy?: StringNullableFilter<"WarehouseRelease"> | string | null
+    procurementApprovedAt?: DateTimeNullableFilter<"WarehouseRelease"> | Date | string | null
+    rejectedSide?: StringNullableFilter<"WarehouseRelease"> | string | null
+    rejectedReason?: StringNullableFilter<"WarehouseRelease"> | string | null
     createdAt?: DateTimeFilter<"WarehouseRelease"> | Date | string
     updatedAt?: DateTimeFilter<"WarehouseRelease"> | Date | string
     materialRequest?: XOR<MaterialRequestNullableScalarRelationFilter, MaterialRequestWhereInput> | null
     requester?: XOR<UserScalarRelationFilter, UserWhereInput>
-    wpoApprover?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
-    systemApprover?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
-    pmApprover?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
+    warehouseApprover?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
+    procurementApprover?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
     items?: WarehouseReleaseItemListRelationFilter
   }
 
@@ -24573,19 +25679,18 @@ export namespace Prisma {
     dateReleased?: SortOrderInput | SortOrder
     requesterId?: SortOrder
     status?: SortOrder
-    wpoApprovedBy?: SortOrderInput | SortOrder
-    wpoApprovedAt?: SortOrderInput | SortOrder
-    systemApprovedBy?: SortOrderInput | SortOrder
-    systemApprovedAt?: SortOrderInput | SortOrder
-    pmApprovedBy?: SortOrderInput | SortOrder
-    pmApprovedAt?: SortOrderInput | SortOrder
+    warehouseApprovedBy?: SortOrderInput | SortOrder
+    warehouseApprovedAt?: SortOrderInput | SortOrder
+    procurementApprovedBy?: SortOrderInput | SortOrder
+    procurementApprovedAt?: SortOrderInput | SortOrder
+    rejectedSide?: SortOrderInput | SortOrder
+    rejectedReason?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     materialRequest?: MaterialRequestOrderByWithRelationInput
     requester?: UserOrderByWithRelationInput
-    wpoApprover?: UserOrderByWithRelationInput
-    systemApprover?: UserOrderByWithRelationInput
-    pmApprover?: UserOrderByWithRelationInput
+    warehouseApprover?: UserOrderByWithRelationInput
+    procurementApprover?: UserOrderByWithRelationInput
     items?: WarehouseReleaseItemOrderByRelationAggregateInput
     _relevance?: WarehouseReleaseOrderByRelevanceInput
   }
@@ -24604,20 +25709,19 @@ export namespace Prisma {
     releaseDate?: DateTimeFilter<"WarehouseRelease"> | Date | string
     dateReleased?: DateTimeNullableFilter<"WarehouseRelease"> | Date | string | null
     requesterId?: StringFilter<"WarehouseRelease"> | string
-    status?: EnumStatusFilter<"WarehouseRelease"> | $Enums.Status
-    wpoApprovedBy?: StringNullableFilter<"WarehouseRelease"> | string | null
-    wpoApprovedAt?: DateTimeNullableFilter<"WarehouseRelease"> | Date | string | null
-    systemApprovedBy?: StringNullableFilter<"WarehouseRelease"> | string | null
-    systemApprovedAt?: DateTimeNullableFilter<"WarehouseRelease"> | Date | string | null
-    pmApprovedBy?: StringNullableFilter<"WarehouseRelease"> | string | null
-    pmApprovedAt?: DateTimeNullableFilter<"WarehouseRelease"> | Date | string | null
+    status?: EnumWrStatusFilter<"WarehouseRelease"> | $Enums.WrStatus
+    warehouseApprovedBy?: StringNullableFilter<"WarehouseRelease"> | string | null
+    warehouseApprovedAt?: DateTimeNullableFilter<"WarehouseRelease"> | Date | string | null
+    procurementApprovedBy?: StringNullableFilter<"WarehouseRelease"> | string | null
+    procurementApprovedAt?: DateTimeNullableFilter<"WarehouseRelease"> | Date | string | null
+    rejectedSide?: StringNullableFilter<"WarehouseRelease"> | string | null
+    rejectedReason?: StringNullableFilter<"WarehouseRelease"> | string | null
     createdAt?: DateTimeFilter<"WarehouseRelease"> | Date | string
     updatedAt?: DateTimeFilter<"WarehouseRelease"> | Date | string
     materialRequest?: XOR<MaterialRequestNullableScalarRelationFilter, MaterialRequestWhereInput> | null
     requester?: XOR<UserScalarRelationFilter, UserWhereInput>
-    wpoApprover?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
-    systemApprover?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
-    pmApprover?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
+    warehouseApprover?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
+    procurementApprover?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
     items?: WarehouseReleaseItemListRelationFilter
   }, "id" | "docNo">
 
@@ -24633,12 +25737,12 @@ export namespace Prisma {
     dateReleased?: SortOrderInput | SortOrder
     requesterId?: SortOrder
     status?: SortOrder
-    wpoApprovedBy?: SortOrderInput | SortOrder
-    wpoApprovedAt?: SortOrderInput | SortOrder
-    systemApprovedBy?: SortOrderInput | SortOrder
-    systemApprovedAt?: SortOrderInput | SortOrder
-    pmApprovedBy?: SortOrderInput | SortOrder
-    pmApprovedAt?: SortOrderInput | SortOrder
+    warehouseApprovedBy?: SortOrderInput | SortOrder
+    warehouseApprovedAt?: SortOrderInput | SortOrder
+    procurementApprovedBy?: SortOrderInput | SortOrder
+    procurementApprovedAt?: SortOrderInput | SortOrder
+    rejectedSide?: SortOrderInput | SortOrder
+    rejectedReason?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: WarehouseReleaseCountOrderByAggregateInput
@@ -24660,13 +25764,13 @@ export namespace Prisma {
     releaseDate?: DateTimeWithAggregatesFilter<"WarehouseRelease"> | Date | string
     dateReleased?: DateTimeNullableWithAggregatesFilter<"WarehouseRelease"> | Date | string | null
     requesterId?: StringWithAggregatesFilter<"WarehouseRelease"> | string
-    status?: EnumStatusWithAggregatesFilter<"WarehouseRelease"> | $Enums.Status
-    wpoApprovedBy?: StringNullableWithAggregatesFilter<"WarehouseRelease"> | string | null
-    wpoApprovedAt?: DateTimeNullableWithAggregatesFilter<"WarehouseRelease"> | Date | string | null
-    systemApprovedBy?: StringNullableWithAggregatesFilter<"WarehouseRelease"> | string | null
-    systemApprovedAt?: DateTimeNullableWithAggregatesFilter<"WarehouseRelease"> | Date | string | null
-    pmApprovedBy?: StringNullableWithAggregatesFilter<"WarehouseRelease"> | string | null
-    pmApprovedAt?: DateTimeNullableWithAggregatesFilter<"WarehouseRelease"> | Date | string | null
+    status?: EnumWrStatusWithAggregatesFilter<"WarehouseRelease"> | $Enums.WrStatus
+    warehouseApprovedBy?: StringNullableWithAggregatesFilter<"WarehouseRelease"> | string | null
+    warehouseApprovedAt?: DateTimeNullableWithAggregatesFilter<"WarehouseRelease"> | Date | string | null
+    procurementApprovedBy?: StringNullableWithAggregatesFilter<"WarehouseRelease"> | string | null
+    procurementApprovedAt?: DateTimeNullableWithAggregatesFilter<"WarehouseRelease"> | Date | string | null
+    rejectedSide?: StringNullableWithAggregatesFilter<"WarehouseRelease"> | string | null
+    rejectedReason?: StringNullableWithAggregatesFilter<"WarehouseRelease"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"WarehouseRelease"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"WarehouseRelease"> | Date | string
   }
@@ -26054,9 +27158,8 @@ export namespace Prisma {
     faultReportsSysApproved?: FaultReportCreateNestedManyWithoutSystemApproverInput
     faultReportsPmApproved?: FaultReportCreateNestedManyWithoutPmApproverInput
     warehouseReleases?: WarehouseReleaseCreateNestedManyWithoutRequesterInput
-    wrWpoApproved?: WarehouseReleaseCreateNestedManyWithoutWpoApproverInput
-    wrSysApproved?: WarehouseReleaseCreateNestedManyWithoutSystemApproverInput
-    wrPmApproved?: WarehouseReleaseCreateNestedManyWithoutPmApproverInput
+    wrWarehouseApproved?: WarehouseReleaseCreateNestedManyWithoutWarehouseApproverInput
+    wrProcurementApproved?: WarehouseReleaseCreateNestedManyWithoutProcurementApproverInput
     bomsCreated?: BillOfMaterialCreateNestedManyWithoutCreatorInput
     bomsSubmitted?: BillOfMaterialCreateNestedManyWithoutSubmitterInput
     bomsWpoApproved?: BillOfMaterialCreateNestedManyWithoutWpoApproverInput
@@ -26069,6 +27172,7 @@ export namespace Prisma {
     borrowedProcessed?: BorrowedItemCreateNestedManyWithoutProcessorInput
     projectBudgets?: ProjectBudgetCreateNestedManyWithoutInputterInput
     supplierPrices?: SupplierPriceCreateNestedManyWithoutInputterInput
+    notifications?: NotificationCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateInput = {
@@ -26089,9 +27193,8 @@ export namespace Prisma {
     faultReportsSysApproved?: FaultReportUncheckedCreateNestedManyWithoutSystemApproverInput
     faultReportsPmApproved?: FaultReportUncheckedCreateNestedManyWithoutPmApproverInput
     warehouseReleases?: WarehouseReleaseUncheckedCreateNestedManyWithoutRequesterInput
-    wrWpoApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutWpoApproverInput
-    wrSysApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutSystemApproverInput
-    wrPmApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutPmApproverInput
+    wrWarehouseApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutWarehouseApproverInput
+    wrProcurementApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutProcurementApproverInput
     bomsCreated?: BillOfMaterialUncheckedCreateNestedManyWithoutCreatorInput
     bomsSubmitted?: BillOfMaterialUncheckedCreateNestedManyWithoutSubmitterInput
     bomsWpoApproved?: BillOfMaterialUncheckedCreateNestedManyWithoutWpoApproverInput
@@ -26104,6 +27207,7 @@ export namespace Prisma {
     borrowedProcessed?: BorrowedItemUncheckedCreateNestedManyWithoutProcessorInput
     projectBudgets?: ProjectBudgetUncheckedCreateNestedManyWithoutInputterInput
     supplierPrices?: SupplierPriceUncheckedCreateNestedManyWithoutInputterInput
+    notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserUpdateInput = {
@@ -26124,9 +27228,8 @@ export namespace Prisma {
     faultReportsSysApproved?: FaultReportUpdateManyWithoutSystemApproverNestedInput
     faultReportsPmApproved?: FaultReportUpdateManyWithoutPmApproverNestedInput
     warehouseReleases?: WarehouseReleaseUpdateManyWithoutRequesterNestedInput
-    wrWpoApproved?: WarehouseReleaseUpdateManyWithoutWpoApproverNestedInput
-    wrSysApproved?: WarehouseReleaseUpdateManyWithoutSystemApproverNestedInput
-    wrPmApproved?: WarehouseReleaseUpdateManyWithoutPmApproverNestedInput
+    wrWarehouseApproved?: WarehouseReleaseUpdateManyWithoutWarehouseApproverNestedInput
+    wrProcurementApproved?: WarehouseReleaseUpdateManyWithoutProcurementApproverNestedInput
     bomsCreated?: BillOfMaterialUpdateManyWithoutCreatorNestedInput
     bomsSubmitted?: BillOfMaterialUpdateManyWithoutSubmitterNestedInput
     bomsWpoApproved?: BillOfMaterialUpdateManyWithoutWpoApproverNestedInput
@@ -26139,6 +27242,7 @@ export namespace Prisma {
     borrowedProcessed?: BorrowedItemUpdateManyWithoutProcessorNestedInput
     projectBudgets?: ProjectBudgetUpdateManyWithoutInputterNestedInput
     supplierPrices?: SupplierPriceUpdateManyWithoutInputterNestedInput
+    notifications?: NotificationUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateInput = {
@@ -26159,9 +27263,8 @@ export namespace Prisma {
     faultReportsSysApproved?: FaultReportUncheckedUpdateManyWithoutSystemApproverNestedInput
     faultReportsPmApproved?: FaultReportUncheckedUpdateManyWithoutPmApproverNestedInput
     warehouseReleases?: WarehouseReleaseUncheckedUpdateManyWithoutRequesterNestedInput
-    wrWpoApproved?: WarehouseReleaseUncheckedUpdateManyWithoutWpoApproverNestedInput
-    wrSysApproved?: WarehouseReleaseUncheckedUpdateManyWithoutSystemApproverNestedInput
-    wrPmApproved?: WarehouseReleaseUncheckedUpdateManyWithoutPmApproverNestedInput
+    wrWarehouseApproved?: WarehouseReleaseUncheckedUpdateManyWithoutWarehouseApproverNestedInput
+    wrProcurementApproved?: WarehouseReleaseUncheckedUpdateManyWithoutProcurementApproverNestedInput
     bomsCreated?: BillOfMaterialUncheckedUpdateManyWithoutCreatorNestedInput
     bomsSubmitted?: BillOfMaterialUncheckedUpdateManyWithoutSubmitterNestedInput
     bomsWpoApproved?: BillOfMaterialUncheckedUpdateManyWithoutWpoApproverNestedInput
@@ -26174,6 +27277,7 @@ export namespace Prisma {
     borrowedProcessed?: BorrowedItemUncheckedUpdateManyWithoutProcessorNestedInput
     projectBudgets?: ProjectBudgetUncheckedUpdateManyWithoutInputterNestedInput
     supplierPrices?: SupplierPriceUncheckedUpdateManyWithoutInputterNestedInput
+    notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateManyInput = {
@@ -26206,6 +27310,68 @@ export namespace Prisma {
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
     engineerRole?: NullableEnumEngineerRoleFieldUpdateOperationsInput | $Enums.EngineerRole | null
     position?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type NotificationCreateInput = {
+    id?: string
+    message: string
+    link?: string | null
+    isRead?: boolean
+    createdAt?: Date | string
+    user: UserCreateNestedOneWithoutNotificationsInput
+  }
+
+  export type NotificationUncheckedCreateInput = {
+    id?: string
+    userId: string
+    message: string
+    link?: string | null
+    isRead?: boolean
+    createdAt?: Date | string
+  }
+
+  export type NotificationUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    message?: StringFieldUpdateOperationsInput | string
+    link?: NullableStringFieldUpdateOperationsInput | string | null
+    isRead?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutNotificationsNestedInput
+  }
+
+  export type NotificationUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    message?: StringFieldUpdateOperationsInput | string
+    link?: NullableStringFieldUpdateOperationsInput | string | null
+    isRead?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type NotificationCreateManyInput = {
+    id?: string
+    userId: string
+    message: string
+    link?: string | null
+    isRead?: boolean
+    createdAt?: Date | string
+  }
+
+  export type NotificationUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    message?: StringFieldUpdateOperationsInput | string
+    link?: NullableStringFieldUpdateOperationsInput | string | null
+    isRead?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type NotificationUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    message?: StringFieldUpdateOperationsInput | string
+    link?: NullableStringFieldUpdateOperationsInput | string | null
+    isRead?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -26656,17 +27822,17 @@ export namespace Prisma {
     deliveryLocation?: string | null
     releaseDate?: Date | string
     dateReleased?: Date | string | null
-    status?: $Enums.Status
-    wpoApprovedAt?: Date | string | null
-    systemApprovedAt?: Date | string | null
-    pmApprovedAt?: Date | string | null
+    status?: $Enums.WrStatus
+    warehouseApprovedAt?: Date | string | null
+    procurementApprovedAt?: Date | string | null
+    rejectedSide?: string | null
+    rejectedReason?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     materialRequest?: MaterialRequestCreateNestedOneWithoutWarehouseReleasesInput
     requester: UserCreateNestedOneWithoutWarehouseReleasesInput
-    wpoApprover?: UserCreateNestedOneWithoutWrWpoApprovedInput
-    systemApprover?: UserCreateNestedOneWithoutWrSysApprovedInput
-    pmApprover?: UserCreateNestedOneWithoutWrPmApprovedInput
+    warehouseApprover?: UserCreateNestedOneWithoutWrWarehouseApprovedInput
+    procurementApprover?: UserCreateNestedOneWithoutWrProcurementApprovedInput
     items?: WarehouseReleaseItemCreateNestedManyWithoutReleaseInput
   }
 
@@ -26681,13 +27847,13 @@ export namespace Prisma {
     releaseDate?: Date | string
     dateReleased?: Date | string | null
     requesterId: string
-    status?: $Enums.Status
-    wpoApprovedBy?: string | null
-    wpoApprovedAt?: Date | string | null
-    systemApprovedBy?: string | null
-    systemApprovedAt?: Date | string | null
-    pmApprovedBy?: string | null
-    pmApprovedAt?: Date | string | null
+    status?: $Enums.WrStatus
+    warehouseApprovedBy?: string | null
+    warehouseApprovedAt?: Date | string | null
+    procurementApprovedBy?: string | null
+    procurementApprovedAt?: Date | string | null
+    rejectedSide?: string | null
+    rejectedReason?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     items?: WarehouseReleaseItemUncheckedCreateNestedManyWithoutReleaseInput
@@ -26702,17 +27868,17 @@ export namespace Prisma {
     deliveryLocation?: NullableStringFieldUpdateOperationsInput | string | null
     releaseDate?: DateTimeFieldUpdateOperationsInput | Date | string
     dateReleased?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    status?: EnumStatusFieldUpdateOperationsInput | $Enums.Status
-    wpoApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    systemApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    pmApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    status?: EnumWrStatusFieldUpdateOperationsInput | $Enums.WrStatus
+    warehouseApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    procurementApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rejectedSide?: NullableStringFieldUpdateOperationsInput | string | null
+    rejectedReason?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     materialRequest?: MaterialRequestUpdateOneWithoutWarehouseReleasesNestedInput
     requester?: UserUpdateOneRequiredWithoutWarehouseReleasesNestedInput
-    wpoApprover?: UserUpdateOneWithoutWrWpoApprovedNestedInput
-    systemApprover?: UserUpdateOneWithoutWrSysApprovedNestedInput
-    pmApprover?: UserUpdateOneWithoutWrPmApprovedNestedInput
+    warehouseApprover?: UserUpdateOneWithoutWrWarehouseApprovedNestedInput
+    procurementApprover?: UserUpdateOneWithoutWrProcurementApprovedNestedInput
     items?: WarehouseReleaseItemUpdateManyWithoutReleaseNestedInput
   }
 
@@ -26727,13 +27893,13 @@ export namespace Prisma {
     releaseDate?: DateTimeFieldUpdateOperationsInput | Date | string
     dateReleased?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     requesterId?: StringFieldUpdateOperationsInput | string
-    status?: EnumStatusFieldUpdateOperationsInput | $Enums.Status
-    wpoApprovedBy?: NullableStringFieldUpdateOperationsInput | string | null
-    wpoApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    systemApprovedBy?: NullableStringFieldUpdateOperationsInput | string | null
-    systemApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    pmApprovedBy?: NullableStringFieldUpdateOperationsInput | string | null
-    pmApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    status?: EnumWrStatusFieldUpdateOperationsInput | $Enums.WrStatus
+    warehouseApprovedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    warehouseApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    procurementApprovedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    procurementApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rejectedSide?: NullableStringFieldUpdateOperationsInput | string | null
+    rejectedReason?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     items?: WarehouseReleaseItemUncheckedUpdateManyWithoutReleaseNestedInput
@@ -26750,13 +27916,13 @@ export namespace Prisma {
     releaseDate?: Date | string
     dateReleased?: Date | string | null
     requesterId: string
-    status?: $Enums.Status
-    wpoApprovedBy?: string | null
-    wpoApprovedAt?: Date | string | null
-    systemApprovedBy?: string | null
-    systemApprovedAt?: Date | string | null
-    pmApprovedBy?: string | null
-    pmApprovedAt?: Date | string | null
+    status?: $Enums.WrStatus
+    warehouseApprovedBy?: string | null
+    warehouseApprovedAt?: Date | string | null
+    procurementApprovedBy?: string | null
+    procurementApprovedAt?: Date | string | null
+    rejectedSide?: string | null
+    rejectedReason?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -26770,10 +27936,11 @@ export namespace Prisma {
     deliveryLocation?: NullableStringFieldUpdateOperationsInput | string | null
     releaseDate?: DateTimeFieldUpdateOperationsInput | Date | string
     dateReleased?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    status?: EnumStatusFieldUpdateOperationsInput | $Enums.Status
-    wpoApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    systemApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    pmApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    status?: EnumWrStatusFieldUpdateOperationsInput | $Enums.WrStatus
+    warehouseApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    procurementApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rejectedSide?: NullableStringFieldUpdateOperationsInput | string | null
+    rejectedReason?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -26789,13 +27956,13 @@ export namespace Prisma {
     releaseDate?: DateTimeFieldUpdateOperationsInput | Date | string
     dateReleased?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     requesterId?: StringFieldUpdateOperationsInput | string
-    status?: EnumStatusFieldUpdateOperationsInput | $Enums.Status
-    wpoApprovedBy?: NullableStringFieldUpdateOperationsInput | string | null
-    wpoApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    systemApprovedBy?: NullableStringFieldUpdateOperationsInput | string | null
-    systemApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    pmApprovedBy?: NullableStringFieldUpdateOperationsInput | string | null
-    pmApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    status?: EnumWrStatusFieldUpdateOperationsInput | $Enums.WrStatus
+    warehouseApprovedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    warehouseApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    procurementApprovedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    procurementApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rejectedSide?: NullableStringFieldUpdateOperationsInput | string | null
+    rejectedReason?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -28446,6 +29613,12 @@ export namespace Prisma {
     none?: SupplierPriceWhereInput
   }
 
+  export type NotificationListRelationFilter = {
+    every?: NotificationWhereInput
+    some?: NotificationWhereInput
+    none?: NotificationWhereInput
+  }
+
   export type SortOrderInput = {
     sort: SortOrder
     nulls?: NullsOrder
@@ -28484,6 +29657,10 @@ export namespace Prisma {
   }
 
   export type SupplierPriceOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type NotificationOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -28596,6 +29773,57 @@ export namespace Prisma {
     _max?: NestedDateTimeFilter<$PrismaModel>
   }
 
+  export type BoolFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolFilter<$PrismaModel> | boolean
+  }
+
+  export type UserScalarRelationFilter = {
+    is?: UserWhereInput
+    isNot?: UserWhereInput
+  }
+
+  export type NotificationOrderByRelevanceInput = {
+    fields: NotificationOrderByRelevanceFieldEnum | NotificationOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
+
+  export type NotificationCountOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    message?: SortOrder
+    link?: SortOrder
+    isRead?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type NotificationMaxOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    message?: SortOrder
+    link?: SortOrder
+    isRead?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type NotificationMinOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    message?: SortOrder
+    link?: SortOrder
+    isRead?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type BoolWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedBoolFilter<$PrismaModel>
+    _max?: NestedBoolFilter<$PrismaModel>
+  }
+
   export type EnumStatusFilter<$PrismaModel = never> = {
     equals?: $Enums.Status | EnumStatusFieldRefInput<$PrismaModel>
     in?: $Enums.Status[]
@@ -28624,11 +29852,6 @@ export namespace Prisma {
     every?: SuratJalanWhereInput
     some?: SuratJalanWhereInput
     none?: SuratJalanWhereInput
-  }
-
-  export type UserScalarRelationFilter = {
-    is?: UserWhereInput
-    isNot?: UserWhereInput
   }
 
   export type UserNullableScalarRelationFilter = {
@@ -28965,6 +30188,13 @@ export namespace Prisma {
     _max?: NestedEnumStatusNullableFilter<$PrismaModel>
   }
 
+  export type EnumWrStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.WrStatus | EnumWrStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.WrStatus[]
+    notIn?: $Enums.WrStatus[]
+    not?: NestedEnumWrStatusFilter<$PrismaModel> | $Enums.WrStatus
+  }
+
   export type MaterialRequestNullableScalarRelationFilter = {
     is?: MaterialRequestWhereInput | null
     isNot?: MaterialRequestWhereInput | null
@@ -28998,12 +30228,12 @@ export namespace Prisma {
     dateReleased?: SortOrder
     requesterId?: SortOrder
     status?: SortOrder
-    wpoApprovedBy?: SortOrder
-    wpoApprovedAt?: SortOrder
-    systemApprovedBy?: SortOrder
-    systemApprovedAt?: SortOrder
-    pmApprovedBy?: SortOrder
-    pmApprovedAt?: SortOrder
+    warehouseApprovedBy?: SortOrder
+    warehouseApprovedAt?: SortOrder
+    procurementApprovedBy?: SortOrder
+    procurementApprovedAt?: SortOrder
+    rejectedSide?: SortOrder
+    rejectedReason?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -29020,12 +30250,12 @@ export namespace Prisma {
     dateReleased?: SortOrder
     requesterId?: SortOrder
     status?: SortOrder
-    wpoApprovedBy?: SortOrder
-    wpoApprovedAt?: SortOrder
-    systemApprovedBy?: SortOrder
-    systemApprovedAt?: SortOrder
-    pmApprovedBy?: SortOrder
-    pmApprovedAt?: SortOrder
+    warehouseApprovedBy?: SortOrder
+    warehouseApprovedAt?: SortOrder
+    procurementApprovedBy?: SortOrder
+    procurementApprovedAt?: SortOrder
+    rejectedSide?: SortOrder
+    rejectedReason?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -29042,14 +30272,24 @@ export namespace Prisma {
     dateReleased?: SortOrder
     requesterId?: SortOrder
     status?: SortOrder
-    wpoApprovedBy?: SortOrder
-    wpoApprovedAt?: SortOrder
-    systemApprovedBy?: SortOrder
-    systemApprovedAt?: SortOrder
-    pmApprovedBy?: SortOrder
-    pmApprovedAt?: SortOrder
+    warehouseApprovedBy?: SortOrder
+    warehouseApprovedAt?: SortOrder
+    procurementApprovedBy?: SortOrder
+    procurementApprovedAt?: SortOrder
+    rejectedSide?: SortOrder
+    rejectedReason?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+  }
+
+  export type EnumWrStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.WrStatus | EnumWrStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.WrStatus[]
+    notIn?: $Enums.WrStatus[]
+    not?: NestedEnumWrStatusWithAggregatesFilter<$PrismaModel> | $Enums.WrStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumWrStatusFilter<$PrismaModel>
+    _max?: NestedEnumWrStatusFilter<$PrismaModel>
   }
 
   export type IntNullableFilter<$PrismaModel = never> = {
@@ -29456,11 +30696,6 @@ export namespace Prisma {
     mrItemId?: SortOrder
   }
 
-  export type BoolFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolFilter<$PrismaModel> | boolean
-  }
-
   export type POInvoiceOrderByRelevanceInput = {
     fields: POInvoiceOrderByRelevanceFieldEnum | POInvoiceOrderByRelevanceFieldEnum[]
     sort: SortOrder
@@ -29509,14 +30744,6 @@ export namespace Prisma {
 
   export type POInvoiceSumOrderByAggregateInput = {
     amount?: SortOrder
-  }
-
-  export type BoolWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedBoolFilter<$PrismaModel>
-    _max?: NestedBoolFilter<$PrismaModel>
   }
 
   export type EnumBorrowStatusFilter<$PrismaModel = never> = {
@@ -30209,24 +31436,17 @@ export namespace Prisma {
     connect?: WarehouseReleaseWhereUniqueInput | WarehouseReleaseWhereUniqueInput[]
   }
 
-  export type WarehouseReleaseCreateNestedManyWithoutWpoApproverInput = {
-    create?: XOR<WarehouseReleaseCreateWithoutWpoApproverInput, WarehouseReleaseUncheckedCreateWithoutWpoApproverInput> | WarehouseReleaseCreateWithoutWpoApproverInput[] | WarehouseReleaseUncheckedCreateWithoutWpoApproverInput[]
-    connectOrCreate?: WarehouseReleaseCreateOrConnectWithoutWpoApproverInput | WarehouseReleaseCreateOrConnectWithoutWpoApproverInput[]
-    createMany?: WarehouseReleaseCreateManyWpoApproverInputEnvelope
+  export type WarehouseReleaseCreateNestedManyWithoutWarehouseApproverInput = {
+    create?: XOR<WarehouseReleaseCreateWithoutWarehouseApproverInput, WarehouseReleaseUncheckedCreateWithoutWarehouseApproverInput> | WarehouseReleaseCreateWithoutWarehouseApproverInput[] | WarehouseReleaseUncheckedCreateWithoutWarehouseApproverInput[]
+    connectOrCreate?: WarehouseReleaseCreateOrConnectWithoutWarehouseApproverInput | WarehouseReleaseCreateOrConnectWithoutWarehouseApproverInput[]
+    createMany?: WarehouseReleaseCreateManyWarehouseApproverInputEnvelope
     connect?: WarehouseReleaseWhereUniqueInput | WarehouseReleaseWhereUniqueInput[]
   }
 
-  export type WarehouseReleaseCreateNestedManyWithoutSystemApproverInput = {
-    create?: XOR<WarehouseReleaseCreateWithoutSystemApproverInput, WarehouseReleaseUncheckedCreateWithoutSystemApproverInput> | WarehouseReleaseCreateWithoutSystemApproverInput[] | WarehouseReleaseUncheckedCreateWithoutSystemApproverInput[]
-    connectOrCreate?: WarehouseReleaseCreateOrConnectWithoutSystemApproverInput | WarehouseReleaseCreateOrConnectWithoutSystemApproverInput[]
-    createMany?: WarehouseReleaseCreateManySystemApproverInputEnvelope
-    connect?: WarehouseReleaseWhereUniqueInput | WarehouseReleaseWhereUniqueInput[]
-  }
-
-  export type WarehouseReleaseCreateNestedManyWithoutPmApproverInput = {
-    create?: XOR<WarehouseReleaseCreateWithoutPmApproverInput, WarehouseReleaseUncheckedCreateWithoutPmApproverInput> | WarehouseReleaseCreateWithoutPmApproverInput[] | WarehouseReleaseUncheckedCreateWithoutPmApproverInput[]
-    connectOrCreate?: WarehouseReleaseCreateOrConnectWithoutPmApproverInput | WarehouseReleaseCreateOrConnectWithoutPmApproverInput[]
-    createMany?: WarehouseReleaseCreateManyPmApproverInputEnvelope
+  export type WarehouseReleaseCreateNestedManyWithoutProcurementApproverInput = {
+    create?: XOR<WarehouseReleaseCreateWithoutProcurementApproverInput, WarehouseReleaseUncheckedCreateWithoutProcurementApproverInput> | WarehouseReleaseCreateWithoutProcurementApproverInput[] | WarehouseReleaseUncheckedCreateWithoutProcurementApproverInput[]
+    connectOrCreate?: WarehouseReleaseCreateOrConnectWithoutProcurementApproverInput | WarehouseReleaseCreateOrConnectWithoutProcurementApproverInput[]
+    createMany?: WarehouseReleaseCreateManyProcurementApproverInputEnvelope
     connect?: WarehouseReleaseWhereUniqueInput | WarehouseReleaseWhereUniqueInput[]
   }
 
@@ -30314,6 +31534,13 @@ export namespace Prisma {
     connect?: SupplierPriceWhereUniqueInput | SupplierPriceWhereUniqueInput[]
   }
 
+  export type NotificationCreateNestedManyWithoutUserInput = {
+    create?: XOR<NotificationCreateWithoutUserInput, NotificationUncheckedCreateWithoutUserInput> | NotificationCreateWithoutUserInput[] | NotificationUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: NotificationCreateOrConnectWithoutUserInput | NotificationCreateOrConnectWithoutUserInput[]
+    createMany?: NotificationCreateManyUserInputEnvelope
+    connect?: NotificationWhereUniqueInput | NotificationWhereUniqueInput[]
+  }
+
   export type MaterialRequestUncheckedCreateNestedManyWithoutRequesterInput = {
     create?: XOR<MaterialRequestCreateWithoutRequesterInput, MaterialRequestUncheckedCreateWithoutRequesterInput> | MaterialRequestCreateWithoutRequesterInput[] | MaterialRequestUncheckedCreateWithoutRequesterInput[]
     connectOrCreate?: MaterialRequestCreateOrConnectWithoutRequesterInput | MaterialRequestCreateOrConnectWithoutRequesterInput[]
@@ -30377,24 +31604,17 @@ export namespace Prisma {
     connect?: WarehouseReleaseWhereUniqueInput | WarehouseReleaseWhereUniqueInput[]
   }
 
-  export type WarehouseReleaseUncheckedCreateNestedManyWithoutWpoApproverInput = {
-    create?: XOR<WarehouseReleaseCreateWithoutWpoApproverInput, WarehouseReleaseUncheckedCreateWithoutWpoApproverInput> | WarehouseReleaseCreateWithoutWpoApproverInput[] | WarehouseReleaseUncheckedCreateWithoutWpoApproverInput[]
-    connectOrCreate?: WarehouseReleaseCreateOrConnectWithoutWpoApproverInput | WarehouseReleaseCreateOrConnectWithoutWpoApproverInput[]
-    createMany?: WarehouseReleaseCreateManyWpoApproverInputEnvelope
+  export type WarehouseReleaseUncheckedCreateNestedManyWithoutWarehouseApproverInput = {
+    create?: XOR<WarehouseReleaseCreateWithoutWarehouseApproverInput, WarehouseReleaseUncheckedCreateWithoutWarehouseApproverInput> | WarehouseReleaseCreateWithoutWarehouseApproverInput[] | WarehouseReleaseUncheckedCreateWithoutWarehouseApproverInput[]
+    connectOrCreate?: WarehouseReleaseCreateOrConnectWithoutWarehouseApproverInput | WarehouseReleaseCreateOrConnectWithoutWarehouseApproverInput[]
+    createMany?: WarehouseReleaseCreateManyWarehouseApproverInputEnvelope
     connect?: WarehouseReleaseWhereUniqueInput | WarehouseReleaseWhereUniqueInput[]
   }
 
-  export type WarehouseReleaseUncheckedCreateNestedManyWithoutSystemApproverInput = {
-    create?: XOR<WarehouseReleaseCreateWithoutSystemApproverInput, WarehouseReleaseUncheckedCreateWithoutSystemApproverInput> | WarehouseReleaseCreateWithoutSystemApproverInput[] | WarehouseReleaseUncheckedCreateWithoutSystemApproverInput[]
-    connectOrCreate?: WarehouseReleaseCreateOrConnectWithoutSystemApproverInput | WarehouseReleaseCreateOrConnectWithoutSystemApproverInput[]
-    createMany?: WarehouseReleaseCreateManySystemApproverInputEnvelope
-    connect?: WarehouseReleaseWhereUniqueInput | WarehouseReleaseWhereUniqueInput[]
-  }
-
-  export type WarehouseReleaseUncheckedCreateNestedManyWithoutPmApproverInput = {
-    create?: XOR<WarehouseReleaseCreateWithoutPmApproverInput, WarehouseReleaseUncheckedCreateWithoutPmApproverInput> | WarehouseReleaseCreateWithoutPmApproverInput[] | WarehouseReleaseUncheckedCreateWithoutPmApproverInput[]
-    connectOrCreate?: WarehouseReleaseCreateOrConnectWithoutPmApproverInput | WarehouseReleaseCreateOrConnectWithoutPmApproverInput[]
-    createMany?: WarehouseReleaseCreateManyPmApproverInputEnvelope
+  export type WarehouseReleaseUncheckedCreateNestedManyWithoutProcurementApproverInput = {
+    create?: XOR<WarehouseReleaseCreateWithoutProcurementApproverInput, WarehouseReleaseUncheckedCreateWithoutProcurementApproverInput> | WarehouseReleaseCreateWithoutProcurementApproverInput[] | WarehouseReleaseUncheckedCreateWithoutProcurementApproverInput[]
+    connectOrCreate?: WarehouseReleaseCreateOrConnectWithoutProcurementApproverInput | WarehouseReleaseCreateOrConnectWithoutProcurementApproverInput[]
+    createMany?: WarehouseReleaseCreateManyProcurementApproverInputEnvelope
     connect?: WarehouseReleaseWhereUniqueInput | WarehouseReleaseWhereUniqueInput[]
   }
 
@@ -30480,6 +31700,13 @@ export namespace Prisma {
     connectOrCreate?: SupplierPriceCreateOrConnectWithoutInputterInput | SupplierPriceCreateOrConnectWithoutInputterInput[]
     createMany?: SupplierPriceCreateManyInputterInputEnvelope
     connect?: SupplierPriceWhereUniqueInput | SupplierPriceWhereUniqueInput[]
+  }
+
+  export type NotificationUncheckedCreateNestedManyWithoutUserInput = {
+    create?: XOR<NotificationCreateWithoutUserInput, NotificationUncheckedCreateWithoutUserInput> | NotificationCreateWithoutUserInput[] | NotificationUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: NotificationCreateOrConnectWithoutUserInput | NotificationCreateOrConnectWithoutUserInput[]
+    createMany?: NotificationCreateManyUserInputEnvelope
+    connect?: NotificationWhereUniqueInput | NotificationWhereUniqueInput[]
   }
 
   export type StringFieldUpdateOperationsInput = {
@@ -30628,45 +31855,31 @@ export namespace Prisma {
     deleteMany?: WarehouseReleaseScalarWhereInput | WarehouseReleaseScalarWhereInput[]
   }
 
-  export type WarehouseReleaseUpdateManyWithoutWpoApproverNestedInput = {
-    create?: XOR<WarehouseReleaseCreateWithoutWpoApproverInput, WarehouseReleaseUncheckedCreateWithoutWpoApproverInput> | WarehouseReleaseCreateWithoutWpoApproverInput[] | WarehouseReleaseUncheckedCreateWithoutWpoApproverInput[]
-    connectOrCreate?: WarehouseReleaseCreateOrConnectWithoutWpoApproverInput | WarehouseReleaseCreateOrConnectWithoutWpoApproverInput[]
-    upsert?: WarehouseReleaseUpsertWithWhereUniqueWithoutWpoApproverInput | WarehouseReleaseUpsertWithWhereUniqueWithoutWpoApproverInput[]
-    createMany?: WarehouseReleaseCreateManyWpoApproverInputEnvelope
+  export type WarehouseReleaseUpdateManyWithoutWarehouseApproverNestedInput = {
+    create?: XOR<WarehouseReleaseCreateWithoutWarehouseApproverInput, WarehouseReleaseUncheckedCreateWithoutWarehouseApproverInput> | WarehouseReleaseCreateWithoutWarehouseApproverInput[] | WarehouseReleaseUncheckedCreateWithoutWarehouseApproverInput[]
+    connectOrCreate?: WarehouseReleaseCreateOrConnectWithoutWarehouseApproverInput | WarehouseReleaseCreateOrConnectWithoutWarehouseApproverInput[]
+    upsert?: WarehouseReleaseUpsertWithWhereUniqueWithoutWarehouseApproverInput | WarehouseReleaseUpsertWithWhereUniqueWithoutWarehouseApproverInput[]
+    createMany?: WarehouseReleaseCreateManyWarehouseApproverInputEnvelope
     set?: WarehouseReleaseWhereUniqueInput | WarehouseReleaseWhereUniqueInput[]
     disconnect?: WarehouseReleaseWhereUniqueInput | WarehouseReleaseWhereUniqueInput[]
     delete?: WarehouseReleaseWhereUniqueInput | WarehouseReleaseWhereUniqueInput[]
     connect?: WarehouseReleaseWhereUniqueInput | WarehouseReleaseWhereUniqueInput[]
-    update?: WarehouseReleaseUpdateWithWhereUniqueWithoutWpoApproverInput | WarehouseReleaseUpdateWithWhereUniqueWithoutWpoApproverInput[]
-    updateMany?: WarehouseReleaseUpdateManyWithWhereWithoutWpoApproverInput | WarehouseReleaseUpdateManyWithWhereWithoutWpoApproverInput[]
+    update?: WarehouseReleaseUpdateWithWhereUniqueWithoutWarehouseApproverInput | WarehouseReleaseUpdateWithWhereUniqueWithoutWarehouseApproverInput[]
+    updateMany?: WarehouseReleaseUpdateManyWithWhereWithoutWarehouseApproverInput | WarehouseReleaseUpdateManyWithWhereWithoutWarehouseApproverInput[]
     deleteMany?: WarehouseReleaseScalarWhereInput | WarehouseReleaseScalarWhereInput[]
   }
 
-  export type WarehouseReleaseUpdateManyWithoutSystemApproverNestedInput = {
-    create?: XOR<WarehouseReleaseCreateWithoutSystemApproverInput, WarehouseReleaseUncheckedCreateWithoutSystemApproverInput> | WarehouseReleaseCreateWithoutSystemApproverInput[] | WarehouseReleaseUncheckedCreateWithoutSystemApproverInput[]
-    connectOrCreate?: WarehouseReleaseCreateOrConnectWithoutSystemApproverInput | WarehouseReleaseCreateOrConnectWithoutSystemApproverInput[]
-    upsert?: WarehouseReleaseUpsertWithWhereUniqueWithoutSystemApproverInput | WarehouseReleaseUpsertWithWhereUniqueWithoutSystemApproverInput[]
-    createMany?: WarehouseReleaseCreateManySystemApproverInputEnvelope
+  export type WarehouseReleaseUpdateManyWithoutProcurementApproverNestedInput = {
+    create?: XOR<WarehouseReleaseCreateWithoutProcurementApproverInput, WarehouseReleaseUncheckedCreateWithoutProcurementApproverInput> | WarehouseReleaseCreateWithoutProcurementApproverInput[] | WarehouseReleaseUncheckedCreateWithoutProcurementApproverInput[]
+    connectOrCreate?: WarehouseReleaseCreateOrConnectWithoutProcurementApproverInput | WarehouseReleaseCreateOrConnectWithoutProcurementApproverInput[]
+    upsert?: WarehouseReleaseUpsertWithWhereUniqueWithoutProcurementApproverInput | WarehouseReleaseUpsertWithWhereUniqueWithoutProcurementApproverInput[]
+    createMany?: WarehouseReleaseCreateManyProcurementApproverInputEnvelope
     set?: WarehouseReleaseWhereUniqueInput | WarehouseReleaseWhereUniqueInput[]
     disconnect?: WarehouseReleaseWhereUniqueInput | WarehouseReleaseWhereUniqueInput[]
     delete?: WarehouseReleaseWhereUniqueInput | WarehouseReleaseWhereUniqueInput[]
     connect?: WarehouseReleaseWhereUniqueInput | WarehouseReleaseWhereUniqueInput[]
-    update?: WarehouseReleaseUpdateWithWhereUniqueWithoutSystemApproverInput | WarehouseReleaseUpdateWithWhereUniqueWithoutSystemApproverInput[]
-    updateMany?: WarehouseReleaseUpdateManyWithWhereWithoutSystemApproverInput | WarehouseReleaseUpdateManyWithWhereWithoutSystemApproverInput[]
-    deleteMany?: WarehouseReleaseScalarWhereInput | WarehouseReleaseScalarWhereInput[]
-  }
-
-  export type WarehouseReleaseUpdateManyWithoutPmApproverNestedInput = {
-    create?: XOR<WarehouseReleaseCreateWithoutPmApproverInput, WarehouseReleaseUncheckedCreateWithoutPmApproverInput> | WarehouseReleaseCreateWithoutPmApproverInput[] | WarehouseReleaseUncheckedCreateWithoutPmApproverInput[]
-    connectOrCreate?: WarehouseReleaseCreateOrConnectWithoutPmApproverInput | WarehouseReleaseCreateOrConnectWithoutPmApproverInput[]
-    upsert?: WarehouseReleaseUpsertWithWhereUniqueWithoutPmApproverInput | WarehouseReleaseUpsertWithWhereUniqueWithoutPmApproverInput[]
-    createMany?: WarehouseReleaseCreateManyPmApproverInputEnvelope
-    set?: WarehouseReleaseWhereUniqueInput | WarehouseReleaseWhereUniqueInput[]
-    disconnect?: WarehouseReleaseWhereUniqueInput | WarehouseReleaseWhereUniqueInput[]
-    delete?: WarehouseReleaseWhereUniqueInput | WarehouseReleaseWhereUniqueInput[]
-    connect?: WarehouseReleaseWhereUniqueInput | WarehouseReleaseWhereUniqueInput[]
-    update?: WarehouseReleaseUpdateWithWhereUniqueWithoutPmApproverInput | WarehouseReleaseUpdateWithWhereUniqueWithoutPmApproverInput[]
-    updateMany?: WarehouseReleaseUpdateManyWithWhereWithoutPmApproverInput | WarehouseReleaseUpdateManyWithWhereWithoutPmApproverInput[]
+    update?: WarehouseReleaseUpdateWithWhereUniqueWithoutProcurementApproverInput | WarehouseReleaseUpdateWithWhereUniqueWithoutProcurementApproverInput[]
+    updateMany?: WarehouseReleaseUpdateManyWithWhereWithoutProcurementApproverInput | WarehouseReleaseUpdateManyWithWhereWithoutProcurementApproverInput[]
     deleteMany?: WarehouseReleaseScalarWhereInput | WarehouseReleaseScalarWhereInput[]
   }
 
@@ -30838,6 +32051,20 @@ export namespace Prisma {
     deleteMany?: SupplierPriceScalarWhereInput | SupplierPriceScalarWhereInput[]
   }
 
+  export type NotificationUpdateManyWithoutUserNestedInput = {
+    create?: XOR<NotificationCreateWithoutUserInput, NotificationUncheckedCreateWithoutUserInput> | NotificationCreateWithoutUserInput[] | NotificationUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: NotificationCreateOrConnectWithoutUserInput | NotificationCreateOrConnectWithoutUserInput[]
+    upsert?: NotificationUpsertWithWhereUniqueWithoutUserInput | NotificationUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: NotificationCreateManyUserInputEnvelope
+    set?: NotificationWhereUniqueInput | NotificationWhereUniqueInput[]
+    disconnect?: NotificationWhereUniqueInput | NotificationWhereUniqueInput[]
+    delete?: NotificationWhereUniqueInput | NotificationWhereUniqueInput[]
+    connect?: NotificationWhereUniqueInput | NotificationWhereUniqueInput[]
+    update?: NotificationUpdateWithWhereUniqueWithoutUserInput | NotificationUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: NotificationUpdateManyWithWhereWithoutUserInput | NotificationUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: NotificationScalarWhereInput | NotificationScalarWhereInput[]
+  }
+
   export type MaterialRequestUncheckedUpdateManyWithoutRequesterNestedInput = {
     create?: XOR<MaterialRequestCreateWithoutRequesterInput, MaterialRequestUncheckedCreateWithoutRequesterInput> | MaterialRequestCreateWithoutRequesterInput[] | MaterialRequestUncheckedCreateWithoutRequesterInput[]
     connectOrCreate?: MaterialRequestCreateOrConnectWithoutRequesterInput | MaterialRequestCreateOrConnectWithoutRequesterInput[]
@@ -30964,45 +32191,31 @@ export namespace Prisma {
     deleteMany?: WarehouseReleaseScalarWhereInput | WarehouseReleaseScalarWhereInput[]
   }
 
-  export type WarehouseReleaseUncheckedUpdateManyWithoutWpoApproverNestedInput = {
-    create?: XOR<WarehouseReleaseCreateWithoutWpoApproverInput, WarehouseReleaseUncheckedCreateWithoutWpoApproverInput> | WarehouseReleaseCreateWithoutWpoApproverInput[] | WarehouseReleaseUncheckedCreateWithoutWpoApproverInput[]
-    connectOrCreate?: WarehouseReleaseCreateOrConnectWithoutWpoApproverInput | WarehouseReleaseCreateOrConnectWithoutWpoApproverInput[]
-    upsert?: WarehouseReleaseUpsertWithWhereUniqueWithoutWpoApproverInput | WarehouseReleaseUpsertWithWhereUniqueWithoutWpoApproverInput[]
-    createMany?: WarehouseReleaseCreateManyWpoApproverInputEnvelope
+  export type WarehouseReleaseUncheckedUpdateManyWithoutWarehouseApproverNestedInput = {
+    create?: XOR<WarehouseReleaseCreateWithoutWarehouseApproverInput, WarehouseReleaseUncheckedCreateWithoutWarehouseApproverInput> | WarehouseReleaseCreateWithoutWarehouseApproverInput[] | WarehouseReleaseUncheckedCreateWithoutWarehouseApproverInput[]
+    connectOrCreate?: WarehouseReleaseCreateOrConnectWithoutWarehouseApproverInput | WarehouseReleaseCreateOrConnectWithoutWarehouseApproverInput[]
+    upsert?: WarehouseReleaseUpsertWithWhereUniqueWithoutWarehouseApproverInput | WarehouseReleaseUpsertWithWhereUniqueWithoutWarehouseApproverInput[]
+    createMany?: WarehouseReleaseCreateManyWarehouseApproverInputEnvelope
     set?: WarehouseReleaseWhereUniqueInput | WarehouseReleaseWhereUniqueInput[]
     disconnect?: WarehouseReleaseWhereUniqueInput | WarehouseReleaseWhereUniqueInput[]
     delete?: WarehouseReleaseWhereUniqueInput | WarehouseReleaseWhereUniqueInput[]
     connect?: WarehouseReleaseWhereUniqueInput | WarehouseReleaseWhereUniqueInput[]
-    update?: WarehouseReleaseUpdateWithWhereUniqueWithoutWpoApproverInput | WarehouseReleaseUpdateWithWhereUniqueWithoutWpoApproverInput[]
-    updateMany?: WarehouseReleaseUpdateManyWithWhereWithoutWpoApproverInput | WarehouseReleaseUpdateManyWithWhereWithoutWpoApproverInput[]
+    update?: WarehouseReleaseUpdateWithWhereUniqueWithoutWarehouseApproverInput | WarehouseReleaseUpdateWithWhereUniqueWithoutWarehouseApproverInput[]
+    updateMany?: WarehouseReleaseUpdateManyWithWhereWithoutWarehouseApproverInput | WarehouseReleaseUpdateManyWithWhereWithoutWarehouseApproverInput[]
     deleteMany?: WarehouseReleaseScalarWhereInput | WarehouseReleaseScalarWhereInput[]
   }
 
-  export type WarehouseReleaseUncheckedUpdateManyWithoutSystemApproverNestedInput = {
-    create?: XOR<WarehouseReleaseCreateWithoutSystemApproverInput, WarehouseReleaseUncheckedCreateWithoutSystemApproverInput> | WarehouseReleaseCreateWithoutSystemApproverInput[] | WarehouseReleaseUncheckedCreateWithoutSystemApproverInput[]
-    connectOrCreate?: WarehouseReleaseCreateOrConnectWithoutSystemApproverInput | WarehouseReleaseCreateOrConnectWithoutSystemApproverInput[]
-    upsert?: WarehouseReleaseUpsertWithWhereUniqueWithoutSystemApproverInput | WarehouseReleaseUpsertWithWhereUniqueWithoutSystemApproverInput[]
-    createMany?: WarehouseReleaseCreateManySystemApproverInputEnvelope
+  export type WarehouseReleaseUncheckedUpdateManyWithoutProcurementApproverNestedInput = {
+    create?: XOR<WarehouseReleaseCreateWithoutProcurementApproverInput, WarehouseReleaseUncheckedCreateWithoutProcurementApproverInput> | WarehouseReleaseCreateWithoutProcurementApproverInput[] | WarehouseReleaseUncheckedCreateWithoutProcurementApproverInput[]
+    connectOrCreate?: WarehouseReleaseCreateOrConnectWithoutProcurementApproverInput | WarehouseReleaseCreateOrConnectWithoutProcurementApproverInput[]
+    upsert?: WarehouseReleaseUpsertWithWhereUniqueWithoutProcurementApproverInput | WarehouseReleaseUpsertWithWhereUniqueWithoutProcurementApproverInput[]
+    createMany?: WarehouseReleaseCreateManyProcurementApproverInputEnvelope
     set?: WarehouseReleaseWhereUniqueInput | WarehouseReleaseWhereUniqueInput[]
     disconnect?: WarehouseReleaseWhereUniqueInput | WarehouseReleaseWhereUniqueInput[]
     delete?: WarehouseReleaseWhereUniqueInput | WarehouseReleaseWhereUniqueInput[]
     connect?: WarehouseReleaseWhereUniqueInput | WarehouseReleaseWhereUniqueInput[]
-    update?: WarehouseReleaseUpdateWithWhereUniqueWithoutSystemApproverInput | WarehouseReleaseUpdateWithWhereUniqueWithoutSystemApproverInput[]
-    updateMany?: WarehouseReleaseUpdateManyWithWhereWithoutSystemApproverInput | WarehouseReleaseUpdateManyWithWhereWithoutSystemApproverInput[]
-    deleteMany?: WarehouseReleaseScalarWhereInput | WarehouseReleaseScalarWhereInput[]
-  }
-
-  export type WarehouseReleaseUncheckedUpdateManyWithoutPmApproverNestedInput = {
-    create?: XOR<WarehouseReleaseCreateWithoutPmApproverInput, WarehouseReleaseUncheckedCreateWithoutPmApproverInput> | WarehouseReleaseCreateWithoutPmApproverInput[] | WarehouseReleaseUncheckedCreateWithoutPmApproverInput[]
-    connectOrCreate?: WarehouseReleaseCreateOrConnectWithoutPmApproverInput | WarehouseReleaseCreateOrConnectWithoutPmApproverInput[]
-    upsert?: WarehouseReleaseUpsertWithWhereUniqueWithoutPmApproverInput | WarehouseReleaseUpsertWithWhereUniqueWithoutPmApproverInput[]
-    createMany?: WarehouseReleaseCreateManyPmApproverInputEnvelope
-    set?: WarehouseReleaseWhereUniqueInput | WarehouseReleaseWhereUniqueInput[]
-    disconnect?: WarehouseReleaseWhereUniqueInput | WarehouseReleaseWhereUniqueInput[]
-    delete?: WarehouseReleaseWhereUniqueInput | WarehouseReleaseWhereUniqueInput[]
-    connect?: WarehouseReleaseWhereUniqueInput | WarehouseReleaseWhereUniqueInput[]
-    update?: WarehouseReleaseUpdateWithWhereUniqueWithoutPmApproverInput | WarehouseReleaseUpdateWithWhereUniqueWithoutPmApproverInput[]
-    updateMany?: WarehouseReleaseUpdateManyWithWhereWithoutPmApproverInput | WarehouseReleaseUpdateManyWithWhereWithoutPmApproverInput[]
+    update?: WarehouseReleaseUpdateWithWhereUniqueWithoutProcurementApproverInput | WarehouseReleaseUpdateWithWhereUniqueWithoutProcurementApproverInput[]
+    updateMany?: WarehouseReleaseUpdateManyWithWhereWithoutProcurementApproverInput | WarehouseReleaseUpdateManyWithWhereWithoutProcurementApproverInput[]
     deleteMany?: WarehouseReleaseScalarWhereInput | WarehouseReleaseScalarWhereInput[]
   }
 
@@ -31172,6 +32385,38 @@ export namespace Prisma {
     update?: SupplierPriceUpdateWithWhereUniqueWithoutInputterInput | SupplierPriceUpdateWithWhereUniqueWithoutInputterInput[]
     updateMany?: SupplierPriceUpdateManyWithWhereWithoutInputterInput | SupplierPriceUpdateManyWithWhereWithoutInputterInput[]
     deleteMany?: SupplierPriceScalarWhereInput | SupplierPriceScalarWhereInput[]
+  }
+
+  export type NotificationUncheckedUpdateManyWithoutUserNestedInput = {
+    create?: XOR<NotificationCreateWithoutUserInput, NotificationUncheckedCreateWithoutUserInput> | NotificationCreateWithoutUserInput[] | NotificationUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: NotificationCreateOrConnectWithoutUserInput | NotificationCreateOrConnectWithoutUserInput[]
+    upsert?: NotificationUpsertWithWhereUniqueWithoutUserInput | NotificationUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: NotificationCreateManyUserInputEnvelope
+    set?: NotificationWhereUniqueInput | NotificationWhereUniqueInput[]
+    disconnect?: NotificationWhereUniqueInput | NotificationWhereUniqueInput[]
+    delete?: NotificationWhereUniqueInput | NotificationWhereUniqueInput[]
+    connect?: NotificationWhereUniqueInput | NotificationWhereUniqueInput[]
+    update?: NotificationUpdateWithWhereUniqueWithoutUserInput | NotificationUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: NotificationUpdateManyWithWhereWithoutUserInput | NotificationUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: NotificationScalarWhereInput | NotificationScalarWhereInput[]
+  }
+
+  export type UserCreateNestedOneWithoutNotificationsInput = {
+    create?: XOR<UserCreateWithoutNotificationsInput, UserUncheckedCreateWithoutNotificationsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutNotificationsInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type BoolFieldUpdateOperationsInput = {
+    set?: boolean
+  }
+
+  export type UserUpdateOneRequiredWithoutNotificationsNestedInput = {
+    create?: XOR<UserCreateWithoutNotificationsInput, UserUncheckedCreateWithoutNotificationsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutNotificationsInput
+    upsert?: UserUpsertWithoutNotificationsInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutNotificationsInput, UserUpdateWithoutNotificationsInput>, UserUncheckedUpdateWithoutNotificationsInput>
   }
 
   export type MaterialRequestItemCreateNestedManyWithoutRequestInput = {
@@ -31520,21 +32765,15 @@ export namespace Prisma {
     connect?: UserWhereUniqueInput
   }
 
-  export type UserCreateNestedOneWithoutWrWpoApprovedInput = {
-    create?: XOR<UserCreateWithoutWrWpoApprovedInput, UserUncheckedCreateWithoutWrWpoApprovedInput>
-    connectOrCreate?: UserCreateOrConnectWithoutWrWpoApprovedInput
+  export type UserCreateNestedOneWithoutWrWarehouseApprovedInput = {
+    create?: XOR<UserCreateWithoutWrWarehouseApprovedInput, UserUncheckedCreateWithoutWrWarehouseApprovedInput>
+    connectOrCreate?: UserCreateOrConnectWithoutWrWarehouseApprovedInput
     connect?: UserWhereUniqueInput
   }
 
-  export type UserCreateNestedOneWithoutWrSysApprovedInput = {
-    create?: XOR<UserCreateWithoutWrSysApprovedInput, UserUncheckedCreateWithoutWrSysApprovedInput>
-    connectOrCreate?: UserCreateOrConnectWithoutWrSysApprovedInput
-    connect?: UserWhereUniqueInput
-  }
-
-  export type UserCreateNestedOneWithoutWrPmApprovedInput = {
-    create?: XOR<UserCreateWithoutWrPmApprovedInput, UserUncheckedCreateWithoutWrPmApprovedInput>
-    connectOrCreate?: UserCreateOrConnectWithoutWrPmApprovedInput
+  export type UserCreateNestedOneWithoutWrProcurementApprovedInput = {
+    create?: XOR<UserCreateWithoutWrProcurementApprovedInput, UserUncheckedCreateWithoutWrProcurementApprovedInput>
+    connectOrCreate?: UserCreateOrConnectWithoutWrProcurementApprovedInput
     connect?: UserWhereUniqueInput
   }
 
@@ -31550,6 +32789,10 @@ export namespace Prisma {
     connectOrCreate?: WarehouseReleaseItemCreateOrConnectWithoutReleaseInput | WarehouseReleaseItemCreateOrConnectWithoutReleaseInput[]
     createMany?: WarehouseReleaseItemCreateManyReleaseInputEnvelope
     connect?: WarehouseReleaseItemWhereUniqueInput | WarehouseReleaseItemWhereUniqueInput[]
+  }
+
+  export type EnumWrStatusFieldUpdateOperationsInput = {
+    set?: $Enums.WrStatus
   }
 
   export type MaterialRequestUpdateOneWithoutWarehouseReleasesNestedInput = {
@@ -31570,34 +32813,24 @@ export namespace Prisma {
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutWarehouseReleasesInput, UserUpdateWithoutWarehouseReleasesInput>, UserUncheckedUpdateWithoutWarehouseReleasesInput>
   }
 
-  export type UserUpdateOneWithoutWrWpoApprovedNestedInput = {
-    create?: XOR<UserCreateWithoutWrWpoApprovedInput, UserUncheckedCreateWithoutWrWpoApprovedInput>
-    connectOrCreate?: UserCreateOrConnectWithoutWrWpoApprovedInput
-    upsert?: UserUpsertWithoutWrWpoApprovedInput
+  export type UserUpdateOneWithoutWrWarehouseApprovedNestedInput = {
+    create?: XOR<UserCreateWithoutWrWarehouseApprovedInput, UserUncheckedCreateWithoutWrWarehouseApprovedInput>
+    connectOrCreate?: UserCreateOrConnectWithoutWrWarehouseApprovedInput
+    upsert?: UserUpsertWithoutWrWarehouseApprovedInput
     disconnect?: UserWhereInput | boolean
     delete?: UserWhereInput | boolean
     connect?: UserWhereUniqueInput
-    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutWrWpoApprovedInput, UserUpdateWithoutWrWpoApprovedInput>, UserUncheckedUpdateWithoutWrWpoApprovedInput>
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutWrWarehouseApprovedInput, UserUpdateWithoutWrWarehouseApprovedInput>, UserUncheckedUpdateWithoutWrWarehouseApprovedInput>
   }
 
-  export type UserUpdateOneWithoutWrSysApprovedNestedInput = {
-    create?: XOR<UserCreateWithoutWrSysApprovedInput, UserUncheckedCreateWithoutWrSysApprovedInput>
-    connectOrCreate?: UserCreateOrConnectWithoutWrSysApprovedInput
-    upsert?: UserUpsertWithoutWrSysApprovedInput
+  export type UserUpdateOneWithoutWrProcurementApprovedNestedInput = {
+    create?: XOR<UserCreateWithoutWrProcurementApprovedInput, UserUncheckedCreateWithoutWrProcurementApprovedInput>
+    connectOrCreate?: UserCreateOrConnectWithoutWrProcurementApprovedInput
+    upsert?: UserUpsertWithoutWrProcurementApprovedInput
     disconnect?: UserWhereInput | boolean
     delete?: UserWhereInput | boolean
     connect?: UserWhereUniqueInput
-    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutWrSysApprovedInput, UserUpdateWithoutWrSysApprovedInput>, UserUncheckedUpdateWithoutWrSysApprovedInput>
-  }
-
-  export type UserUpdateOneWithoutWrPmApprovedNestedInput = {
-    create?: XOR<UserCreateWithoutWrPmApprovedInput, UserUncheckedCreateWithoutWrPmApprovedInput>
-    connectOrCreate?: UserCreateOrConnectWithoutWrPmApprovedInput
-    upsert?: UserUpsertWithoutWrPmApprovedInput
-    disconnect?: UserWhereInput | boolean
-    delete?: UserWhereInput | boolean
-    connect?: UserWhereUniqueInput
-    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutWrPmApprovedInput, UserUpdateWithoutWrPmApprovedInput>, UserUncheckedUpdateWithoutWrPmApprovedInput>
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutWrProcurementApprovedInput, UserUpdateWithoutWrProcurementApprovedInput>, UserUncheckedUpdateWithoutWrProcurementApprovedInput>
   }
 
   export type WarehouseReleaseItemUpdateManyWithoutReleaseNestedInput = {
@@ -31812,10 +33045,6 @@ export namespace Prisma {
     create?: XOR<PurchaseOrderCreateWithoutInvoicesInput, PurchaseOrderUncheckedCreateWithoutInvoicesInput>
     connectOrCreate?: PurchaseOrderCreateOrConnectWithoutInvoicesInput
     connect?: PurchaseOrderWhereUniqueInput
-  }
-
-  export type BoolFieldUpdateOperationsInput = {
-    set?: boolean
   }
 
   export type PurchaseOrderUpdateOneRequiredWithoutInvoicesNestedInput = {
@@ -32327,6 +33556,19 @@ export namespace Prisma {
     _max?: NestedDateTimeFilter<$PrismaModel>
   }
 
+  export type NestedBoolFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolFilter<$PrismaModel> | boolean
+  }
+
+  export type NestedBoolWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedBoolFilter<$PrismaModel>
+    _max?: NestedBoolFilter<$PrismaModel>
+  }
+
   export type NestedEnumStatusFilter<$PrismaModel = never> = {
     equals?: $Enums.Status | EnumStatusFieldRefInput<$PrismaModel>
     in?: $Enums.Status[]
@@ -32447,6 +33689,23 @@ export namespace Prisma {
     _max?: NestedEnumStatusNullableFilter<$PrismaModel>
   }
 
+  export type NestedEnumWrStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.WrStatus | EnumWrStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.WrStatus[]
+    notIn?: $Enums.WrStatus[]
+    not?: NestedEnumWrStatusFilter<$PrismaModel> | $Enums.WrStatus
+  }
+
+  export type NestedEnumWrStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.WrStatus | EnumWrStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.WrStatus[]
+    notIn?: $Enums.WrStatus[]
+    not?: NestedEnumWrStatusWithAggregatesFilter<$PrismaModel> | $Enums.WrStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumWrStatusFilter<$PrismaModel>
+    _max?: NestedEnumWrStatusFilter<$PrismaModel>
+  }
+
   export type NestedIntNullableWithAggregatesFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel> | null
     in?: number[] | null
@@ -32533,19 +33792,6 @@ export namespace Prisma {
     _sum?: NestedDecimalNullableFilter<$PrismaModel>
     _min?: NestedDecimalNullableFilter<$PrismaModel>
     _max?: NestedDecimalNullableFilter<$PrismaModel>
-  }
-
-  export type NestedBoolFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolFilter<$PrismaModel> | boolean
-  }
-
-  export type NestedBoolWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedBoolFilter<$PrismaModel>
-    _max?: NestedBoolFilter<$PrismaModel>
   }
 
   export type NestedEnumBorrowStatusFilter<$PrismaModel = never> = {
@@ -33115,16 +34361,16 @@ export namespace Prisma {
     deliveryLocation?: string | null
     releaseDate?: Date | string
     dateReleased?: Date | string | null
-    status?: $Enums.Status
-    wpoApprovedAt?: Date | string | null
-    systemApprovedAt?: Date | string | null
-    pmApprovedAt?: Date | string | null
+    status?: $Enums.WrStatus
+    warehouseApprovedAt?: Date | string | null
+    procurementApprovedAt?: Date | string | null
+    rejectedSide?: string | null
+    rejectedReason?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     materialRequest?: MaterialRequestCreateNestedOneWithoutWarehouseReleasesInput
-    wpoApprover?: UserCreateNestedOneWithoutWrWpoApprovedInput
-    systemApprover?: UserCreateNestedOneWithoutWrSysApprovedInput
-    pmApprover?: UserCreateNestedOneWithoutWrPmApprovedInput
+    warehouseApprover?: UserCreateNestedOneWithoutWrWarehouseApprovedInput
+    procurementApprover?: UserCreateNestedOneWithoutWrProcurementApprovedInput
     items?: WarehouseReleaseItemCreateNestedManyWithoutReleaseInput
   }
 
@@ -33138,13 +34384,13 @@ export namespace Prisma {
     deliveryLocation?: string | null
     releaseDate?: Date | string
     dateReleased?: Date | string | null
-    status?: $Enums.Status
-    wpoApprovedBy?: string | null
-    wpoApprovedAt?: Date | string | null
-    systemApprovedBy?: string | null
-    systemApprovedAt?: Date | string | null
-    pmApprovedBy?: string | null
-    pmApprovedAt?: Date | string | null
+    status?: $Enums.WrStatus
+    warehouseApprovedBy?: string | null
+    warehouseApprovedAt?: Date | string | null
+    procurementApprovedBy?: string | null
+    procurementApprovedAt?: Date | string | null
+    rejectedSide?: string | null
+    rejectedReason?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     items?: WarehouseReleaseItemUncheckedCreateNestedManyWithoutReleaseInput
@@ -33160,7 +34406,7 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
-  export type WarehouseReleaseCreateWithoutWpoApproverInput = {
+  export type WarehouseReleaseCreateWithoutWarehouseApproverInput = {
     id?: string
     docNo: string
     projectId?: string | null
@@ -33169,20 +34415,20 @@ export namespace Prisma {
     deliveryLocation?: string | null
     releaseDate?: Date | string
     dateReleased?: Date | string | null
-    status?: $Enums.Status
-    wpoApprovedAt?: Date | string | null
-    systemApprovedAt?: Date | string | null
-    pmApprovedAt?: Date | string | null
+    status?: $Enums.WrStatus
+    warehouseApprovedAt?: Date | string | null
+    procurementApprovedAt?: Date | string | null
+    rejectedSide?: string | null
+    rejectedReason?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     materialRequest?: MaterialRequestCreateNestedOneWithoutWarehouseReleasesInput
     requester: UserCreateNestedOneWithoutWarehouseReleasesInput
-    systemApprover?: UserCreateNestedOneWithoutWrSysApprovedInput
-    pmApprover?: UserCreateNestedOneWithoutWrPmApprovedInput
+    procurementApprover?: UserCreateNestedOneWithoutWrProcurementApprovedInput
     items?: WarehouseReleaseItemCreateNestedManyWithoutReleaseInput
   }
 
-  export type WarehouseReleaseUncheckedCreateWithoutWpoApproverInput = {
+  export type WarehouseReleaseUncheckedCreateWithoutWarehouseApproverInput = {
     id?: string
     docNo: string
     materialRequestId?: string | null
@@ -33193,28 +34439,28 @@ export namespace Prisma {
     releaseDate?: Date | string
     dateReleased?: Date | string | null
     requesterId: string
-    status?: $Enums.Status
-    wpoApprovedAt?: Date | string | null
-    systemApprovedBy?: string | null
-    systemApprovedAt?: Date | string | null
-    pmApprovedBy?: string | null
-    pmApprovedAt?: Date | string | null
+    status?: $Enums.WrStatus
+    warehouseApprovedAt?: Date | string | null
+    procurementApprovedBy?: string | null
+    procurementApprovedAt?: Date | string | null
+    rejectedSide?: string | null
+    rejectedReason?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     items?: WarehouseReleaseItemUncheckedCreateNestedManyWithoutReleaseInput
   }
 
-  export type WarehouseReleaseCreateOrConnectWithoutWpoApproverInput = {
+  export type WarehouseReleaseCreateOrConnectWithoutWarehouseApproverInput = {
     where: WarehouseReleaseWhereUniqueInput
-    create: XOR<WarehouseReleaseCreateWithoutWpoApproverInput, WarehouseReleaseUncheckedCreateWithoutWpoApproverInput>
+    create: XOR<WarehouseReleaseCreateWithoutWarehouseApproverInput, WarehouseReleaseUncheckedCreateWithoutWarehouseApproverInput>
   }
 
-  export type WarehouseReleaseCreateManyWpoApproverInputEnvelope = {
-    data: WarehouseReleaseCreateManyWpoApproverInput | WarehouseReleaseCreateManyWpoApproverInput[]
+  export type WarehouseReleaseCreateManyWarehouseApproverInputEnvelope = {
+    data: WarehouseReleaseCreateManyWarehouseApproverInput | WarehouseReleaseCreateManyWarehouseApproverInput[]
     skipDuplicates?: boolean
   }
 
-  export type WarehouseReleaseCreateWithoutSystemApproverInput = {
+  export type WarehouseReleaseCreateWithoutProcurementApproverInput = {
     id?: string
     docNo: string
     projectId?: string | null
@@ -33223,20 +34469,20 @@ export namespace Prisma {
     deliveryLocation?: string | null
     releaseDate?: Date | string
     dateReleased?: Date | string | null
-    status?: $Enums.Status
-    wpoApprovedAt?: Date | string | null
-    systemApprovedAt?: Date | string | null
-    pmApprovedAt?: Date | string | null
+    status?: $Enums.WrStatus
+    warehouseApprovedAt?: Date | string | null
+    procurementApprovedAt?: Date | string | null
+    rejectedSide?: string | null
+    rejectedReason?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     materialRequest?: MaterialRequestCreateNestedOneWithoutWarehouseReleasesInput
     requester: UserCreateNestedOneWithoutWarehouseReleasesInput
-    wpoApprover?: UserCreateNestedOneWithoutWrWpoApprovedInput
-    pmApprover?: UserCreateNestedOneWithoutWrPmApprovedInput
+    warehouseApprover?: UserCreateNestedOneWithoutWrWarehouseApprovedInput
     items?: WarehouseReleaseItemCreateNestedManyWithoutReleaseInput
   }
 
-  export type WarehouseReleaseUncheckedCreateWithoutSystemApproverInput = {
+  export type WarehouseReleaseUncheckedCreateWithoutProcurementApproverInput = {
     id?: string
     docNo: string
     materialRequestId?: string | null
@@ -33247,78 +34493,24 @@ export namespace Prisma {
     releaseDate?: Date | string
     dateReleased?: Date | string | null
     requesterId: string
-    status?: $Enums.Status
-    wpoApprovedBy?: string | null
-    wpoApprovedAt?: Date | string | null
-    systemApprovedAt?: Date | string | null
-    pmApprovedBy?: string | null
-    pmApprovedAt?: Date | string | null
+    status?: $Enums.WrStatus
+    warehouseApprovedBy?: string | null
+    warehouseApprovedAt?: Date | string | null
+    procurementApprovedAt?: Date | string | null
+    rejectedSide?: string | null
+    rejectedReason?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     items?: WarehouseReleaseItemUncheckedCreateNestedManyWithoutReleaseInput
   }
 
-  export type WarehouseReleaseCreateOrConnectWithoutSystemApproverInput = {
+  export type WarehouseReleaseCreateOrConnectWithoutProcurementApproverInput = {
     where: WarehouseReleaseWhereUniqueInput
-    create: XOR<WarehouseReleaseCreateWithoutSystemApproverInput, WarehouseReleaseUncheckedCreateWithoutSystemApproverInput>
+    create: XOR<WarehouseReleaseCreateWithoutProcurementApproverInput, WarehouseReleaseUncheckedCreateWithoutProcurementApproverInput>
   }
 
-  export type WarehouseReleaseCreateManySystemApproverInputEnvelope = {
-    data: WarehouseReleaseCreateManySystemApproverInput | WarehouseReleaseCreateManySystemApproverInput[]
-    skipDuplicates?: boolean
-  }
-
-  export type WarehouseReleaseCreateWithoutPmApproverInput = {
-    id?: string
-    docNo: string
-    projectId?: string | null
-    projectName?: string | null
-    deliveryTarget?: string | null
-    deliveryLocation?: string | null
-    releaseDate?: Date | string
-    dateReleased?: Date | string | null
-    status?: $Enums.Status
-    wpoApprovedAt?: Date | string | null
-    systemApprovedAt?: Date | string | null
-    pmApprovedAt?: Date | string | null
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    materialRequest?: MaterialRequestCreateNestedOneWithoutWarehouseReleasesInput
-    requester: UserCreateNestedOneWithoutWarehouseReleasesInput
-    wpoApprover?: UserCreateNestedOneWithoutWrWpoApprovedInput
-    systemApprover?: UserCreateNestedOneWithoutWrSysApprovedInput
-    items?: WarehouseReleaseItemCreateNestedManyWithoutReleaseInput
-  }
-
-  export type WarehouseReleaseUncheckedCreateWithoutPmApproverInput = {
-    id?: string
-    docNo: string
-    materialRequestId?: string | null
-    projectId?: string | null
-    projectName?: string | null
-    deliveryTarget?: string | null
-    deliveryLocation?: string | null
-    releaseDate?: Date | string
-    dateReleased?: Date | string | null
-    requesterId: string
-    status?: $Enums.Status
-    wpoApprovedBy?: string | null
-    wpoApprovedAt?: Date | string | null
-    systemApprovedBy?: string | null
-    systemApprovedAt?: Date | string | null
-    pmApprovedAt?: Date | string | null
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    items?: WarehouseReleaseItemUncheckedCreateNestedManyWithoutReleaseInput
-  }
-
-  export type WarehouseReleaseCreateOrConnectWithoutPmApproverInput = {
-    where: WarehouseReleaseWhereUniqueInput
-    create: XOR<WarehouseReleaseCreateWithoutPmApproverInput, WarehouseReleaseUncheckedCreateWithoutPmApproverInput>
-  }
-
-  export type WarehouseReleaseCreateManyPmApproverInputEnvelope = {
-    data: WarehouseReleaseCreateManyPmApproverInput | WarehouseReleaseCreateManyPmApproverInput[]
+  export type WarehouseReleaseCreateManyProcurementApproverInputEnvelope = {
+    data: WarehouseReleaseCreateManyProcurementApproverInput | WarehouseReleaseCreateManyProcurementApproverInput[]
     skipDuplicates?: boolean
   }
 
@@ -34012,6 +35204,32 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type NotificationCreateWithoutUserInput = {
+    id?: string
+    message: string
+    link?: string | null
+    isRead?: boolean
+    createdAt?: Date | string
+  }
+
+  export type NotificationUncheckedCreateWithoutUserInput = {
+    id?: string
+    message: string
+    link?: string | null
+    isRead?: boolean
+    createdAt?: Date | string
+  }
+
+  export type NotificationCreateOrConnectWithoutUserInput = {
+    where: NotificationWhereUniqueInput
+    create: XOR<NotificationCreateWithoutUserInput, NotificationUncheckedCreateWithoutUserInput>
+  }
+
+  export type NotificationCreateManyUserInputEnvelope = {
+    data: NotificationCreateManyUserInput | NotificationCreateManyUserInput[]
+    skipDuplicates?: boolean
+  }
+
   export type MaterialRequestUpsertWithWhereUniqueWithoutRequesterInput = {
     where: MaterialRequestWhereUniqueInput
     update: XOR<MaterialRequestUpdateWithoutRequesterInput, MaterialRequestUncheckedUpdateWithoutRequesterInput>
@@ -34224,63 +35442,47 @@ export namespace Prisma {
     releaseDate?: DateTimeFilter<"WarehouseRelease"> | Date | string
     dateReleased?: DateTimeNullableFilter<"WarehouseRelease"> | Date | string | null
     requesterId?: StringFilter<"WarehouseRelease"> | string
-    status?: EnumStatusFilter<"WarehouseRelease"> | $Enums.Status
-    wpoApprovedBy?: StringNullableFilter<"WarehouseRelease"> | string | null
-    wpoApprovedAt?: DateTimeNullableFilter<"WarehouseRelease"> | Date | string | null
-    systemApprovedBy?: StringNullableFilter<"WarehouseRelease"> | string | null
-    systemApprovedAt?: DateTimeNullableFilter<"WarehouseRelease"> | Date | string | null
-    pmApprovedBy?: StringNullableFilter<"WarehouseRelease"> | string | null
-    pmApprovedAt?: DateTimeNullableFilter<"WarehouseRelease"> | Date | string | null
+    status?: EnumWrStatusFilter<"WarehouseRelease"> | $Enums.WrStatus
+    warehouseApprovedBy?: StringNullableFilter<"WarehouseRelease"> | string | null
+    warehouseApprovedAt?: DateTimeNullableFilter<"WarehouseRelease"> | Date | string | null
+    procurementApprovedBy?: StringNullableFilter<"WarehouseRelease"> | string | null
+    procurementApprovedAt?: DateTimeNullableFilter<"WarehouseRelease"> | Date | string | null
+    rejectedSide?: StringNullableFilter<"WarehouseRelease"> | string | null
+    rejectedReason?: StringNullableFilter<"WarehouseRelease"> | string | null
     createdAt?: DateTimeFilter<"WarehouseRelease"> | Date | string
     updatedAt?: DateTimeFilter<"WarehouseRelease"> | Date | string
   }
 
-  export type WarehouseReleaseUpsertWithWhereUniqueWithoutWpoApproverInput = {
+  export type WarehouseReleaseUpsertWithWhereUniqueWithoutWarehouseApproverInput = {
     where: WarehouseReleaseWhereUniqueInput
-    update: XOR<WarehouseReleaseUpdateWithoutWpoApproverInput, WarehouseReleaseUncheckedUpdateWithoutWpoApproverInput>
-    create: XOR<WarehouseReleaseCreateWithoutWpoApproverInput, WarehouseReleaseUncheckedCreateWithoutWpoApproverInput>
+    update: XOR<WarehouseReleaseUpdateWithoutWarehouseApproverInput, WarehouseReleaseUncheckedUpdateWithoutWarehouseApproverInput>
+    create: XOR<WarehouseReleaseCreateWithoutWarehouseApproverInput, WarehouseReleaseUncheckedCreateWithoutWarehouseApproverInput>
   }
 
-  export type WarehouseReleaseUpdateWithWhereUniqueWithoutWpoApproverInput = {
+  export type WarehouseReleaseUpdateWithWhereUniqueWithoutWarehouseApproverInput = {
     where: WarehouseReleaseWhereUniqueInput
-    data: XOR<WarehouseReleaseUpdateWithoutWpoApproverInput, WarehouseReleaseUncheckedUpdateWithoutWpoApproverInput>
+    data: XOR<WarehouseReleaseUpdateWithoutWarehouseApproverInput, WarehouseReleaseUncheckedUpdateWithoutWarehouseApproverInput>
   }
 
-  export type WarehouseReleaseUpdateManyWithWhereWithoutWpoApproverInput = {
+  export type WarehouseReleaseUpdateManyWithWhereWithoutWarehouseApproverInput = {
     where: WarehouseReleaseScalarWhereInput
-    data: XOR<WarehouseReleaseUpdateManyMutationInput, WarehouseReleaseUncheckedUpdateManyWithoutWpoApproverInput>
+    data: XOR<WarehouseReleaseUpdateManyMutationInput, WarehouseReleaseUncheckedUpdateManyWithoutWarehouseApproverInput>
   }
 
-  export type WarehouseReleaseUpsertWithWhereUniqueWithoutSystemApproverInput = {
+  export type WarehouseReleaseUpsertWithWhereUniqueWithoutProcurementApproverInput = {
     where: WarehouseReleaseWhereUniqueInput
-    update: XOR<WarehouseReleaseUpdateWithoutSystemApproverInput, WarehouseReleaseUncheckedUpdateWithoutSystemApproverInput>
-    create: XOR<WarehouseReleaseCreateWithoutSystemApproverInput, WarehouseReleaseUncheckedCreateWithoutSystemApproverInput>
+    update: XOR<WarehouseReleaseUpdateWithoutProcurementApproverInput, WarehouseReleaseUncheckedUpdateWithoutProcurementApproverInput>
+    create: XOR<WarehouseReleaseCreateWithoutProcurementApproverInput, WarehouseReleaseUncheckedCreateWithoutProcurementApproverInput>
   }
 
-  export type WarehouseReleaseUpdateWithWhereUniqueWithoutSystemApproverInput = {
+  export type WarehouseReleaseUpdateWithWhereUniqueWithoutProcurementApproverInput = {
     where: WarehouseReleaseWhereUniqueInput
-    data: XOR<WarehouseReleaseUpdateWithoutSystemApproverInput, WarehouseReleaseUncheckedUpdateWithoutSystemApproverInput>
+    data: XOR<WarehouseReleaseUpdateWithoutProcurementApproverInput, WarehouseReleaseUncheckedUpdateWithoutProcurementApproverInput>
   }
 
-  export type WarehouseReleaseUpdateManyWithWhereWithoutSystemApproverInput = {
+  export type WarehouseReleaseUpdateManyWithWhereWithoutProcurementApproverInput = {
     where: WarehouseReleaseScalarWhereInput
-    data: XOR<WarehouseReleaseUpdateManyMutationInput, WarehouseReleaseUncheckedUpdateManyWithoutSystemApproverInput>
-  }
-
-  export type WarehouseReleaseUpsertWithWhereUniqueWithoutPmApproverInput = {
-    where: WarehouseReleaseWhereUniqueInput
-    update: XOR<WarehouseReleaseUpdateWithoutPmApproverInput, WarehouseReleaseUncheckedUpdateWithoutPmApproverInput>
-    create: XOR<WarehouseReleaseCreateWithoutPmApproverInput, WarehouseReleaseUncheckedCreateWithoutPmApproverInput>
-  }
-
-  export type WarehouseReleaseUpdateWithWhereUniqueWithoutPmApproverInput = {
-    where: WarehouseReleaseWhereUniqueInput
-    data: XOR<WarehouseReleaseUpdateWithoutPmApproverInput, WarehouseReleaseUncheckedUpdateWithoutPmApproverInput>
-  }
-
-  export type WarehouseReleaseUpdateManyWithWhereWithoutPmApproverInput = {
-    where: WarehouseReleaseScalarWhereInput
-    data: XOR<WarehouseReleaseUpdateManyMutationInput, WarehouseReleaseUncheckedUpdateManyWithoutPmApproverInput>
+    data: XOR<WarehouseReleaseUpdateManyMutationInput, WarehouseReleaseUncheckedUpdateManyWithoutProcurementApproverInput>
   }
 
   export type BillOfMaterialUpsertWithWhereUniqueWithoutCreatorInput = {
@@ -34600,6 +35802,186 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"SupplierPrice"> | Date | string
   }
 
+  export type NotificationUpsertWithWhereUniqueWithoutUserInput = {
+    where: NotificationWhereUniqueInput
+    update: XOR<NotificationUpdateWithoutUserInput, NotificationUncheckedUpdateWithoutUserInput>
+    create: XOR<NotificationCreateWithoutUserInput, NotificationUncheckedCreateWithoutUserInput>
+  }
+
+  export type NotificationUpdateWithWhereUniqueWithoutUserInput = {
+    where: NotificationWhereUniqueInput
+    data: XOR<NotificationUpdateWithoutUserInput, NotificationUncheckedUpdateWithoutUserInput>
+  }
+
+  export type NotificationUpdateManyWithWhereWithoutUserInput = {
+    where: NotificationScalarWhereInput
+    data: XOR<NotificationUpdateManyMutationInput, NotificationUncheckedUpdateManyWithoutUserInput>
+  }
+
+  export type NotificationScalarWhereInput = {
+    AND?: NotificationScalarWhereInput | NotificationScalarWhereInput[]
+    OR?: NotificationScalarWhereInput[]
+    NOT?: NotificationScalarWhereInput | NotificationScalarWhereInput[]
+    id?: StringFilter<"Notification"> | string
+    userId?: StringFilter<"Notification"> | string
+    message?: StringFilter<"Notification"> | string
+    link?: StringNullableFilter<"Notification"> | string | null
+    isRead?: BoolFilter<"Notification"> | boolean
+    createdAt?: DateTimeFilter<"Notification"> | Date | string
+  }
+
+  export type UserCreateWithoutNotificationsInput = {
+    id?: string
+    username: string
+    password: string
+    name: string
+    role?: $Enums.Role
+    engineerRole?: $Enums.EngineerRole | null
+    position?: string | null
+    createdAt?: Date | string
+    materialRequests?: MaterialRequestCreateNestedManyWithoutRequesterInput
+    pmApprovals?: MaterialRequestCreateNestedManyWithoutPmApproverInput
+    wpoApprovals?: MaterialRequestCreateNestedManyWithoutWpoApproverInput
+    mrSystemApproved?: MaterialRequestCreateNestedManyWithoutSystemApproverInput
+    faultReports?: FaultReportCreateNestedManyWithoutReporterInput
+    faultReportsWpoApproved?: FaultReportCreateNestedManyWithoutWpoApproverInput
+    faultReportsSysApproved?: FaultReportCreateNestedManyWithoutSystemApproverInput
+    faultReportsPmApproved?: FaultReportCreateNestedManyWithoutPmApproverInput
+    warehouseReleases?: WarehouseReleaseCreateNestedManyWithoutRequesterInput
+    wrWarehouseApproved?: WarehouseReleaseCreateNestedManyWithoutWarehouseApproverInput
+    wrProcurementApproved?: WarehouseReleaseCreateNestedManyWithoutProcurementApproverInput
+    bomsCreated?: BillOfMaterialCreateNestedManyWithoutCreatorInput
+    bomsSubmitted?: BillOfMaterialCreateNestedManyWithoutSubmitterInput
+    bomsWpoApproved?: BillOfMaterialCreateNestedManyWithoutWpoApproverInput
+    bomsSystemApproved?: BillOfMaterialCreateNestedManyWithoutSystemApproverInput
+    bomsAssignedStaff?: BillOfMaterialCreateNestedManyWithoutAssignedStaffInput
+    bomsAssignedWpo?: BillOfMaterialCreateNestedManyWithoutAssignedWpoInput
+    bomsAssignedSystem?: BillOfMaterialCreateNestedManyWithoutAssignedSystemInput
+    bomHistories?: BomHistoryCreateNestedManyWithoutUserInput
+    purchaseOrders?: PurchaseOrderCreateNestedManyWithoutCreatorInput
+    borrowedProcessed?: BorrowedItemCreateNestedManyWithoutProcessorInput
+    projectBudgets?: ProjectBudgetCreateNestedManyWithoutInputterInput
+    supplierPrices?: SupplierPriceCreateNestedManyWithoutInputterInput
+  }
+
+  export type UserUncheckedCreateWithoutNotificationsInput = {
+    id?: string
+    username: string
+    password: string
+    name: string
+    role?: $Enums.Role
+    engineerRole?: $Enums.EngineerRole | null
+    position?: string | null
+    createdAt?: Date | string
+    materialRequests?: MaterialRequestUncheckedCreateNestedManyWithoutRequesterInput
+    pmApprovals?: MaterialRequestUncheckedCreateNestedManyWithoutPmApproverInput
+    wpoApprovals?: MaterialRequestUncheckedCreateNestedManyWithoutWpoApproverInput
+    mrSystemApproved?: MaterialRequestUncheckedCreateNestedManyWithoutSystemApproverInput
+    faultReports?: FaultReportUncheckedCreateNestedManyWithoutReporterInput
+    faultReportsWpoApproved?: FaultReportUncheckedCreateNestedManyWithoutWpoApproverInput
+    faultReportsSysApproved?: FaultReportUncheckedCreateNestedManyWithoutSystemApproverInput
+    faultReportsPmApproved?: FaultReportUncheckedCreateNestedManyWithoutPmApproverInput
+    warehouseReleases?: WarehouseReleaseUncheckedCreateNestedManyWithoutRequesterInput
+    wrWarehouseApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutWarehouseApproverInput
+    wrProcurementApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutProcurementApproverInput
+    bomsCreated?: BillOfMaterialUncheckedCreateNestedManyWithoutCreatorInput
+    bomsSubmitted?: BillOfMaterialUncheckedCreateNestedManyWithoutSubmitterInput
+    bomsWpoApproved?: BillOfMaterialUncheckedCreateNestedManyWithoutWpoApproverInput
+    bomsSystemApproved?: BillOfMaterialUncheckedCreateNestedManyWithoutSystemApproverInput
+    bomsAssignedStaff?: BillOfMaterialUncheckedCreateNestedManyWithoutAssignedStaffInput
+    bomsAssignedWpo?: BillOfMaterialUncheckedCreateNestedManyWithoutAssignedWpoInput
+    bomsAssignedSystem?: BillOfMaterialUncheckedCreateNestedManyWithoutAssignedSystemInput
+    bomHistories?: BomHistoryUncheckedCreateNestedManyWithoutUserInput
+    purchaseOrders?: PurchaseOrderUncheckedCreateNestedManyWithoutCreatorInput
+    borrowedProcessed?: BorrowedItemUncheckedCreateNestedManyWithoutProcessorInput
+    projectBudgets?: ProjectBudgetUncheckedCreateNestedManyWithoutInputterInput
+    supplierPrices?: SupplierPriceUncheckedCreateNestedManyWithoutInputterInput
+  }
+
+  export type UserCreateOrConnectWithoutNotificationsInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutNotificationsInput, UserUncheckedCreateWithoutNotificationsInput>
+  }
+
+  export type UserUpsertWithoutNotificationsInput = {
+    update: XOR<UserUpdateWithoutNotificationsInput, UserUncheckedUpdateWithoutNotificationsInput>
+    create: XOR<UserCreateWithoutNotificationsInput, UserUncheckedCreateWithoutNotificationsInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutNotificationsInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutNotificationsInput, UserUncheckedUpdateWithoutNotificationsInput>
+  }
+
+  export type UserUpdateWithoutNotificationsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    username?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    engineerRole?: NullableEnumEngineerRoleFieldUpdateOperationsInput | $Enums.EngineerRole | null
+    position?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    materialRequests?: MaterialRequestUpdateManyWithoutRequesterNestedInput
+    pmApprovals?: MaterialRequestUpdateManyWithoutPmApproverNestedInput
+    wpoApprovals?: MaterialRequestUpdateManyWithoutWpoApproverNestedInput
+    mrSystemApproved?: MaterialRequestUpdateManyWithoutSystemApproverNestedInput
+    faultReports?: FaultReportUpdateManyWithoutReporterNestedInput
+    faultReportsWpoApproved?: FaultReportUpdateManyWithoutWpoApproverNestedInput
+    faultReportsSysApproved?: FaultReportUpdateManyWithoutSystemApproverNestedInput
+    faultReportsPmApproved?: FaultReportUpdateManyWithoutPmApproverNestedInput
+    warehouseReleases?: WarehouseReleaseUpdateManyWithoutRequesterNestedInput
+    wrWarehouseApproved?: WarehouseReleaseUpdateManyWithoutWarehouseApproverNestedInput
+    wrProcurementApproved?: WarehouseReleaseUpdateManyWithoutProcurementApproverNestedInput
+    bomsCreated?: BillOfMaterialUpdateManyWithoutCreatorNestedInput
+    bomsSubmitted?: BillOfMaterialUpdateManyWithoutSubmitterNestedInput
+    bomsWpoApproved?: BillOfMaterialUpdateManyWithoutWpoApproverNestedInput
+    bomsSystemApproved?: BillOfMaterialUpdateManyWithoutSystemApproverNestedInput
+    bomsAssignedStaff?: BillOfMaterialUpdateManyWithoutAssignedStaffNestedInput
+    bomsAssignedWpo?: BillOfMaterialUpdateManyWithoutAssignedWpoNestedInput
+    bomsAssignedSystem?: BillOfMaterialUpdateManyWithoutAssignedSystemNestedInput
+    bomHistories?: BomHistoryUpdateManyWithoutUserNestedInput
+    purchaseOrders?: PurchaseOrderUpdateManyWithoutCreatorNestedInput
+    borrowedProcessed?: BorrowedItemUpdateManyWithoutProcessorNestedInput
+    projectBudgets?: ProjectBudgetUpdateManyWithoutInputterNestedInput
+    supplierPrices?: SupplierPriceUpdateManyWithoutInputterNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutNotificationsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    username?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    engineerRole?: NullableEnumEngineerRoleFieldUpdateOperationsInput | $Enums.EngineerRole | null
+    position?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    materialRequests?: MaterialRequestUncheckedUpdateManyWithoutRequesterNestedInput
+    pmApprovals?: MaterialRequestUncheckedUpdateManyWithoutPmApproverNestedInput
+    wpoApprovals?: MaterialRequestUncheckedUpdateManyWithoutWpoApproverNestedInput
+    mrSystemApproved?: MaterialRequestUncheckedUpdateManyWithoutSystemApproverNestedInput
+    faultReports?: FaultReportUncheckedUpdateManyWithoutReporterNestedInput
+    faultReportsWpoApproved?: FaultReportUncheckedUpdateManyWithoutWpoApproverNestedInput
+    faultReportsSysApproved?: FaultReportUncheckedUpdateManyWithoutSystemApproverNestedInput
+    faultReportsPmApproved?: FaultReportUncheckedUpdateManyWithoutPmApproverNestedInput
+    warehouseReleases?: WarehouseReleaseUncheckedUpdateManyWithoutRequesterNestedInput
+    wrWarehouseApproved?: WarehouseReleaseUncheckedUpdateManyWithoutWarehouseApproverNestedInput
+    wrProcurementApproved?: WarehouseReleaseUncheckedUpdateManyWithoutProcurementApproverNestedInput
+    bomsCreated?: BillOfMaterialUncheckedUpdateManyWithoutCreatorNestedInput
+    bomsSubmitted?: BillOfMaterialUncheckedUpdateManyWithoutSubmitterNestedInput
+    bomsWpoApproved?: BillOfMaterialUncheckedUpdateManyWithoutWpoApproverNestedInput
+    bomsSystemApproved?: BillOfMaterialUncheckedUpdateManyWithoutSystemApproverNestedInput
+    bomsAssignedStaff?: BillOfMaterialUncheckedUpdateManyWithoutAssignedStaffNestedInput
+    bomsAssignedWpo?: BillOfMaterialUncheckedUpdateManyWithoutAssignedWpoNestedInput
+    bomsAssignedSystem?: BillOfMaterialUncheckedUpdateManyWithoutAssignedSystemNestedInput
+    bomHistories?: BomHistoryUncheckedUpdateManyWithoutUserNestedInput
+    purchaseOrders?: PurchaseOrderUncheckedUpdateManyWithoutCreatorNestedInput
+    borrowedProcessed?: BorrowedItemUncheckedUpdateManyWithoutProcessorNestedInput
+    projectBudgets?: ProjectBudgetUncheckedUpdateManyWithoutInputterNestedInput
+    supplierPrices?: SupplierPriceUncheckedUpdateManyWithoutInputterNestedInput
+  }
+
   export type MaterialRequestItemCreateWithoutRequestInput = {
     description: string
     elsicomPartNum?: string | null
@@ -34668,16 +36050,16 @@ export namespace Prisma {
     deliveryLocation?: string | null
     releaseDate?: Date | string
     dateReleased?: Date | string | null
-    status?: $Enums.Status
-    wpoApprovedAt?: Date | string | null
-    systemApprovedAt?: Date | string | null
-    pmApprovedAt?: Date | string | null
+    status?: $Enums.WrStatus
+    warehouseApprovedAt?: Date | string | null
+    procurementApprovedAt?: Date | string | null
+    rejectedSide?: string | null
+    rejectedReason?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     requester: UserCreateNestedOneWithoutWarehouseReleasesInput
-    wpoApprover?: UserCreateNestedOneWithoutWrWpoApprovedInput
-    systemApprover?: UserCreateNestedOneWithoutWrSysApprovedInput
-    pmApprover?: UserCreateNestedOneWithoutWrPmApprovedInput
+    warehouseApprover?: UserCreateNestedOneWithoutWrWarehouseApprovedInput
+    procurementApprover?: UserCreateNestedOneWithoutWrProcurementApprovedInput
     items?: WarehouseReleaseItemCreateNestedManyWithoutReleaseInput
   }
 
@@ -34691,13 +36073,13 @@ export namespace Prisma {
     releaseDate?: Date | string
     dateReleased?: Date | string | null
     requesterId: string
-    status?: $Enums.Status
-    wpoApprovedBy?: string | null
-    wpoApprovedAt?: Date | string | null
-    systemApprovedBy?: string | null
-    systemApprovedAt?: Date | string | null
-    pmApprovedBy?: string | null
-    pmApprovedAt?: Date | string | null
+    status?: $Enums.WrStatus
+    warehouseApprovedBy?: string | null
+    warehouseApprovedAt?: Date | string | null
+    procurementApprovedBy?: string | null
+    procurementApprovedAt?: Date | string | null
+    rejectedSide?: string | null
+    rejectedReason?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     items?: WarehouseReleaseItemUncheckedCreateNestedManyWithoutReleaseInput
@@ -34782,9 +36164,8 @@ export namespace Prisma {
     faultReportsSysApproved?: FaultReportCreateNestedManyWithoutSystemApproverInput
     faultReportsPmApproved?: FaultReportCreateNestedManyWithoutPmApproverInput
     warehouseReleases?: WarehouseReleaseCreateNestedManyWithoutRequesterInput
-    wrWpoApproved?: WarehouseReleaseCreateNestedManyWithoutWpoApproverInput
-    wrSysApproved?: WarehouseReleaseCreateNestedManyWithoutSystemApproverInput
-    wrPmApproved?: WarehouseReleaseCreateNestedManyWithoutPmApproverInput
+    wrWarehouseApproved?: WarehouseReleaseCreateNestedManyWithoutWarehouseApproverInput
+    wrProcurementApproved?: WarehouseReleaseCreateNestedManyWithoutProcurementApproverInput
     bomsCreated?: BillOfMaterialCreateNestedManyWithoutCreatorInput
     bomsSubmitted?: BillOfMaterialCreateNestedManyWithoutSubmitterInput
     bomsWpoApproved?: BillOfMaterialCreateNestedManyWithoutWpoApproverInput
@@ -34797,6 +36178,7 @@ export namespace Prisma {
     borrowedProcessed?: BorrowedItemCreateNestedManyWithoutProcessorInput
     projectBudgets?: ProjectBudgetCreateNestedManyWithoutInputterInput
     supplierPrices?: SupplierPriceCreateNestedManyWithoutInputterInput
+    notifications?: NotificationCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutMaterialRequestsInput = {
@@ -34816,9 +36198,8 @@ export namespace Prisma {
     faultReportsSysApproved?: FaultReportUncheckedCreateNestedManyWithoutSystemApproverInput
     faultReportsPmApproved?: FaultReportUncheckedCreateNestedManyWithoutPmApproverInput
     warehouseReleases?: WarehouseReleaseUncheckedCreateNestedManyWithoutRequesterInput
-    wrWpoApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutWpoApproverInput
-    wrSysApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutSystemApproverInput
-    wrPmApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutPmApproverInput
+    wrWarehouseApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutWarehouseApproverInput
+    wrProcurementApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutProcurementApproverInput
     bomsCreated?: BillOfMaterialUncheckedCreateNestedManyWithoutCreatorInput
     bomsSubmitted?: BillOfMaterialUncheckedCreateNestedManyWithoutSubmitterInput
     bomsWpoApproved?: BillOfMaterialUncheckedCreateNestedManyWithoutWpoApproverInput
@@ -34831,6 +36212,7 @@ export namespace Prisma {
     borrowedProcessed?: BorrowedItemUncheckedCreateNestedManyWithoutProcessorInput
     projectBudgets?: ProjectBudgetUncheckedCreateNestedManyWithoutInputterInput
     supplierPrices?: SupplierPriceUncheckedCreateNestedManyWithoutInputterInput
+    notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutMaterialRequestsInput = {
@@ -34855,9 +36237,8 @@ export namespace Prisma {
     faultReportsSysApproved?: FaultReportCreateNestedManyWithoutSystemApproverInput
     faultReportsPmApproved?: FaultReportCreateNestedManyWithoutPmApproverInput
     warehouseReleases?: WarehouseReleaseCreateNestedManyWithoutRequesterInput
-    wrWpoApproved?: WarehouseReleaseCreateNestedManyWithoutWpoApproverInput
-    wrSysApproved?: WarehouseReleaseCreateNestedManyWithoutSystemApproverInput
-    wrPmApproved?: WarehouseReleaseCreateNestedManyWithoutPmApproverInput
+    wrWarehouseApproved?: WarehouseReleaseCreateNestedManyWithoutWarehouseApproverInput
+    wrProcurementApproved?: WarehouseReleaseCreateNestedManyWithoutProcurementApproverInput
     bomsCreated?: BillOfMaterialCreateNestedManyWithoutCreatorInput
     bomsSubmitted?: BillOfMaterialCreateNestedManyWithoutSubmitterInput
     bomsWpoApproved?: BillOfMaterialCreateNestedManyWithoutWpoApproverInput
@@ -34870,6 +36251,7 @@ export namespace Prisma {
     borrowedProcessed?: BorrowedItemCreateNestedManyWithoutProcessorInput
     projectBudgets?: ProjectBudgetCreateNestedManyWithoutInputterInput
     supplierPrices?: SupplierPriceCreateNestedManyWithoutInputterInput
+    notifications?: NotificationCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutWpoApprovalsInput = {
@@ -34889,9 +36271,8 @@ export namespace Prisma {
     faultReportsSysApproved?: FaultReportUncheckedCreateNestedManyWithoutSystemApproverInput
     faultReportsPmApproved?: FaultReportUncheckedCreateNestedManyWithoutPmApproverInput
     warehouseReleases?: WarehouseReleaseUncheckedCreateNestedManyWithoutRequesterInput
-    wrWpoApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutWpoApproverInput
-    wrSysApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutSystemApproverInput
-    wrPmApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutPmApproverInput
+    wrWarehouseApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutWarehouseApproverInput
+    wrProcurementApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutProcurementApproverInput
     bomsCreated?: BillOfMaterialUncheckedCreateNestedManyWithoutCreatorInput
     bomsSubmitted?: BillOfMaterialUncheckedCreateNestedManyWithoutSubmitterInput
     bomsWpoApproved?: BillOfMaterialUncheckedCreateNestedManyWithoutWpoApproverInput
@@ -34904,6 +36285,7 @@ export namespace Prisma {
     borrowedProcessed?: BorrowedItemUncheckedCreateNestedManyWithoutProcessorInput
     projectBudgets?: ProjectBudgetUncheckedCreateNestedManyWithoutInputterInput
     supplierPrices?: SupplierPriceUncheckedCreateNestedManyWithoutInputterInput
+    notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutWpoApprovalsInput = {
@@ -34928,9 +36310,8 @@ export namespace Prisma {
     faultReportsSysApproved?: FaultReportCreateNestedManyWithoutSystemApproverInput
     faultReportsPmApproved?: FaultReportCreateNestedManyWithoutPmApproverInput
     warehouseReleases?: WarehouseReleaseCreateNestedManyWithoutRequesterInput
-    wrWpoApproved?: WarehouseReleaseCreateNestedManyWithoutWpoApproverInput
-    wrSysApproved?: WarehouseReleaseCreateNestedManyWithoutSystemApproverInput
-    wrPmApproved?: WarehouseReleaseCreateNestedManyWithoutPmApproverInput
+    wrWarehouseApproved?: WarehouseReleaseCreateNestedManyWithoutWarehouseApproverInput
+    wrProcurementApproved?: WarehouseReleaseCreateNestedManyWithoutProcurementApproverInput
     bomsCreated?: BillOfMaterialCreateNestedManyWithoutCreatorInput
     bomsSubmitted?: BillOfMaterialCreateNestedManyWithoutSubmitterInput
     bomsWpoApproved?: BillOfMaterialCreateNestedManyWithoutWpoApproverInput
@@ -34943,6 +36324,7 @@ export namespace Prisma {
     borrowedProcessed?: BorrowedItemCreateNestedManyWithoutProcessorInput
     projectBudgets?: ProjectBudgetCreateNestedManyWithoutInputterInput
     supplierPrices?: SupplierPriceCreateNestedManyWithoutInputterInput
+    notifications?: NotificationCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutMrSystemApprovedInput = {
@@ -34962,9 +36344,8 @@ export namespace Prisma {
     faultReportsSysApproved?: FaultReportUncheckedCreateNestedManyWithoutSystemApproverInput
     faultReportsPmApproved?: FaultReportUncheckedCreateNestedManyWithoutPmApproverInput
     warehouseReleases?: WarehouseReleaseUncheckedCreateNestedManyWithoutRequesterInput
-    wrWpoApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutWpoApproverInput
-    wrSysApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutSystemApproverInput
-    wrPmApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutPmApproverInput
+    wrWarehouseApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutWarehouseApproverInput
+    wrProcurementApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutProcurementApproverInput
     bomsCreated?: BillOfMaterialUncheckedCreateNestedManyWithoutCreatorInput
     bomsSubmitted?: BillOfMaterialUncheckedCreateNestedManyWithoutSubmitterInput
     bomsWpoApproved?: BillOfMaterialUncheckedCreateNestedManyWithoutWpoApproverInput
@@ -34977,6 +36358,7 @@ export namespace Prisma {
     borrowedProcessed?: BorrowedItemUncheckedCreateNestedManyWithoutProcessorInput
     projectBudgets?: ProjectBudgetUncheckedCreateNestedManyWithoutInputterInput
     supplierPrices?: SupplierPriceUncheckedCreateNestedManyWithoutInputterInput
+    notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutMrSystemApprovedInput = {
@@ -35001,9 +36383,8 @@ export namespace Prisma {
     faultReportsSysApproved?: FaultReportCreateNestedManyWithoutSystemApproverInput
     faultReportsPmApproved?: FaultReportCreateNestedManyWithoutPmApproverInput
     warehouseReleases?: WarehouseReleaseCreateNestedManyWithoutRequesterInput
-    wrWpoApproved?: WarehouseReleaseCreateNestedManyWithoutWpoApproverInput
-    wrSysApproved?: WarehouseReleaseCreateNestedManyWithoutSystemApproverInput
-    wrPmApproved?: WarehouseReleaseCreateNestedManyWithoutPmApproverInput
+    wrWarehouseApproved?: WarehouseReleaseCreateNestedManyWithoutWarehouseApproverInput
+    wrProcurementApproved?: WarehouseReleaseCreateNestedManyWithoutProcurementApproverInput
     bomsCreated?: BillOfMaterialCreateNestedManyWithoutCreatorInput
     bomsSubmitted?: BillOfMaterialCreateNestedManyWithoutSubmitterInput
     bomsWpoApproved?: BillOfMaterialCreateNestedManyWithoutWpoApproverInput
@@ -35016,6 +36397,7 @@ export namespace Prisma {
     borrowedProcessed?: BorrowedItemCreateNestedManyWithoutProcessorInput
     projectBudgets?: ProjectBudgetCreateNestedManyWithoutInputterInput
     supplierPrices?: SupplierPriceCreateNestedManyWithoutInputterInput
+    notifications?: NotificationCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutPmApprovalsInput = {
@@ -35035,9 +36417,8 @@ export namespace Prisma {
     faultReportsSysApproved?: FaultReportUncheckedCreateNestedManyWithoutSystemApproverInput
     faultReportsPmApproved?: FaultReportUncheckedCreateNestedManyWithoutPmApproverInput
     warehouseReleases?: WarehouseReleaseUncheckedCreateNestedManyWithoutRequesterInput
-    wrWpoApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutWpoApproverInput
-    wrSysApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutSystemApproverInput
-    wrPmApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutPmApproverInput
+    wrWarehouseApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutWarehouseApproverInput
+    wrProcurementApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutProcurementApproverInput
     bomsCreated?: BillOfMaterialUncheckedCreateNestedManyWithoutCreatorInput
     bomsSubmitted?: BillOfMaterialUncheckedCreateNestedManyWithoutSubmitterInput
     bomsWpoApproved?: BillOfMaterialUncheckedCreateNestedManyWithoutWpoApproverInput
@@ -35050,6 +36431,7 @@ export namespace Prisma {
     borrowedProcessed?: BorrowedItemUncheckedCreateNestedManyWithoutProcessorInput
     projectBudgets?: ProjectBudgetUncheckedCreateNestedManyWithoutInputterInput
     supplierPrices?: SupplierPriceUncheckedCreateNestedManyWithoutInputterInput
+    notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutPmApprovalsInput = {
@@ -35177,9 +36559,8 @@ export namespace Prisma {
     faultReportsSysApproved?: FaultReportUpdateManyWithoutSystemApproverNestedInput
     faultReportsPmApproved?: FaultReportUpdateManyWithoutPmApproverNestedInput
     warehouseReleases?: WarehouseReleaseUpdateManyWithoutRequesterNestedInput
-    wrWpoApproved?: WarehouseReleaseUpdateManyWithoutWpoApproverNestedInput
-    wrSysApproved?: WarehouseReleaseUpdateManyWithoutSystemApproverNestedInput
-    wrPmApproved?: WarehouseReleaseUpdateManyWithoutPmApproverNestedInput
+    wrWarehouseApproved?: WarehouseReleaseUpdateManyWithoutWarehouseApproverNestedInput
+    wrProcurementApproved?: WarehouseReleaseUpdateManyWithoutProcurementApproverNestedInput
     bomsCreated?: BillOfMaterialUpdateManyWithoutCreatorNestedInput
     bomsSubmitted?: BillOfMaterialUpdateManyWithoutSubmitterNestedInput
     bomsWpoApproved?: BillOfMaterialUpdateManyWithoutWpoApproverNestedInput
@@ -35192,6 +36573,7 @@ export namespace Prisma {
     borrowedProcessed?: BorrowedItemUpdateManyWithoutProcessorNestedInput
     projectBudgets?: ProjectBudgetUpdateManyWithoutInputterNestedInput
     supplierPrices?: SupplierPriceUpdateManyWithoutInputterNestedInput
+    notifications?: NotificationUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutMaterialRequestsInput = {
@@ -35211,9 +36593,8 @@ export namespace Prisma {
     faultReportsSysApproved?: FaultReportUncheckedUpdateManyWithoutSystemApproverNestedInput
     faultReportsPmApproved?: FaultReportUncheckedUpdateManyWithoutPmApproverNestedInput
     warehouseReleases?: WarehouseReleaseUncheckedUpdateManyWithoutRequesterNestedInput
-    wrWpoApproved?: WarehouseReleaseUncheckedUpdateManyWithoutWpoApproverNestedInput
-    wrSysApproved?: WarehouseReleaseUncheckedUpdateManyWithoutSystemApproverNestedInput
-    wrPmApproved?: WarehouseReleaseUncheckedUpdateManyWithoutPmApproverNestedInput
+    wrWarehouseApproved?: WarehouseReleaseUncheckedUpdateManyWithoutWarehouseApproverNestedInput
+    wrProcurementApproved?: WarehouseReleaseUncheckedUpdateManyWithoutProcurementApproverNestedInput
     bomsCreated?: BillOfMaterialUncheckedUpdateManyWithoutCreatorNestedInput
     bomsSubmitted?: BillOfMaterialUncheckedUpdateManyWithoutSubmitterNestedInput
     bomsWpoApproved?: BillOfMaterialUncheckedUpdateManyWithoutWpoApproverNestedInput
@@ -35226,6 +36607,7 @@ export namespace Prisma {
     borrowedProcessed?: BorrowedItemUncheckedUpdateManyWithoutProcessorNestedInput
     projectBudgets?: ProjectBudgetUncheckedUpdateManyWithoutInputterNestedInput
     supplierPrices?: SupplierPriceUncheckedUpdateManyWithoutInputterNestedInput
+    notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserUpsertWithoutWpoApprovalsInput = {
@@ -35256,9 +36638,8 @@ export namespace Prisma {
     faultReportsSysApproved?: FaultReportUpdateManyWithoutSystemApproverNestedInput
     faultReportsPmApproved?: FaultReportUpdateManyWithoutPmApproverNestedInput
     warehouseReleases?: WarehouseReleaseUpdateManyWithoutRequesterNestedInput
-    wrWpoApproved?: WarehouseReleaseUpdateManyWithoutWpoApproverNestedInput
-    wrSysApproved?: WarehouseReleaseUpdateManyWithoutSystemApproverNestedInput
-    wrPmApproved?: WarehouseReleaseUpdateManyWithoutPmApproverNestedInput
+    wrWarehouseApproved?: WarehouseReleaseUpdateManyWithoutWarehouseApproverNestedInput
+    wrProcurementApproved?: WarehouseReleaseUpdateManyWithoutProcurementApproverNestedInput
     bomsCreated?: BillOfMaterialUpdateManyWithoutCreatorNestedInput
     bomsSubmitted?: BillOfMaterialUpdateManyWithoutSubmitterNestedInput
     bomsWpoApproved?: BillOfMaterialUpdateManyWithoutWpoApproverNestedInput
@@ -35271,6 +36652,7 @@ export namespace Prisma {
     borrowedProcessed?: BorrowedItemUpdateManyWithoutProcessorNestedInput
     projectBudgets?: ProjectBudgetUpdateManyWithoutInputterNestedInput
     supplierPrices?: SupplierPriceUpdateManyWithoutInputterNestedInput
+    notifications?: NotificationUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutWpoApprovalsInput = {
@@ -35290,9 +36672,8 @@ export namespace Prisma {
     faultReportsSysApproved?: FaultReportUncheckedUpdateManyWithoutSystemApproverNestedInput
     faultReportsPmApproved?: FaultReportUncheckedUpdateManyWithoutPmApproverNestedInput
     warehouseReleases?: WarehouseReleaseUncheckedUpdateManyWithoutRequesterNestedInput
-    wrWpoApproved?: WarehouseReleaseUncheckedUpdateManyWithoutWpoApproverNestedInput
-    wrSysApproved?: WarehouseReleaseUncheckedUpdateManyWithoutSystemApproverNestedInput
-    wrPmApproved?: WarehouseReleaseUncheckedUpdateManyWithoutPmApproverNestedInput
+    wrWarehouseApproved?: WarehouseReleaseUncheckedUpdateManyWithoutWarehouseApproverNestedInput
+    wrProcurementApproved?: WarehouseReleaseUncheckedUpdateManyWithoutProcurementApproverNestedInput
     bomsCreated?: BillOfMaterialUncheckedUpdateManyWithoutCreatorNestedInput
     bomsSubmitted?: BillOfMaterialUncheckedUpdateManyWithoutSubmitterNestedInput
     bomsWpoApproved?: BillOfMaterialUncheckedUpdateManyWithoutWpoApproverNestedInput
@@ -35305,6 +36686,7 @@ export namespace Prisma {
     borrowedProcessed?: BorrowedItemUncheckedUpdateManyWithoutProcessorNestedInput
     projectBudgets?: ProjectBudgetUncheckedUpdateManyWithoutInputterNestedInput
     supplierPrices?: SupplierPriceUncheckedUpdateManyWithoutInputterNestedInput
+    notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserUpsertWithoutMrSystemApprovedInput = {
@@ -35335,9 +36717,8 @@ export namespace Prisma {
     faultReportsSysApproved?: FaultReportUpdateManyWithoutSystemApproverNestedInput
     faultReportsPmApproved?: FaultReportUpdateManyWithoutPmApproverNestedInput
     warehouseReleases?: WarehouseReleaseUpdateManyWithoutRequesterNestedInput
-    wrWpoApproved?: WarehouseReleaseUpdateManyWithoutWpoApproverNestedInput
-    wrSysApproved?: WarehouseReleaseUpdateManyWithoutSystemApproverNestedInput
-    wrPmApproved?: WarehouseReleaseUpdateManyWithoutPmApproverNestedInput
+    wrWarehouseApproved?: WarehouseReleaseUpdateManyWithoutWarehouseApproverNestedInput
+    wrProcurementApproved?: WarehouseReleaseUpdateManyWithoutProcurementApproverNestedInput
     bomsCreated?: BillOfMaterialUpdateManyWithoutCreatorNestedInput
     bomsSubmitted?: BillOfMaterialUpdateManyWithoutSubmitterNestedInput
     bomsWpoApproved?: BillOfMaterialUpdateManyWithoutWpoApproverNestedInput
@@ -35350,6 +36731,7 @@ export namespace Prisma {
     borrowedProcessed?: BorrowedItemUpdateManyWithoutProcessorNestedInput
     projectBudgets?: ProjectBudgetUpdateManyWithoutInputterNestedInput
     supplierPrices?: SupplierPriceUpdateManyWithoutInputterNestedInput
+    notifications?: NotificationUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutMrSystemApprovedInput = {
@@ -35369,9 +36751,8 @@ export namespace Prisma {
     faultReportsSysApproved?: FaultReportUncheckedUpdateManyWithoutSystemApproverNestedInput
     faultReportsPmApproved?: FaultReportUncheckedUpdateManyWithoutPmApproverNestedInput
     warehouseReleases?: WarehouseReleaseUncheckedUpdateManyWithoutRequesterNestedInput
-    wrWpoApproved?: WarehouseReleaseUncheckedUpdateManyWithoutWpoApproverNestedInput
-    wrSysApproved?: WarehouseReleaseUncheckedUpdateManyWithoutSystemApproverNestedInput
-    wrPmApproved?: WarehouseReleaseUncheckedUpdateManyWithoutPmApproverNestedInput
+    wrWarehouseApproved?: WarehouseReleaseUncheckedUpdateManyWithoutWarehouseApproverNestedInput
+    wrProcurementApproved?: WarehouseReleaseUncheckedUpdateManyWithoutProcurementApproverNestedInput
     bomsCreated?: BillOfMaterialUncheckedUpdateManyWithoutCreatorNestedInput
     bomsSubmitted?: BillOfMaterialUncheckedUpdateManyWithoutSubmitterNestedInput
     bomsWpoApproved?: BillOfMaterialUncheckedUpdateManyWithoutWpoApproverNestedInput
@@ -35384,6 +36765,7 @@ export namespace Prisma {
     borrowedProcessed?: BorrowedItemUncheckedUpdateManyWithoutProcessorNestedInput
     projectBudgets?: ProjectBudgetUncheckedUpdateManyWithoutInputterNestedInput
     supplierPrices?: SupplierPriceUncheckedUpdateManyWithoutInputterNestedInput
+    notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserUpsertWithoutPmApprovalsInput = {
@@ -35414,9 +36796,8 @@ export namespace Prisma {
     faultReportsSysApproved?: FaultReportUpdateManyWithoutSystemApproverNestedInput
     faultReportsPmApproved?: FaultReportUpdateManyWithoutPmApproverNestedInput
     warehouseReleases?: WarehouseReleaseUpdateManyWithoutRequesterNestedInput
-    wrWpoApproved?: WarehouseReleaseUpdateManyWithoutWpoApproverNestedInput
-    wrSysApproved?: WarehouseReleaseUpdateManyWithoutSystemApproverNestedInput
-    wrPmApproved?: WarehouseReleaseUpdateManyWithoutPmApproverNestedInput
+    wrWarehouseApproved?: WarehouseReleaseUpdateManyWithoutWarehouseApproverNestedInput
+    wrProcurementApproved?: WarehouseReleaseUpdateManyWithoutProcurementApproverNestedInput
     bomsCreated?: BillOfMaterialUpdateManyWithoutCreatorNestedInput
     bomsSubmitted?: BillOfMaterialUpdateManyWithoutSubmitterNestedInput
     bomsWpoApproved?: BillOfMaterialUpdateManyWithoutWpoApproverNestedInput
@@ -35429,6 +36810,7 @@ export namespace Prisma {
     borrowedProcessed?: BorrowedItemUpdateManyWithoutProcessorNestedInput
     projectBudgets?: ProjectBudgetUpdateManyWithoutInputterNestedInput
     supplierPrices?: SupplierPriceUpdateManyWithoutInputterNestedInput
+    notifications?: NotificationUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutPmApprovalsInput = {
@@ -35448,9 +36830,8 @@ export namespace Prisma {
     faultReportsSysApproved?: FaultReportUncheckedUpdateManyWithoutSystemApproverNestedInput
     faultReportsPmApproved?: FaultReportUncheckedUpdateManyWithoutPmApproverNestedInput
     warehouseReleases?: WarehouseReleaseUncheckedUpdateManyWithoutRequesterNestedInput
-    wrWpoApproved?: WarehouseReleaseUncheckedUpdateManyWithoutWpoApproverNestedInput
-    wrSysApproved?: WarehouseReleaseUncheckedUpdateManyWithoutSystemApproverNestedInput
-    wrPmApproved?: WarehouseReleaseUncheckedUpdateManyWithoutPmApproverNestedInput
+    wrWarehouseApproved?: WarehouseReleaseUncheckedUpdateManyWithoutWarehouseApproverNestedInput
+    wrProcurementApproved?: WarehouseReleaseUncheckedUpdateManyWithoutProcurementApproverNestedInput
     bomsCreated?: BillOfMaterialUncheckedUpdateManyWithoutCreatorNestedInput
     bomsSubmitted?: BillOfMaterialUncheckedUpdateManyWithoutSubmitterNestedInput
     bomsWpoApproved?: BillOfMaterialUncheckedUpdateManyWithoutWpoApproverNestedInput
@@ -35463,6 +36844,7 @@ export namespace Prisma {
     borrowedProcessed?: BorrowedItemUncheckedUpdateManyWithoutProcessorNestedInput
     projectBudgets?: ProjectBudgetUncheckedUpdateManyWithoutInputterNestedInput
     supplierPrices?: SupplierPriceUncheckedUpdateManyWithoutInputterNestedInput
+    notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type MaterialRequestCreateWithoutItemsInput = {
@@ -35606,9 +36988,8 @@ export namespace Prisma {
     faultReportsSysApproved?: FaultReportCreateNestedManyWithoutSystemApproverInput
     faultReportsPmApproved?: FaultReportCreateNestedManyWithoutPmApproverInput
     warehouseReleases?: WarehouseReleaseCreateNestedManyWithoutRequesterInput
-    wrWpoApproved?: WarehouseReleaseCreateNestedManyWithoutWpoApproverInput
-    wrSysApproved?: WarehouseReleaseCreateNestedManyWithoutSystemApproverInput
-    wrPmApproved?: WarehouseReleaseCreateNestedManyWithoutPmApproverInput
+    wrWarehouseApproved?: WarehouseReleaseCreateNestedManyWithoutWarehouseApproverInput
+    wrProcurementApproved?: WarehouseReleaseCreateNestedManyWithoutProcurementApproverInput
     bomsCreated?: BillOfMaterialCreateNestedManyWithoutCreatorInput
     bomsSubmitted?: BillOfMaterialCreateNestedManyWithoutSubmitterInput
     bomsWpoApproved?: BillOfMaterialCreateNestedManyWithoutWpoApproverInput
@@ -35621,6 +37002,7 @@ export namespace Prisma {
     borrowedProcessed?: BorrowedItemCreateNestedManyWithoutProcessorInput
     projectBudgets?: ProjectBudgetCreateNestedManyWithoutInputterInput
     supplierPrices?: SupplierPriceCreateNestedManyWithoutInputterInput
+    notifications?: NotificationCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutFaultReportsInput = {
@@ -35640,9 +37022,8 @@ export namespace Prisma {
     faultReportsSysApproved?: FaultReportUncheckedCreateNestedManyWithoutSystemApproverInput
     faultReportsPmApproved?: FaultReportUncheckedCreateNestedManyWithoutPmApproverInput
     warehouseReleases?: WarehouseReleaseUncheckedCreateNestedManyWithoutRequesterInput
-    wrWpoApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutWpoApproverInput
-    wrSysApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutSystemApproverInput
-    wrPmApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutPmApproverInput
+    wrWarehouseApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutWarehouseApproverInput
+    wrProcurementApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutProcurementApproverInput
     bomsCreated?: BillOfMaterialUncheckedCreateNestedManyWithoutCreatorInput
     bomsSubmitted?: BillOfMaterialUncheckedCreateNestedManyWithoutSubmitterInput
     bomsWpoApproved?: BillOfMaterialUncheckedCreateNestedManyWithoutWpoApproverInput
@@ -35655,6 +37036,7 @@ export namespace Prisma {
     borrowedProcessed?: BorrowedItemUncheckedCreateNestedManyWithoutProcessorInput
     projectBudgets?: ProjectBudgetUncheckedCreateNestedManyWithoutInputterInput
     supplierPrices?: SupplierPriceUncheckedCreateNestedManyWithoutInputterInput
+    notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutFaultReportsInput = {
@@ -35679,9 +37061,8 @@ export namespace Prisma {
     faultReportsSysApproved?: FaultReportCreateNestedManyWithoutSystemApproverInput
     faultReportsPmApproved?: FaultReportCreateNestedManyWithoutPmApproverInput
     warehouseReleases?: WarehouseReleaseCreateNestedManyWithoutRequesterInput
-    wrWpoApproved?: WarehouseReleaseCreateNestedManyWithoutWpoApproverInput
-    wrSysApproved?: WarehouseReleaseCreateNestedManyWithoutSystemApproverInput
-    wrPmApproved?: WarehouseReleaseCreateNestedManyWithoutPmApproverInput
+    wrWarehouseApproved?: WarehouseReleaseCreateNestedManyWithoutWarehouseApproverInput
+    wrProcurementApproved?: WarehouseReleaseCreateNestedManyWithoutProcurementApproverInput
     bomsCreated?: BillOfMaterialCreateNestedManyWithoutCreatorInput
     bomsSubmitted?: BillOfMaterialCreateNestedManyWithoutSubmitterInput
     bomsWpoApproved?: BillOfMaterialCreateNestedManyWithoutWpoApproverInput
@@ -35694,6 +37075,7 @@ export namespace Prisma {
     borrowedProcessed?: BorrowedItemCreateNestedManyWithoutProcessorInput
     projectBudgets?: ProjectBudgetCreateNestedManyWithoutInputterInput
     supplierPrices?: SupplierPriceCreateNestedManyWithoutInputterInput
+    notifications?: NotificationCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutFaultReportsWpoApprovedInput = {
@@ -35713,9 +37095,8 @@ export namespace Prisma {
     faultReportsSysApproved?: FaultReportUncheckedCreateNestedManyWithoutSystemApproverInput
     faultReportsPmApproved?: FaultReportUncheckedCreateNestedManyWithoutPmApproverInput
     warehouseReleases?: WarehouseReleaseUncheckedCreateNestedManyWithoutRequesterInput
-    wrWpoApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutWpoApproverInput
-    wrSysApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutSystemApproverInput
-    wrPmApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutPmApproverInput
+    wrWarehouseApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutWarehouseApproverInput
+    wrProcurementApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutProcurementApproverInput
     bomsCreated?: BillOfMaterialUncheckedCreateNestedManyWithoutCreatorInput
     bomsSubmitted?: BillOfMaterialUncheckedCreateNestedManyWithoutSubmitterInput
     bomsWpoApproved?: BillOfMaterialUncheckedCreateNestedManyWithoutWpoApproverInput
@@ -35728,6 +37109,7 @@ export namespace Prisma {
     borrowedProcessed?: BorrowedItemUncheckedCreateNestedManyWithoutProcessorInput
     projectBudgets?: ProjectBudgetUncheckedCreateNestedManyWithoutInputterInput
     supplierPrices?: SupplierPriceUncheckedCreateNestedManyWithoutInputterInput
+    notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutFaultReportsWpoApprovedInput = {
@@ -35752,9 +37134,8 @@ export namespace Prisma {
     faultReportsWpoApproved?: FaultReportCreateNestedManyWithoutWpoApproverInput
     faultReportsPmApproved?: FaultReportCreateNestedManyWithoutPmApproverInput
     warehouseReleases?: WarehouseReleaseCreateNestedManyWithoutRequesterInput
-    wrWpoApproved?: WarehouseReleaseCreateNestedManyWithoutWpoApproverInput
-    wrSysApproved?: WarehouseReleaseCreateNestedManyWithoutSystemApproverInput
-    wrPmApproved?: WarehouseReleaseCreateNestedManyWithoutPmApproverInput
+    wrWarehouseApproved?: WarehouseReleaseCreateNestedManyWithoutWarehouseApproverInput
+    wrProcurementApproved?: WarehouseReleaseCreateNestedManyWithoutProcurementApproverInput
     bomsCreated?: BillOfMaterialCreateNestedManyWithoutCreatorInput
     bomsSubmitted?: BillOfMaterialCreateNestedManyWithoutSubmitterInput
     bomsWpoApproved?: BillOfMaterialCreateNestedManyWithoutWpoApproverInput
@@ -35767,6 +37148,7 @@ export namespace Prisma {
     borrowedProcessed?: BorrowedItemCreateNestedManyWithoutProcessorInput
     projectBudgets?: ProjectBudgetCreateNestedManyWithoutInputterInput
     supplierPrices?: SupplierPriceCreateNestedManyWithoutInputterInput
+    notifications?: NotificationCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutFaultReportsSysApprovedInput = {
@@ -35786,9 +37168,8 @@ export namespace Prisma {
     faultReportsWpoApproved?: FaultReportUncheckedCreateNestedManyWithoutWpoApproverInput
     faultReportsPmApproved?: FaultReportUncheckedCreateNestedManyWithoutPmApproverInput
     warehouseReleases?: WarehouseReleaseUncheckedCreateNestedManyWithoutRequesterInput
-    wrWpoApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutWpoApproverInput
-    wrSysApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutSystemApproverInput
-    wrPmApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutPmApproverInput
+    wrWarehouseApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutWarehouseApproverInput
+    wrProcurementApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutProcurementApproverInput
     bomsCreated?: BillOfMaterialUncheckedCreateNestedManyWithoutCreatorInput
     bomsSubmitted?: BillOfMaterialUncheckedCreateNestedManyWithoutSubmitterInput
     bomsWpoApproved?: BillOfMaterialUncheckedCreateNestedManyWithoutWpoApproverInput
@@ -35801,6 +37182,7 @@ export namespace Prisma {
     borrowedProcessed?: BorrowedItemUncheckedCreateNestedManyWithoutProcessorInput
     projectBudgets?: ProjectBudgetUncheckedCreateNestedManyWithoutInputterInput
     supplierPrices?: SupplierPriceUncheckedCreateNestedManyWithoutInputterInput
+    notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutFaultReportsSysApprovedInput = {
@@ -35825,9 +37207,8 @@ export namespace Prisma {
     faultReportsWpoApproved?: FaultReportCreateNestedManyWithoutWpoApproverInput
     faultReportsSysApproved?: FaultReportCreateNestedManyWithoutSystemApproverInput
     warehouseReleases?: WarehouseReleaseCreateNestedManyWithoutRequesterInput
-    wrWpoApproved?: WarehouseReleaseCreateNestedManyWithoutWpoApproverInput
-    wrSysApproved?: WarehouseReleaseCreateNestedManyWithoutSystemApproverInput
-    wrPmApproved?: WarehouseReleaseCreateNestedManyWithoutPmApproverInput
+    wrWarehouseApproved?: WarehouseReleaseCreateNestedManyWithoutWarehouseApproverInput
+    wrProcurementApproved?: WarehouseReleaseCreateNestedManyWithoutProcurementApproverInput
     bomsCreated?: BillOfMaterialCreateNestedManyWithoutCreatorInput
     bomsSubmitted?: BillOfMaterialCreateNestedManyWithoutSubmitterInput
     bomsWpoApproved?: BillOfMaterialCreateNestedManyWithoutWpoApproverInput
@@ -35840,6 +37221,7 @@ export namespace Prisma {
     borrowedProcessed?: BorrowedItemCreateNestedManyWithoutProcessorInput
     projectBudgets?: ProjectBudgetCreateNestedManyWithoutInputterInput
     supplierPrices?: SupplierPriceCreateNestedManyWithoutInputterInput
+    notifications?: NotificationCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutFaultReportsPmApprovedInput = {
@@ -35859,9 +37241,8 @@ export namespace Prisma {
     faultReportsWpoApproved?: FaultReportUncheckedCreateNestedManyWithoutWpoApproverInput
     faultReportsSysApproved?: FaultReportUncheckedCreateNestedManyWithoutSystemApproverInput
     warehouseReleases?: WarehouseReleaseUncheckedCreateNestedManyWithoutRequesterInput
-    wrWpoApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutWpoApproverInput
-    wrSysApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutSystemApproverInput
-    wrPmApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutPmApproverInput
+    wrWarehouseApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutWarehouseApproverInput
+    wrProcurementApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutProcurementApproverInput
     bomsCreated?: BillOfMaterialUncheckedCreateNestedManyWithoutCreatorInput
     bomsSubmitted?: BillOfMaterialUncheckedCreateNestedManyWithoutSubmitterInput
     bomsWpoApproved?: BillOfMaterialUncheckedCreateNestedManyWithoutWpoApproverInput
@@ -35874,6 +37255,7 @@ export namespace Prisma {
     borrowedProcessed?: BorrowedItemUncheckedCreateNestedManyWithoutProcessorInput
     projectBudgets?: ProjectBudgetUncheckedCreateNestedManyWithoutInputterInput
     supplierPrices?: SupplierPriceUncheckedCreateNestedManyWithoutInputterInput
+    notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutFaultReportsPmApprovedInput = {
@@ -35909,9 +37291,8 @@ export namespace Prisma {
     faultReportsSysApproved?: FaultReportUpdateManyWithoutSystemApproverNestedInput
     faultReportsPmApproved?: FaultReportUpdateManyWithoutPmApproverNestedInput
     warehouseReleases?: WarehouseReleaseUpdateManyWithoutRequesterNestedInput
-    wrWpoApproved?: WarehouseReleaseUpdateManyWithoutWpoApproverNestedInput
-    wrSysApproved?: WarehouseReleaseUpdateManyWithoutSystemApproverNestedInput
-    wrPmApproved?: WarehouseReleaseUpdateManyWithoutPmApproverNestedInput
+    wrWarehouseApproved?: WarehouseReleaseUpdateManyWithoutWarehouseApproverNestedInput
+    wrProcurementApproved?: WarehouseReleaseUpdateManyWithoutProcurementApproverNestedInput
     bomsCreated?: BillOfMaterialUpdateManyWithoutCreatorNestedInput
     bomsSubmitted?: BillOfMaterialUpdateManyWithoutSubmitterNestedInput
     bomsWpoApproved?: BillOfMaterialUpdateManyWithoutWpoApproverNestedInput
@@ -35924,6 +37305,7 @@ export namespace Prisma {
     borrowedProcessed?: BorrowedItemUpdateManyWithoutProcessorNestedInput
     projectBudgets?: ProjectBudgetUpdateManyWithoutInputterNestedInput
     supplierPrices?: SupplierPriceUpdateManyWithoutInputterNestedInput
+    notifications?: NotificationUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutFaultReportsInput = {
@@ -35943,9 +37325,8 @@ export namespace Prisma {
     faultReportsSysApproved?: FaultReportUncheckedUpdateManyWithoutSystemApproverNestedInput
     faultReportsPmApproved?: FaultReportUncheckedUpdateManyWithoutPmApproverNestedInput
     warehouseReleases?: WarehouseReleaseUncheckedUpdateManyWithoutRequesterNestedInput
-    wrWpoApproved?: WarehouseReleaseUncheckedUpdateManyWithoutWpoApproverNestedInput
-    wrSysApproved?: WarehouseReleaseUncheckedUpdateManyWithoutSystemApproverNestedInput
-    wrPmApproved?: WarehouseReleaseUncheckedUpdateManyWithoutPmApproverNestedInput
+    wrWarehouseApproved?: WarehouseReleaseUncheckedUpdateManyWithoutWarehouseApproverNestedInput
+    wrProcurementApproved?: WarehouseReleaseUncheckedUpdateManyWithoutProcurementApproverNestedInput
     bomsCreated?: BillOfMaterialUncheckedUpdateManyWithoutCreatorNestedInput
     bomsSubmitted?: BillOfMaterialUncheckedUpdateManyWithoutSubmitterNestedInput
     bomsWpoApproved?: BillOfMaterialUncheckedUpdateManyWithoutWpoApproverNestedInput
@@ -35958,6 +37339,7 @@ export namespace Prisma {
     borrowedProcessed?: BorrowedItemUncheckedUpdateManyWithoutProcessorNestedInput
     projectBudgets?: ProjectBudgetUncheckedUpdateManyWithoutInputterNestedInput
     supplierPrices?: SupplierPriceUncheckedUpdateManyWithoutInputterNestedInput
+    notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserUpsertWithoutFaultReportsWpoApprovedInput = {
@@ -35988,9 +37370,8 @@ export namespace Prisma {
     faultReportsSysApproved?: FaultReportUpdateManyWithoutSystemApproverNestedInput
     faultReportsPmApproved?: FaultReportUpdateManyWithoutPmApproverNestedInput
     warehouseReleases?: WarehouseReleaseUpdateManyWithoutRequesterNestedInput
-    wrWpoApproved?: WarehouseReleaseUpdateManyWithoutWpoApproverNestedInput
-    wrSysApproved?: WarehouseReleaseUpdateManyWithoutSystemApproverNestedInput
-    wrPmApproved?: WarehouseReleaseUpdateManyWithoutPmApproverNestedInput
+    wrWarehouseApproved?: WarehouseReleaseUpdateManyWithoutWarehouseApproverNestedInput
+    wrProcurementApproved?: WarehouseReleaseUpdateManyWithoutProcurementApproverNestedInput
     bomsCreated?: BillOfMaterialUpdateManyWithoutCreatorNestedInput
     bomsSubmitted?: BillOfMaterialUpdateManyWithoutSubmitterNestedInput
     bomsWpoApproved?: BillOfMaterialUpdateManyWithoutWpoApproverNestedInput
@@ -36003,6 +37384,7 @@ export namespace Prisma {
     borrowedProcessed?: BorrowedItemUpdateManyWithoutProcessorNestedInput
     projectBudgets?: ProjectBudgetUpdateManyWithoutInputterNestedInput
     supplierPrices?: SupplierPriceUpdateManyWithoutInputterNestedInput
+    notifications?: NotificationUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutFaultReportsWpoApprovedInput = {
@@ -36022,9 +37404,8 @@ export namespace Prisma {
     faultReportsSysApproved?: FaultReportUncheckedUpdateManyWithoutSystemApproverNestedInput
     faultReportsPmApproved?: FaultReportUncheckedUpdateManyWithoutPmApproverNestedInput
     warehouseReleases?: WarehouseReleaseUncheckedUpdateManyWithoutRequesterNestedInput
-    wrWpoApproved?: WarehouseReleaseUncheckedUpdateManyWithoutWpoApproverNestedInput
-    wrSysApproved?: WarehouseReleaseUncheckedUpdateManyWithoutSystemApproverNestedInput
-    wrPmApproved?: WarehouseReleaseUncheckedUpdateManyWithoutPmApproverNestedInput
+    wrWarehouseApproved?: WarehouseReleaseUncheckedUpdateManyWithoutWarehouseApproverNestedInput
+    wrProcurementApproved?: WarehouseReleaseUncheckedUpdateManyWithoutProcurementApproverNestedInput
     bomsCreated?: BillOfMaterialUncheckedUpdateManyWithoutCreatorNestedInput
     bomsSubmitted?: BillOfMaterialUncheckedUpdateManyWithoutSubmitterNestedInput
     bomsWpoApproved?: BillOfMaterialUncheckedUpdateManyWithoutWpoApproverNestedInput
@@ -36037,6 +37418,7 @@ export namespace Prisma {
     borrowedProcessed?: BorrowedItemUncheckedUpdateManyWithoutProcessorNestedInput
     projectBudgets?: ProjectBudgetUncheckedUpdateManyWithoutInputterNestedInput
     supplierPrices?: SupplierPriceUncheckedUpdateManyWithoutInputterNestedInput
+    notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserUpsertWithoutFaultReportsSysApprovedInput = {
@@ -36067,9 +37449,8 @@ export namespace Prisma {
     faultReportsWpoApproved?: FaultReportUpdateManyWithoutWpoApproverNestedInput
     faultReportsPmApproved?: FaultReportUpdateManyWithoutPmApproverNestedInput
     warehouseReleases?: WarehouseReleaseUpdateManyWithoutRequesterNestedInput
-    wrWpoApproved?: WarehouseReleaseUpdateManyWithoutWpoApproverNestedInput
-    wrSysApproved?: WarehouseReleaseUpdateManyWithoutSystemApproverNestedInput
-    wrPmApproved?: WarehouseReleaseUpdateManyWithoutPmApproverNestedInput
+    wrWarehouseApproved?: WarehouseReleaseUpdateManyWithoutWarehouseApproverNestedInput
+    wrProcurementApproved?: WarehouseReleaseUpdateManyWithoutProcurementApproverNestedInput
     bomsCreated?: BillOfMaterialUpdateManyWithoutCreatorNestedInput
     bomsSubmitted?: BillOfMaterialUpdateManyWithoutSubmitterNestedInput
     bomsWpoApproved?: BillOfMaterialUpdateManyWithoutWpoApproverNestedInput
@@ -36082,6 +37463,7 @@ export namespace Prisma {
     borrowedProcessed?: BorrowedItemUpdateManyWithoutProcessorNestedInput
     projectBudgets?: ProjectBudgetUpdateManyWithoutInputterNestedInput
     supplierPrices?: SupplierPriceUpdateManyWithoutInputterNestedInput
+    notifications?: NotificationUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutFaultReportsSysApprovedInput = {
@@ -36101,9 +37483,8 @@ export namespace Prisma {
     faultReportsWpoApproved?: FaultReportUncheckedUpdateManyWithoutWpoApproverNestedInput
     faultReportsPmApproved?: FaultReportUncheckedUpdateManyWithoutPmApproverNestedInput
     warehouseReleases?: WarehouseReleaseUncheckedUpdateManyWithoutRequesterNestedInput
-    wrWpoApproved?: WarehouseReleaseUncheckedUpdateManyWithoutWpoApproverNestedInput
-    wrSysApproved?: WarehouseReleaseUncheckedUpdateManyWithoutSystemApproverNestedInput
-    wrPmApproved?: WarehouseReleaseUncheckedUpdateManyWithoutPmApproverNestedInput
+    wrWarehouseApproved?: WarehouseReleaseUncheckedUpdateManyWithoutWarehouseApproverNestedInput
+    wrProcurementApproved?: WarehouseReleaseUncheckedUpdateManyWithoutProcurementApproverNestedInput
     bomsCreated?: BillOfMaterialUncheckedUpdateManyWithoutCreatorNestedInput
     bomsSubmitted?: BillOfMaterialUncheckedUpdateManyWithoutSubmitterNestedInput
     bomsWpoApproved?: BillOfMaterialUncheckedUpdateManyWithoutWpoApproverNestedInput
@@ -36116,6 +37497,7 @@ export namespace Prisma {
     borrowedProcessed?: BorrowedItemUncheckedUpdateManyWithoutProcessorNestedInput
     projectBudgets?: ProjectBudgetUncheckedUpdateManyWithoutInputterNestedInput
     supplierPrices?: SupplierPriceUncheckedUpdateManyWithoutInputterNestedInput
+    notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserUpsertWithoutFaultReportsPmApprovedInput = {
@@ -36146,9 +37528,8 @@ export namespace Prisma {
     faultReportsWpoApproved?: FaultReportUpdateManyWithoutWpoApproverNestedInput
     faultReportsSysApproved?: FaultReportUpdateManyWithoutSystemApproverNestedInput
     warehouseReleases?: WarehouseReleaseUpdateManyWithoutRequesterNestedInput
-    wrWpoApproved?: WarehouseReleaseUpdateManyWithoutWpoApproverNestedInput
-    wrSysApproved?: WarehouseReleaseUpdateManyWithoutSystemApproverNestedInput
-    wrPmApproved?: WarehouseReleaseUpdateManyWithoutPmApproverNestedInput
+    wrWarehouseApproved?: WarehouseReleaseUpdateManyWithoutWarehouseApproverNestedInput
+    wrProcurementApproved?: WarehouseReleaseUpdateManyWithoutProcurementApproverNestedInput
     bomsCreated?: BillOfMaterialUpdateManyWithoutCreatorNestedInput
     bomsSubmitted?: BillOfMaterialUpdateManyWithoutSubmitterNestedInput
     bomsWpoApproved?: BillOfMaterialUpdateManyWithoutWpoApproverNestedInput
@@ -36161,6 +37542,7 @@ export namespace Prisma {
     borrowedProcessed?: BorrowedItemUpdateManyWithoutProcessorNestedInput
     projectBudgets?: ProjectBudgetUpdateManyWithoutInputterNestedInput
     supplierPrices?: SupplierPriceUpdateManyWithoutInputterNestedInput
+    notifications?: NotificationUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutFaultReportsPmApprovedInput = {
@@ -36180,9 +37562,8 @@ export namespace Prisma {
     faultReportsWpoApproved?: FaultReportUncheckedUpdateManyWithoutWpoApproverNestedInput
     faultReportsSysApproved?: FaultReportUncheckedUpdateManyWithoutSystemApproverNestedInput
     warehouseReleases?: WarehouseReleaseUncheckedUpdateManyWithoutRequesterNestedInput
-    wrWpoApproved?: WarehouseReleaseUncheckedUpdateManyWithoutWpoApproverNestedInput
-    wrSysApproved?: WarehouseReleaseUncheckedUpdateManyWithoutSystemApproverNestedInput
-    wrPmApproved?: WarehouseReleaseUncheckedUpdateManyWithoutPmApproverNestedInput
+    wrWarehouseApproved?: WarehouseReleaseUncheckedUpdateManyWithoutWarehouseApproverNestedInput
+    wrProcurementApproved?: WarehouseReleaseUncheckedUpdateManyWithoutProcurementApproverNestedInput
     bomsCreated?: BillOfMaterialUncheckedUpdateManyWithoutCreatorNestedInput
     bomsSubmitted?: BillOfMaterialUncheckedUpdateManyWithoutSubmitterNestedInput
     bomsWpoApproved?: BillOfMaterialUncheckedUpdateManyWithoutWpoApproverNestedInput
@@ -36195,6 +37576,7 @@ export namespace Prisma {
     borrowedProcessed?: BorrowedItemUncheckedUpdateManyWithoutProcessorNestedInput
     projectBudgets?: ProjectBudgetUncheckedUpdateManyWithoutInputterNestedInput
     supplierPrices?: SupplierPriceUncheckedUpdateManyWithoutInputterNestedInput
+    notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type MaterialRequestCreateWithoutWarehouseReleasesInput = {
@@ -36273,9 +37655,8 @@ export namespace Prisma {
     faultReportsWpoApproved?: FaultReportCreateNestedManyWithoutWpoApproverInput
     faultReportsSysApproved?: FaultReportCreateNestedManyWithoutSystemApproverInput
     faultReportsPmApproved?: FaultReportCreateNestedManyWithoutPmApproverInput
-    wrWpoApproved?: WarehouseReleaseCreateNestedManyWithoutWpoApproverInput
-    wrSysApproved?: WarehouseReleaseCreateNestedManyWithoutSystemApproverInput
-    wrPmApproved?: WarehouseReleaseCreateNestedManyWithoutPmApproverInput
+    wrWarehouseApproved?: WarehouseReleaseCreateNestedManyWithoutWarehouseApproverInput
+    wrProcurementApproved?: WarehouseReleaseCreateNestedManyWithoutProcurementApproverInput
     bomsCreated?: BillOfMaterialCreateNestedManyWithoutCreatorInput
     bomsSubmitted?: BillOfMaterialCreateNestedManyWithoutSubmitterInput
     bomsWpoApproved?: BillOfMaterialCreateNestedManyWithoutWpoApproverInput
@@ -36288,6 +37669,7 @@ export namespace Prisma {
     borrowedProcessed?: BorrowedItemCreateNestedManyWithoutProcessorInput
     projectBudgets?: ProjectBudgetCreateNestedManyWithoutInputterInput
     supplierPrices?: SupplierPriceCreateNestedManyWithoutInputterInput
+    notifications?: NotificationCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutWarehouseReleasesInput = {
@@ -36307,9 +37689,8 @@ export namespace Prisma {
     faultReportsWpoApproved?: FaultReportUncheckedCreateNestedManyWithoutWpoApproverInput
     faultReportsSysApproved?: FaultReportUncheckedCreateNestedManyWithoutSystemApproverInput
     faultReportsPmApproved?: FaultReportUncheckedCreateNestedManyWithoutPmApproverInput
-    wrWpoApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutWpoApproverInput
-    wrSysApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutSystemApproverInput
-    wrPmApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutPmApproverInput
+    wrWarehouseApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutWarehouseApproverInput
+    wrProcurementApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutProcurementApproverInput
     bomsCreated?: BillOfMaterialUncheckedCreateNestedManyWithoutCreatorInput
     bomsSubmitted?: BillOfMaterialUncheckedCreateNestedManyWithoutSubmitterInput
     bomsWpoApproved?: BillOfMaterialUncheckedCreateNestedManyWithoutWpoApproverInput
@@ -36322,6 +37703,7 @@ export namespace Prisma {
     borrowedProcessed?: BorrowedItemUncheckedCreateNestedManyWithoutProcessorInput
     projectBudgets?: ProjectBudgetUncheckedCreateNestedManyWithoutInputterInput
     supplierPrices?: SupplierPriceUncheckedCreateNestedManyWithoutInputterInput
+    notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutWarehouseReleasesInput = {
@@ -36329,7 +37711,7 @@ export namespace Prisma {
     create: XOR<UserCreateWithoutWarehouseReleasesInput, UserUncheckedCreateWithoutWarehouseReleasesInput>
   }
 
-  export type UserCreateWithoutWrWpoApprovedInput = {
+  export type UserCreateWithoutWrWarehouseApprovedInput = {
     id?: string
     username: string
     password: string
@@ -36347,8 +37729,7 @@ export namespace Prisma {
     faultReportsSysApproved?: FaultReportCreateNestedManyWithoutSystemApproverInput
     faultReportsPmApproved?: FaultReportCreateNestedManyWithoutPmApproverInput
     warehouseReleases?: WarehouseReleaseCreateNestedManyWithoutRequesterInput
-    wrSysApproved?: WarehouseReleaseCreateNestedManyWithoutSystemApproverInput
-    wrPmApproved?: WarehouseReleaseCreateNestedManyWithoutPmApproverInput
+    wrProcurementApproved?: WarehouseReleaseCreateNestedManyWithoutProcurementApproverInput
     bomsCreated?: BillOfMaterialCreateNestedManyWithoutCreatorInput
     bomsSubmitted?: BillOfMaterialCreateNestedManyWithoutSubmitterInput
     bomsWpoApproved?: BillOfMaterialCreateNestedManyWithoutWpoApproverInput
@@ -36361,9 +37742,10 @@ export namespace Prisma {
     borrowedProcessed?: BorrowedItemCreateNestedManyWithoutProcessorInput
     projectBudgets?: ProjectBudgetCreateNestedManyWithoutInputterInput
     supplierPrices?: SupplierPriceCreateNestedManyWithoutInputterInput
+    notifications?: NotificationCreateNestedManyWithoutUserInput
   }
 
-  export type UserUncheckedCreateWithoutWrWpoApprovedInput = {
+  export type UserUncheckedCreateWithoutWrWarehouseApprovedInput = {
     id?: string
     username: string
     password: string
@@ -36381,8 +37763,7 @@ export namespace Prisma {
     faultReportsSysApproved?: FaultReportUncheckedCreateNestedManyWithoutSystemApproverInput
     faultReportsPmApproved?: FaultReportUncheckedCreateNestedManyWithoutPmApproverInput
     warehouseReleases?: WarehouseReleaseUncheckedCreateNestedManyWithoutRequesterInput
-    wrSysApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutSystemApproverInput
-    wrPmApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutPmApproverInput
+    wrProcurementApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutProcurementApproverInput
     bomsCreated?: BillOfMaterialUncheckedCreateNestedManyWithoutCreatorInput
     bomsSubmitted?: BillOfMaterialUncheckedCreateNestedManyWithoutSubmitterInput
     bomsWpoApproved?: BillOfMaterialUncheckedCreateNestedManyWithoutWpoApproverInput
@@ -36395,14 +37776,15 @@ export namespace Prisma {
     borrowedProcessed?: BorrowedItemUncheckedCreateNestedManyWithoutProcessorInput
     projectBudgets?: ProjectBudgetUncheckedCreateNestedManyWithoutInputterInput
     supplierPrices?: SupplierPriceUncheckedCreateNestedManyWithoutInputterInput
+    notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
   }
 
-  export type UserCreateOrConnectWithoutWrWpoApprovedInput = {
+  export type UserCreateOrConnectWithoutWrWarehouseApprovedInput = {
     where: UserWhereUniqueInput
-    create: XOR<UserCreateWithoutWrWpoApprovedInput, UserUncheckedCreateWithoutWrWpoApprovedInput>
+    create: XOR<UserCreateWithoutWrWarehouseApprovedInput, UserUncheckedCreateWithoutWrWarehouseApprovedInput>
   }
 
-  export type UserCreateWithoutWrSysApprovedInput = {
+  export type UserCreateWithoutWrProcurementApprovedInput = {
     id?: string
     username: string
     password: string
@@ -36420,8 +37802,7 @@ export namespace Prisma {
     faultReportsSysApproved?: FaultReportCreateNestedManyWithoutSystemApproverInput
     faultReportsPmApproved?: FaultReportCreateNestedManyWithoutPmApproverInput
     warehouseReleases?: WarehouseReleaseCreateNestedManyWithoutRequesterInput
-    wrWpoApproved?: WarehouseReleaseCreateNestedManyWithoutWpoApproverInput
-    wrPmApproved?: WarehouseReleaseCreateNestedManyWithoutPmApproverInput
+    wrWarehouseApproved?: WarehouseReleaseCreateNestedManyWithoutWarehouseApproverInput
     bomsCreated?: BillOfMaterialCreateNestedManyWithoutCreatorInput
     bomsSubmitted?: BillOfMaterialCreateNestedManyWithoutSubmitterInput
     bomsWpoApproved?: BillOfMaterialCreateNestedManyWithoutWpoApproverInput
@@ -36434,9 +37815,10 @@ export namespace Prisma {
     borrowedProcessed?: BorrowedItemCreateNestedManyWithoutProcessorInput
     projectBudgets?: ProjectBudgetCreateNestedManyWithoutInputterInput
     supplierPrices?: SupplierPriceCreateNestedManyWithoutInputterInput
+    notifications?: NotificationCreateNestedManyWithoutUserInput
   }
 
-  export type UserUncheckedCreateWithoutWrSysApprovedInput = {
+  export type UserUncheckedCreateWithoutWrProcurementApprovedInput = {
     id?: string
     username: string
     password: string
@@ -36454,8 +37836,7 @@ export namespace Prisma {
     faultReportsSysApproved?: FaultReportUncheckedCreateNestedManyWithoutSystemApproverInput
     faultReportsPmApproved?: FaultReportUncheckedCreateNestedManyWithoutPmApproverInput
     warehouseReleases?: WarehouseReleaseUncheckedCreateNestedManyWithoutRequesterInput
-    wrWpoApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutWpoApproverInput
-    wrPmApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutPmApproverInput
+    wrWarehouseApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutWarehouseApproverInput
     bomsCreated?: BillOfMaterialUncheckedCreateNestedManyWithoutCreatorInput
     bomsSubmitted?: BillOfMaterialUncheckedCreateNestedManyWithoutSubmitterInput
     bomsWpoApproved?: BillOfMaterialUncheckedCreateNestedManyWithoutWpoApproverInput
@@ -36468,84 +37849,12 @@ export namespace Prisma {
     borrowedProcessed?: BorrowedItemUncheckedCreateNestedManyWithoutProcessorInput
     projectBudgets?: ProjectBudgetUncheckedCreateNestedManyWithoutInputterInput
     supplierPrices?: SupplierPriceUncheckedCreateNestedManyWithoutInputterInput
+    notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
   }
 
-  export type UserCreateOrConnectWithoutWrSysApprovedInput = {
+  export type UserCreateOrConnectWithoutWrProcurementApprovedInput = {
     where: UserWhereUniqueInput
-    create: XOR<UserCreateWithoutWrSysApprovedInput, UserUncheckedCreateWithoutWrSysApprovedInput>
-  }
-
-  export type UserCreateWithoutWrPmApprovedInput = {
-    id?: string
-    username: string
-    password: string
-    name: string
-    role?: $Enums.Role
-    engineerRole?: $Enums.EngineerRole | null
-    position?: string | null
-    createdAt?: Date | string
-    materialRequests?: MaterialRequestCreateNestedManyWithoutRequesterInput
-    pmApprovals?: MaterialRequestCreateNestedManyWithoutPmApproverInput
-    wpoApprovals?: MaterialRequestCreateNestedManyWithoutWpoApproverInput
-    mrSystemApproved?: MaterialRequestCreateNestedManyWithoutSystemApproverInput
-    faultReports?: FaultReportCreateNestedManyWithoutReporterInput
-    faultReportsWpoApproved?: FaultReportCreateNestedManyWithoutWpoApproverInput
-    faultReportsSysApproved?: FaultReportCreateNestedManyWithoutSystemApproverInput
-    faultReportsPmApproved?: FaultReportCreateNestedManyWithoutPmApproverInput
-    warehouseReleases?: WarehouseReleaseCreateNestedManyWithoutRequesterInput
-    wrWpoApproved?: WarehouseReleaseCreateNestedManyWithoutWpoApproverInput
-    wrSysApproved?: WarehouseReleaseCreateNestedManyWithoutSystemApproverInput
-    bomsCreated?: BillOfMaterialCreateNestedManyWithoutCreatorInput
-    bomsSubmitted?: BillOfMaterialCreateNestedManyWithoutSubmitterInput
-    bomsWpoApproved?: BillOfMaterialCreateNestedManyWithoutWpoApproverInput
-    bomsSystemApproved?: BillOfMaterialCreateNestedManyWithoutSystemApproverInput
-    bomsAssignedStaff?: BillOfMaterialCreateNestedManyWithoutAssignedStaffInput
-    bomsAssignedWpo?: BillOfMaterialCreateNestedManyWithoutAssignedWpoInput
-    bomsAssignedSystem?: BillOfMaterialCreateNestedManyWithoutAssignedSystemInput
-    bomHistories?: BomHistoryCreateNestedManyWithoutUserInput
-    purchaseOrders?: PurchaseOrderCreateNestedManyWithoutCreatorInput
-    borrowedProcessed?: BorrowedItemCreateNestedManyWithoutProcessorInput
-    projectBudgets?: ProjectBudgetCreateNestedManyWithoutInputterInput
-    supplierPrices?: SupplierPriceCreateNestedManyWithoutInputterInput
-  }
-
-  export type UserUncheckedCreateWithoutWrPmApprovedInput = {
-    id?: string
-    username: string
-    password: string
-    name: string
-    role?: $Enums.Role
-    engineerRole?: $Enums.EngineerRole | null
-    position?: string | null
-    createdAt?: Date | string
-    materialRequests?: MaterialRequestUncheckedCreateNestedManyWithoutRequesterInput
-    pmApprovals?: MaterialRequestUncheckedCreateNestedManyWithoutPmApproverInput
-    wpoApprovals?: MaterialRequestUncheckedCreateNestedManyWithoutWpoApproverInput
-    mrSystemApproved?: MaterialRequestUncheckedCreateNestedManyWithoutSystemApproverInput
-    faultReports?: FaultReportUncheckedCreateNestedManyWithoutReporterInput
-    faultReportsWpoApproved?: FaultReportUncheckedCreateNestedManyWithoutWpoApproverInput
-    faultReportsSysApproved?: FaultReportUncheckedCreateNestedManyWithoutSystemApproverInput
-    faultReportsPmApproved?: FaultReportUncheckedCreateNestedManyWithoutPmApproverInput
-    warehouseReleases?: WarehouseReleaseUncheckedCreateNestedManyWithoutRequesterInput
-    wrWpoApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutWpoApproverInput
-    wrSysApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutSystemApproverInput
-    bomsCreated?: BillOfMaterialUncheckedCreateNestedManyWithoutCreatorInput
-    bomsSubmitted?: BillOfMaterialUncheckedCreateNestedManyWithoutSubmitterInput
-    bomsWpoApproved?: BillOfMaterialUncheckedCreateNestedManyWithoutWpoApproverInput
-    bomsSystemApproved?: BillOfMaterialUncheckedCreateNestedManyWithoutSystemApproverInput
-    bomsAssignedStaff?: BillOfMaterialUncheckedCreateNestedManyWithoutAssignedStaffInput
-    bomsAssignedWpo?: BillOfMaterialUncheckedCreateNestedManyWithoutAssignedWpoInput
-    bomsAssignedSystem?: BillOfMaterialUncheckedCreateNestedManyWithoutAssignedSystemInput
-    bomHistories?: BomHistoryUncheckedCreateNestedManyWithoutUserInput
-    purchaseOrders?: PurchaseOrderUncheckedCreateNestedManyWithoutCreatorInput
-    borrowedProcessed?: BorrowedItemUncheckedCreateNestedManyWithoutProcessorInput
-    projectBudgets?: ProjectBudgetUncheckedCreateNestedManyWithoutInputterInput
-    supplierPrices?: SupplierPriceUncheckedCreateNestedManyWithoutInputterInput
-  }
-
-  export type UserCreateOrConnectWithoutWrPmApprovedInput = {
-    where: UserWhereUniqueInput
-    create: XOR<UserCreateWithoutWrPmApprovedInput, UserUncheckedCreateWithoutWrPmApprovedInput>
+    create: XOR<UserCreateWithoutWrProcurementApprovedInput, UserUncheckedCreateWithoutWrProcurementApprovedInput>
   }
 
   export type WarehouseReleaseItemCreateWithoutReleaseInput = {
@@ -36678,9 +37987,8 @@ export namespace Prisma {
     faultReportsWpoApproved?: FaultReportUpdateManyWithoutWpoApproverNestedInput
     faultReportsSysApproved?: FaultReportUpdateManyWithoutSystemApproverNestedInput
     faultReportsPmApproved?: FaultReportUpdateManyWithoutPmApproverNestedInput
-    wrWpoApproved?: WarehouseReleaseUpdateManyWithoutWpoApproverNestedInput
-    wrSysApproved?: WarehouseReleaseUpdateManyWithoutSystemApproverNestedInput
-    wrPmApproved?: WarehouseReleaseUpdateManyWithoutPmApproverNestedInput
+    wrWarehouseApproved?: WarehouseReleaseUpdateManyWithoutWarehouseApproverNestedInput
+    wrProcurementApproved?: WarehouseReleaseUpdateManyWithoutProcurementApproverNestedInput
     bomsCreated?: BillOfMaterialUpdateManyWithoutCreatorNestedInput
     bomsSubmitted?: BillOfMaterialUpdateManyWithoutSubmitterNestedInput
     bomsWpoApproved?: BillOfMaterialUpdateManyWithoutWpoApproverNestedInput
@@ -36693,6 +38001,7 @@ export namespace Prisma {
     borrowedProcessed?: BorrowedItemUpdateManyWithoutProcessorNestedInput
     projectBudgets?: ProjectBudgetUpdateManyWithoutInputterNestedInput
     supplierPrices?: SupplierPriceUpdateManyWithoutInputterNestedInput
+    notifications?: NotificationUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutWarehouseReleasesInput = {
@@ -36712,9 +38021,8 @@ export namespace Prisma {
     faultReportsWpoApproved?: FaultReportUncheckedUpdateManyWithoutWpoApproverNestedInput
     faultReportsSysApproved?: FaultReportUncheckedUpdateManyWithoutSystemApproverNestedInput
     faultReportsPmApproved?: FaultReportUncheckedUpdateManyWithoutPmApproverNestedInput
-    wrWpoApproved?: WarehouseReleaseUncheckedUpdateManyWithoutWpoApproverNestedInput
-    wrSysApproved?: WarehouseReleaseUncheckedUpdateManyWithoutSystemApproverNestedInput
-    wrPmApproved?: WarehouseReleaseUncheckedUpdateManyWithoutPmApproverNestedInput
+    wrWarehouseApproved?: WarehouseReleaseUncheckedUpdateManyWithoutWarehouseApproverNestedInput
+    wrProcurementApproved?: WarehouseReleaseUncheckedUpdateManyWithoutProcurementApproverNestedInput
     bomsCreated?: BillOfMaterialUncheckedUpdateManyWithoutCreatorNestedInput
     bomsSubmitted?: BillOfMaterialUncheckedUpdateManyWithoutSubmitterNestedInput
     bomsWpoApproved?: BillOfMaterialUncheckedUpdateManyWithoutWpoApproverNestedInput
@@ -36727,20 +38035,21 @@ export namespace Prisma {
     borrowedProcessed?: BorrowedItemUncheckedUpdateManyWithoutProcessorNestedInput
     projectBudgets?: ProjectBudgetUncheckedUpdateManyWithoutInputterNestedInput
     supplierPrices?: SupplierPriceUncheckedUpdateManyWithoutInputterNestedInput
+    notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
   }
 
-  export type UserUpsertWithoutWrWpoApprovedInput = {
-    update: XOR<UserUpdateWithoutWrWpoApprovedInput, UserUncheckedUpdateWithoutWrWpoApprovedInput>
-    create: XOR<UserCreateWithoutWrWpoApprovedInput, UserUncheckedCreateWithoutWrWpoApprovedInput>
+  export type UserUpsertWithoutWrWarehouseApprovedInput = {
+    update: XOR<UserUpdateWithoutWrWarehouseApprovedInput, UserUncheckedUpdateWithoutWrWarehouseApprovedInput>
+    create: XOR<UserCreateWithoutWrWarehouseApprovedInput, UserUncheckedCreateWithoutWrWarehouseApprovedInput>
     where?: UserWhereInput
   }
 
-  export type UserUpdateToOneWithWhereWithoutWrWpoApprovedInput = {
+  export type UserUpdateToOneWithWhereWithoutWrWarehouseApprovedInput = {
     where?: UserWhereInput
-    data: XOR<UserUpdateWithoutWrWpoApprovedInput, UserUncheckedUpdateWithoutWrWpoApprovedInput>
+    data: XOR<UserUpdateWithoutWrWarehouseApprovedInput, UserUncheckedUpdateWithoutWrWarehouseApprovedInput>
   }
 
-  export type UserUpdateWithoutWrWpoApprovedInput = {
+  export type UserUpdateWithoutWrWarehouseApprovedInput = {
     id?: StringFieldUpdateOperationsInput | string
     username?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
@@ -36758,8 +38067,7 @@ export namespace Prisma {
     faultReportsSysApproved?: FaultReportUpdateManyWithoutSystemApproverNestedInput
     faultReportsPmApproved?: FaultReportUpdateManyWithoutPmApproverNestedInput
     warehouseReleases?: WarehouseReleaseUpdateManyWithoutRequesterNestedInput
-    wrSysApproved?: WarehouseReleaseUpdateManyWithoutSystemApproverNestedInput
-    wrPmApproved?: WarehouseReleaseUpdateManyWithoutPmApproverNestedInput
+    wrProcurementApproved?: WarehouseReleaseUpdateManyWithoutProcurementApproverNestedInput
     bomsCreated?: BillOfMaterialUpdateManyWithoutCreatorNestedInput
     bomsSubmitted?: BillOfMaterialUpdateManyWithoutSubmitterNestedInput
     bomsWpoApproved?: BillOfMaterialUpdateManyWithoutWpoApproverNestedInput
@@ -36772,9 +38080,10 @@ export namespace Prisma {
     borrowedProcessed?: BorrowedItemUpdateManyWithoutProcessorNestedInput
     projectBudgets?: ProjectBudgetUpdateManyWithoutInputterNestedInput
     supplierPrices?: SupplierPriceUpdateManyWithoutInputterNestedInput
+    notifications?: NotificationUpdateManyWithoutUserNestedInput
   }
 
-  export type UserUncheckedUpdateWithoutWrWpoApprovedInput = {
+  export type UserUncheckedUpdateWithoutWrWarehouseApprovedInput = {
     id?: StringFieldUpdateOperationsInput | string
     username?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
@@ -36792,8 +38101,7 @@ export namespace Prisma {
     faultReportsSysApproved?: FaultReportUncheckedUpdateManyWithoutSystemApproverNestedInput
     faultReportsPmApproved?: FaultReportUncheckedUpdateManyWithoutPmApproverNestedInput
     warehouseReleases?: WarehouseReleaseUncheckedUpdateManyWithoutRequesterNestedInput
-    wrSysApproved?: WarehouseReleaseUncheckedUpdateManyWithoutSystemApproverNestedInput
-    wrPmApproved?: WarehouseReleaseUncheckedUpdateManyWithoutPmApproverNestedInput
+    wrProcurementApproved?: WarehouseReleaseUncheckedUpdateManyWithoutProcurementApproverNestedInput
     bomsCreated?: BillOfMaterialUncheckedUpdateManyWithoutCreatorNestedInput
     bomsSubmitted?: BillOfMaterialUncheckedUpdateManyWithoutSubmitterNestedInput
     bomsWpoApproved?: BillOfMaterialUncheckedUpdateManyWithoutWpoApproverNestedInput
@@ -36806,20 +38114,21 @@ export namespace Prisma {
     borrowedProcessed?: BorrowedItemUncheckedUpdateManyWithoutProcessorNestedInput
     projectBudgets?: ProjectBudgetUncheckedUpdateManyWithoutInputterNestedInput
     supplierPrices?: SupplierPriceUncheckedUpdateManyWithoutInputterNestedInput
+    notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
   }
 
-  export type UserUpsertWithoutWrSysApprovedInput = {
-    update: XOR<UserUpdateWithoutWrSysApprovedInput, UserUncheckedUpdateWithoutWrSysApprovedInput>
-    create: XOR<UserCreateWithoutWrSysApprovedInput, UserUncheckedCreateWithoutWrSysApprovedInput>
+  export type UserUpsertWithoutWrProcurementApprovedInput = {
+    update: XOR<UserUpdateWithoutWrProcurementApprovedInput, UserUncheckedUpdateWithoutWrProcurementApprovedInput>
+    create: XOR<UserCreateWithoutWrProcurementApprovedInput, UserUncheckedCreateWithoutWrProcurementApprovedInput>
     where?: UserWhereInput
   }
 
-  export type UserUpdateToOneWithWhereWithoutWrSysApprovedInput = {
+  export type UserUpdateToOneWithWhereWithoutWrProcurementApprovedInput = {
     where?: UserWhereInput
-    data: XOR<UserUpdateWithoutWrSysApprovedInput, UserUncheckedUpdateWithoutWrSysApprovedInput>
+    data: XOR<UserUpdateWithoutWrProcurementApprovedInput, UserUncheckedUpdateWithoutWrProcurementApprovedInput>
   }
 
-  export type UserUpdateWithoutWrSysApprovedInput = {
+  export type UserUpdateWithoutWrProcurementApprovedInput = {
     id?: StringFieldUpdateOperationsInput | string
     username?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
@@ -36837,8 +38146,7 @@ export namespace Prisma {
     faultReportsSysApproved?: FaultReportUpdateManyWithoutSystemApproverNestedInput
     faultReportsPmApproved?: FaultReportUpdateManyWithoutPmApproverNestedInput
     warehouseReleases?: WarehouseReleaseUpdateManyWithoutRequesterNestedInput
-    wrWpoApproved?: WarehouseReleaseUpdateManyWithoutWpoApproverNestedInput
-    wrPmApproved?: WarehouseReleaseUpdateManyWithoutPmApproverNestedInput
+    wrWarehouseApproved?: WarehouseReleaseUpdateManyWithoutWarehouseApproverNestedInput
     bomsCreated?: BillOfMaterialUpdateManyWithoutCreatorNestedInput
     bomsSubmitted?: BillOfMaterialUpdateManyWithoutSubmitterNestedInput
     bomsWpoApproved?: BillOfMaterialUpdateManyWithoutWpoApproverNestedInput
@@ -36851,9 +38159,10 @@ export namespace Prisma {
     borrowedProcessed?: BorrowedItemUpdateManyWithoutProcessorNestedInput
     projectBudgets?: ProjectBudgetUpdateManyWithoutInputterNestedInput
     supplierPrices?: SupplierPriceUpdateManyWithoutInputterNestedInput
+    notifications?: NotificationUpdateManyWithoutUserNestedInput
   }
 
-  export type UserUncheckedUpdateWithoutWrSysApprovedInput = {
+  export type UserUncheckedUpdateWithoutWrProcurementApprovedInput = {
     id?: StringFieldUpdateOperationsInput | string
     username?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
@@ -36871,8 +38180,7 @@ export namespace Prisma {
     faultReportsSysApproved?: FaultReportUncheckedUpdateManyWithoutSystemApproverNestedInput
     faultReportsPmApproved?: FaultReportUncheckedUpdateManyWithoutPmApproverNestedInput
     warehouseReleases?: WarehouseReleaseUncheckedUpdateManyWithoutRequesterNestedInput
-    wrWpoApproved?: WarehouseReleaseUncheckedUpdateManyWithoutWpoApproverNestedInput
-    wrPmApproved?: WarehouseReleaseUncheckedUpdateManyWithoutPmApproverNestedInput
+    wrWarehouseApproved?: WarehouseReleaseUncheckedUpdateManyWithoutWarehouseApproverNestedInput
     bomsCreated?: BillOfMaterialUncheckedUpdateManyWithoutCreatorNestedInput
     bomsSubmitted?: BillOfMaterialUncheckedUpdateManyWithoutSubmitterNestedInput
     bomsWpoApproved?: BillOfMaterialUncheckedUpdateManyWithoutWpoApproverNestedInput
@@ -36885,85 +38193,7 @@ export namespace Prisma {
     borrowedProcessed?: BorrowedItemUncheckedUpdateManyWithoutProcessorNestedInput
     projectBudgets?: ProjectBudgetUncheckedUpdateManyWithoutInputterNestedInput
     supplierPrices?: SupplierPriceUncheckedUpdateManyWithoutInputterNestedInput
-  }
-
-  export type UserUpsertWithoutWrPmApprovedInput = {
-    update: XOR<UserUpdateWithoutWrPmApprovedInput, UserUncheckedUpdateWithoutWrPmApprovedInput>
-    create: XOR<UserCreateWithoutWrPmApprovedInput, UserUncheckedCreateWithoutWrPmApprovedInput>
-    where?: UserWhereInput
-  }
-
-  export type UserUpdateToOneWithWhereWithoutWrPmApprovedInput = {
-    where?: UserWhereInput
-    data: XOR<UserUpdateWithoutWrPmApprovedInput, UserUncheckedUpdateWithoutWrPmApprovedInput>
-  }
-
-  export type UserUpdateWithoutWrPmApprovedInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    username?: StringFieldUpdateOperationsInput | string
-    password?: StringFieldUpdateOperationsInput | string
-    name?: StringFieldUpdateOperationsInput | string
-    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
-    engineerRole?: NullableEnumEngineerRoleFieldUpdateOperationsInput | $Enums.EngineerRole | null
-    position?: NullableStringFieldUpdateOperationsInput | string | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    materialRequests?: MaterialRequestUpdateManyWithoutRequesterNestedInput
-    pmApprovals?: MaterialRequestUpdateManyWithoutPmApproverNestedInput
-    wpoApprovals?: MaterialRequestUpdateManyWithoutWpoApproverNestedInput
-    mrSystemApproved?: MaterialRequestUpdateManyWithoutSystemApproverNestedInput
-    faultReports?: FaultReportUpdateManyWithoutReporterNestedInput
-    faultReportsWpoApproved?: FaultReportUpdateManyWithoutWpoApproverNestedInput
-    faultReportsSysApproved?: FaultReportUpdateManyWithoutSystemApproverNestedInput
-    faultReportsPmApproved?: FaultReportUpdateManyWithoutPmApproverNestedInput
-    warehouseReleases?: WarehouseReleaseUpdateManyWithoutRequesterNestedInput
-    wrWpoApproved?: WarehouseReleaseUpdateManyWithoutWpoApproverNestedInput
-    wrSysApproved?: WarehouseReleaseUpdateManyWithoutSystemApproverNestedInput
-    bomsCreated?: BillOfMaterialUpdateManyWithoutCreatorNestedInput
-    bomsSubmitted?: BillOfMaterialUpdateManyWithoutSubmitterNestedInput
-    bomsWpoApproved?: BillOfMaterialUpdateManyWithoutWpoApproverNestedInput
-    bomsSystemApproved?: BillOfMaterialUpdateManyWithoutSystemApproverNestedInput
-    bomsAssignedStaff?: BillOfMaterialUpdateManyWithoutAssignedStaffNestedInput
-    bomsAssignedWpo?: BillOfMaterialUpdateManyWithoutAssignedWpoNestedInput
-    bomsAssignedSystem?: BillOfMaterialUpdateManyWithoutAssignedSystemNestedInput
-    bomHistories?: BomHistoryUpdateManyWithoutUserNestedInput
-    purchaseOrders?: PurchaseOrderUpdateManyWithoutCreatorNestedInput
-    borrowedProcessed?: BorrowedItemUpdateManyWithoutProcessorNestedInput
-    projectBudgets?: ProjectBudgetUpdateManyWithoutInputterNestedInput
-    supplierPrices?: SupplierPriceUpdateManyWithoutInputterNestedInput
-  }
-
-  export type UserUncheckedUpdateWithoutWrPmApprovedInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    username?: StringFieldUpdateOperationsInput | string
-    password?: StringFieldUpdateOperationsInput | string
-    name?: StringFieldUpdateOperationsInput | string
-    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
-    engineerRole?: NullableEnumEngineerRoleFieldUpdateOperationsInput | $Enums.EngineerRole | null
-    position?: NullableStringFieldUpdateOperationsInput | string | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    materialRequests?: MaterialRequestUncheckedUpdateManyWithoutRequesterNestedInput
-    pmApprovals?: MaterialRequestUncheckedUpdateManyWithoutPmApproverNestedInput
-    wpoApprovals?: MaterialRequestUncheckedUpdateManyWithoutWpoApproverNestedInput
-    mrSystemApproved?: MaterialRequestUncheckedUpdateManyWithoutSystemApproverNestedInput
-    faultReports?: FaultReportUncheckedUpdateManyWithoutReporterNestedInput
-    faultReportsWpoApproved?: FaultReportUncheckedUpdateManyWithoutWpoApproverNestedInput
-    faultReportsSysApproved?: FaultReportUncheckedUpdateManyWithoutSystemApproverNestedInput
-    faultReportsPmApproved?: FaultReportUncheckedUpdateManyWithoutPmApproverNestedInput
-    warehouseReleases?: WarehouseReleaseUncheckedUpdateManyWithoutRequesterNestedInput
-    wrWpoApproved?: WarehouseReleaseUncheckedUpdateManyWithoutWpoApproverNestedInput
-    wrSysApproved?: WarehouseReleaseUncheckedUpdateManyWithoutSystemApproverNestedInput
-    bomsCreated?: BillOfMaterialUncheckedUpdateManyWithoutCreatorNestedInput
-    bomsSubmitted?: BillOfMaterialUncheckedUpdateManyWithoutSubmitterNestedInput
-    bomsWpoApproved?: BillOfMaterialUncheckedUpdateManyWithoutWpoApproverNestedInput
-    bomsSystemApproved?: BillOfMaterialUncheckedUpdateManyWithoutSystemApproverNestedInput
-    bomsAssignedStaff?: BillOfMaterialUncheckedUpdateManyWithoutAssignedStaffNestedInput
-    bomsAssignedWpo?: BillOfMaterialUncheckedUpdateManyWithoutAssignedWpoNestedInput
-    bomsAssignedSystem?: BillOfMaterialUncheckedUpdateManyWithoutAssignedSystemNestedInput
-    bomHistories?: BomHistoryUncheckedUpdateManyWithoutUserNestedInput
-    purchaseOrders?: PurchaseOrderUncheckedUpdateManyWithoutCreatorNestedInput
-    borrowedProcessed?: BorrowedItemUncheckedUpdateManyWithoutProcessorNestedInput
-    projectBudgets?: ProjectBudgetUncheckedUpdateManyWithoutInputterNestedInput
-    supplierPrices?: SupplierPriceUncheckedUpdateManyWithoutInputterNestedInput
+    notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type WarehouseReleaseItemUpsertWithWhereUniqueWithoutReleaseInput = {
@@ -37009,17 +38239,17 @@ export namespace Prisma {
     deliveryLocation?: string | null
     releaseDate?: Date | string
     dateReleased?: Date | string | null
-    status?: $Enums.Status
-    wpoApprovedAt?: Date | string | null
-    systemApprovedAt?: Date | string | null
-    pmApprovedAt?: Date | string | null
+    status?: $Enums.WrStatus
+    warehouseApprovedAt?: Date | string | null
+    procurementApprovedAt?: Date | string | null
+    rejectedSide?: string | null
+    rejectedReason?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     materialRequest?: MaterialRequestCreateNestedOneWithoutWarehouseReleasesInput
     requester: UserCreateNestedOneWithoutWarehouseReleasesInput
-    wpoApprover?: UserCreateNestedOneWithoutWrWpoApprovedInput
-    systemApprover?: UserCreateNestedOneWithoutWrSysApprovedInput
-    pmApprover?: UserCreateNestedOneWithoutWrPmApprovedInput
+    warehouseApprover?: UserCreateNestedOneWithoutWrWarehouseApprovedInput
+    procurementApprover?: UserCreateNestedOneWithoutWrProcurementApprovedInput
   }
 
   export type WarehouseReleaseUncheckedCreateWithoutItemsInput = {
@@ -37033,13 +38263,13 @@ export namespace Prisma {
     releaseDate?: Date | string
     dateReleased?: Date | string | null
     requesterId: string
-    status?: $Enums.Status
-    wpoApprovedBy?: string | null
-    wpoApprovedAt?: Date | string | null
-    systemApprovedBy?: string | null
-    systemApprovedAt?: Date | string | null
-    pmApprovedBy?: string | null
-    pmApprovedAt?: Date | string | null
+    status?: $Enums.WrStatus
+    warehouseApprovedBy?: string | null
+    warehouseApprovedAt?: Date | string | null
+    procurementApprovedBy?: string | null
+    procurementApprovedAt?: Date | string | null
+    rejectedSide?: string | null
+    rejectedReason?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -37069,17 +38299,17 @@ export namespace Prisma {
     deliveryLocation?: NullableStringFieldUpdateOperationsInput | string | null
     releaseDate?: DateTimeFieldUpdateOperationsInput | Date | string
     dateReleased?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    status?: EnumStatusFieldUpdateOperationsInput | $Enums.Status
-    wpoApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    systemApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    pmApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    status?: EnumWrStatusFieldUpdateOperationsInput | $Enums.WrStatus
+    warehouseApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    procurementApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rejectedSide?: NullableStringFieldUpdateOperationsInput | string | null
+    rejectedReason?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     materialRequest?: MaterialRequestUpdateOneWithoutWarehouseReleasesNestedInput
     requester?: UserUpdateOneRequiredWithoutWarehouseReleasesNestedInput
-    wpoApprover?: UserUpdateOneWithoutWrWpoApprovedNestedInput
-    systemApprover?: UserUpdateOneWithoutWrSysApprovedNestedInput
-    pmApprover?: UserUpdateOneWithoutWrPmApprovedNestedInput
+    warehouseApprover?: UserUpdateOneWithoutWrWarehouseApprovedNestedInput
+    procurementApprover?: UserUpdateOneWithoutWrProcurementApprovedNestedInput
   }
 
   export type WarehouseReleaseUncheckedUpdateWithoutItemsInput = {
@@ -37093,13 +38323,13 @@ export namespace Prisma {
     releaseDate?: DateTimeFieldUpdateOperationsInput | Date | string
     dateReleased?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     requesterId?: StringFieldUpdateOperationsInput | string
-    status?: EnumStatusFieldUpdateOperationsInput | $Enums.Status
-    wpoApprovedBy?: NullableStringFieldUpdateOperationsInput | string | null
-    wpoApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    systemApprovedBy?: NullableStringFieldUpdateOperationsInput | string | null
-    systemApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    pmApprovedBy?: NullableStringFieldUpdateOperationsInput | string | null
-    pmApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    status?: EnumWrStatusFieldUpdateOperationsInput | $Enums.WrStatus
+    warehouseApprovedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    warehouseApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    procurementApprovedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    procurementApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rejectedSide?: NullableStringFieldUpdateOperationsInput | string | null
+    rejectedReason?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -37383,9 +38613,8 @@ export namespace Prisma {
     faultReportsSysApproved?: FaultReportCreateNestedManyWithoutSystemApproverInput
     faultReportsPmApproved?: FaultReportCreateNestedManyWithoutPmApproverInput
     warehouseReleases?: WarehouseReleaseCreateNestedManyWithoutRequesterInput
-    wrWpoApproved?: WarehouseReleaseCreateNestedManyWithoutWpoApproverInput
-    wrSysApproved?: WarehouseReleaseCreateNestedManyWithoutSystemApproverInput
-    wrPmApproved?: WarehouseReleaseCreateNestedManyWithoutPmApproverInput
+    wrWarehouseApproved?: WarehouseReleaseCreateNestedManyWithoutWarehouseApproverInput
+    wrProcurementApproved?: WarehouseReleaseCreateNestedManyWithoutProcurementApproverInput
     bomsCreated?: BillOfMaterialCreateNestedManyWithoutCreatorInput
     bomsSubmitted?: BillOfMaterialCreateNestedManyWithoutSubmitterInput
     bomsWpoApproved?: BillOfMaterialCreateNestedManyWithoutWpoApproverInput
@@ -37397,6 +38626,7 @@ export namespace Prisma {
     borrowedProcessed?: BorrowedItemCreateNestedManyWithoutProcessorInput
     projectBudgets?: ProjectBudgetCreateNestedManyWithoutInputterInput
     supplierPrices?: SupplierPriceCreateNestedManyWithoutInputterInput
+    notifications?: NotificationCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutPurchaseOrdersInput = {
@@ -37417,9 +38647,8 @@ export namespace Prisma {
     faultReportsSysApproved?: FaultReportUncheckedCreateNestedManyWithoutSystemApproverInput
     faultReportsPmApproved?: FaultReportUncheckedCreateNestedManyWithoutPmApproverInput
     warehouseReleases?: WarehouseReleaseUncheckedCreateNestedManyWithoutRequesterInput
-    wrWpoApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutWpoApproverInput
-    wrSysApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutSystemApproverInput
-    wrPmApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutPmApproverInput
+    wrWarehouseApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutWarehouseApproverInput
+    wrProcurementApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutProcurementApproverInput
     bomsCreated?: BillOfMaterialUncheckedCreateNestedManyWithoutCreatorInput
     bomsSubmitted?: BillOfMaterialUncheckedCreateNestedManyWithoutSubmitterInput
     bomsWpoApproved?: BillOfMaterialUncheckedCreateNestedManyWithoutWpoApproverInput
@@ -37431,6 +38660,7 @@ export namespace Prisma {
     borrowedProcessed?: BorrowedItemUncheckedCreateNestedManyWithoutProcessorInput
     projectBudgets?: ProjectBudgetUncheckedCreateNestedManyWithoutInputterInput
     supplierPrices?: SupplierPriceUncheckedCreateNestedManyWithoutInputterInput
+    notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutPurchaseOrdersInput = {
@@ -37601,9 +38831,8 @@ export namespace Prisma {
     faultReportsSysApproved?: FaultReportUpdateManyWithoutSystemApproverNestedInput
     faultReportsPmApproved?: FaultReportUpdateManyWithoutPmApproverNestedInput
     warehouseReleases?: WarehouseReleaseUpdateManyWithoutRequesterNestedInput
-    wrWpoApproved?: WarehouseReleaseUpdateManyWithoutWpoApproverNestedInput
-    wrSysApproved?: WarehouseReleaseUpdateManyWithoutSystemApproverNestedInput
-    wrPmApproved?: WarehouseReleaseUpdateManyWithoutPmApproverNestedInput
+    wrWarehouseApproved?: WarehouseReleaseUpdateManyWithoutWarehouseApproverNestedInput
+    wrProcurementApproved?: WarehouseReleaseUpdateManyWithoutProcurementApproverNestedInput
     bomsCreated?: BillOfMaterialUpdateManyWithoutCreatorNestedInput
     bomsSubmitted?: BillOfMaterialUpdateManyWithoutSubmitterNestedInput
     bomsWpoApproved?: BillOfMaterialUpdateManyWithoutWpoApproverNestedInput
@@ -37615,6 +38844,7 @@ export namespace Prisma {
     borrowedProcessed?: BorrowedItemUpdateManyWithoutProcessorNestedInput
     projectBudgets?: ProjectBudgetUpdateManyWithoutInputterNestedInput
     supplierPrices?: SupplierPriceUpdateManyWithoutInputterNestedInput
+    notifications?: NotificationUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutPurchaseOrdersInput = {
@@ -37635,9 +38865,8 @@ export namespace Prisma {
     faultReportsSysApproved?: FaultReportUncheckedUpdateManyWithoutSystemApproverNestedInput
     faultReportsPmApproved?: FaultReportUncheckedUpdateManyWithoutPmApproverNestedInput
     warehouseReleases?: WarehouseReleaseUncheckedUpdateManyWithoutRequesterNestedInput
-    wrWpoApproved?: WarehouseReleaseUncheckedUpdateManyWithoutWpoApproverNestedInput
-    wrSysApproved?: WarehouseReleaseUncheckedUpdateManyWithoutSystemApproverNestedInput
-    wrPmApproved?: WarehouseReleaseUncheckedUpdateManyWithoutPmApproverNestedInput
+    wrWarehouseApproved?: WarehouseReleaseUncheckedUpdateManyWithoutWarehouseApproverNestedInput
+    wrProcurementApproved?: WarehouseReleaseUncheckedUpdateManyWithoutProcurementApproverNestedInput
     bomsCreated?: BillOfMaterialUncheckedUpdateManyWithoutCreatorNestedInput
     bomsSubmitted?: BillOfMaterialUncheckedUpdateManyWithoutSubmitterNestedInput
     bomsWpoApproved?: BillOfMaterialUncheckedUpdateManyWithoutWpoApproverNestedInput
@@ -37649,6 +38878,7 @@ export namespace Prisma {
     borrowedProcessed?: BorrowedItemUncheckedUpdateManyWithoutProcessorNestedInput
     projectBudgets?: ProjectBudgetUncheckedUpdateManyWithoutInputterNestedInput
     supplierPrices?: SupplierPriceUncheckedUpdateManyWithoutInputterNestedInput
+    notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type PurchaseOrderCreateWithoutItemsInput = {
@@ -37869,9 +39099,8 @@ export namespace Prisma {
     faultReportsSysApproved?: FaultReportCreateNestedManyWithoutSystemApproverInput
     faultReportsPmApproved?: FaultReportCreateNestedManyWithoutPmApproverInput
     warehouseReleases?: WarehouseReleaseCreateNestedManyWithoutRequesterInput
-    wrWpoApproved?: WarehouseReleaseCreateNestedManyWithoutWpoApproverInput
-    wrSysApproved?: WarehouseReleaseCreateNestedManyWithoutSystemApproverInput
-    wrPmApproved?: WarehouseReleaseCreateNestedManyWithoutPmApproverInput
+    wrWarehouseApproved?: WarehouseReleaseCreateNestedManyWithoutWarehouseApproverInput
+    wrProcurementApproved?: WarehouseReleaseCreateNestedManyWithoutProcurementApproverInput
     bomsCreated?: BillOfMaterialCreateNestedManyWithoutCreatorInput
     bomsSubmitted?: BillOfMaterialCreateNestedManyWithoutSubmitterInput
     bomsWpoApproved?: BillOfMaterialCreateNestedManyWithoutWpoApproverInput
@@ -37883,6 +39112,7 @@ export namespace Prisma {
     purchaseOrders?: PurchaseOrderCreateNestedManyWithoutCreatorInput
     projectBudgets?: ProjectBudgetCreateNestedManyWithoutInputterInput
     supplierPrices?: SupplierPriceCreateNestedManyWithoutInputterInput
+    notifications?: NotificationCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutBorrowedProcessedInput = {
@@ -37903,9 +39133,8 @@ export namespace Prisma {
     faultReportsSysApproved?: FaultReportUncheckedCreateNestedManyWithoutSystemApproverInput
     faultReportsPmApproved?: FaultReportUncheckedCreateNestedManyWithoutPmApproverInput
     warehouseReleases?: WarehouseReleaseUncheckedCreateNestedManyWithoutRequesterInput
-    wrWpoApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutWpoApproverInput
-    wrSysApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutSystemApproverInput
-    wrPmApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutPmApproverInput
+    wrWarehouseApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutWarehouseApproverInput
+    wrProcurementApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutProcurementApproverInput
     bomsCreated?: BillOfMaterialUncheckedCreateNestedManyWithoutCreatorInput
     bomsSubmitted?: BillOfMaterialUncheckedCreateNestedManyWithoutSubmitterInput
     bomsWpoApproved?: BillOfMaterialUncheckedCreateNestedManyWithoutWpoApproverInput
@@ -37917,6 +39146,7 @@ export namespace Prisma {
     purchaseOrders?: PurchaseOrderUncheckedCreateNestedManyWithoutCreatorInput
     projectBudgets?: ProjectBudgetUncheckedCreateNestedManyWithoutInputterInput
     supplierPrices?: SupplierPriceUncheckedCreateNestedManyWithoutInputterInput
+    notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutBorrowedProcessedInput = {
@@ -37953,9 +39183,8 @@ export namespace Prisma {
     faultReportsSysApproved?: FaultReportUpdateManyWithoutSystemApproverNestedInput
     faultReportsPmApproved?: FaultReportUpdateManyWithoutPmApproverNestedInput
     warehouseReleases?: WarehouseReleaseUpdateManyWithoutRequesterNestedInput
-    wrWpoApproved?: WarehouseReleaseUpdateManyWithoutWpoApproverNestedInput
-    wrSysApproved?: WarehouseReleaseUpdateManyWithoutSystemApproverNestedInput
-    wrPmApproved?: WarehouseReleaseUpdateManyWithoutPmApproverNestedInput
+    wrWarehouseApproved?: WarehouseReleaseUpdateManyWithoutWarehouseApproverNestedInput
+    wrProcurementApproved?: WarehouseReleaseUpdateManyWithoutProcurementApproverNestedInput
     bomsCreated?: BillOfMaterialUpdateManyWithoutCreatorNestedInput
     bomsSubmitted?: BillOfMaterialUpdateManyWithoutSubmitterNestedInput
     bomsWpoApproved?: BillOfMaterialUpdateManyWithoutWpoApproverNestedInput
@@ -37967,6 +39196,7 @@ export namespace Prisma {
     purchaseOrders?: PurchaseOrderUpdateManyWithoutCreatorNestedInput
     projectBudgets?: ProjectBudgetUpdateManyWithoutInputterNestedInput
     supplierPrices?: SupplierPriceUpdateManyWithoutInputterNestedInput
+    notifications?: NotificationUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutBorrowedProcessedInput = {
@@ -37987,9 +39217,8 @@ export namespace Prisma {
     faultReportsSysApproved?: FaultReportUncheckedUpdateManyWithoutSystemApproverNestedInput
     faultReportsPmApproved?: FaultReportUncheckedUpdateManyWithoutPmApproverNestedInput
     warehouseReleases?: WarehouseReleaseUncheckedUpdateManyWithoutRequesterNestedInput
-    wrWpoApproved?: WarehouseReleaseUncheckedUpdateManyWithoutWpoApproverNestedInput
-    wrSysApproved?: WarehouseReleaseUncheckedUpdateManyWithoutSystemApproverNestedInput
-    wrPmApproved?: WarehouseReleaseUncheckedUpdateManyWithoutPmApproverNestedInput
+    wrWarehouseApproved?: WarehouseReleaseUncheckedUpdateManyWithoutWarehouseApproverNestedInput
+    wrProcurementApproved?: WarehouseReleaseUncheckedUpdateManyWithoutProcurementApproverNestedInput
     bomsCreated?: BillOfMaterialUncheckedUpdateManyWithoutCreatorNestedInput
     bomsSubmitted?: BillOfMaterialUncheckedUpdateManyWithoutSubmitterNestedInput
     bomsWpoApproved?: BillOfMaterialUncheckedUpdateManyWithoutWpoApproverNestedInput
@@ -38001,6 +39230,7 @@ export namespace Prisma {
     purchaseOrders?: PurchaseOrderUncheckedUpdateManyWithoutCreatorNestedInput
     projectBudgets?: ProjectBudgetUncheckedUpdateManyWithoutInputterNestedInput
     supplierPrices?: SupplierPriceUncheckedUpdateManyWithoutInputterNestedInput
+    notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutProjectBudgetsInput = {
@@ -38021,9 +39251,8 @@ export namespace Prisma {
     faultReportsSysApproved?: FaultReportCreateNestedManyWithoutSystemApproverInput
     faultReportsPmApproved?: FaultReportCreateNestedManyWithoutPmApproverInput
     warehouseReleases?: WarehouseReleaseCreateNestedManyWithoutRequesterInput
-    wrWpoApproved?: WarehouseReleaseCreateNestedManyWithoutWpoApproverInput
-    wrSysApproved?: WarehouseReleaseCreateNestedManyWithoutSystemApproverInput
-    wrPmApproved?: WarehouseReleaseCreateNestedManyWithoutPmApproverInput
+    wrWarehouseApproved?: WarehouseReleaseCreateNestedManyWithoutWarehouseApproverInput
+    wrProcurementApproved?: WarehouseReleaseCreateNestedManyWithoutProcurementApproverInput
     bomsCreated?: BillOfMaterialCreateNestedManyWithoutCreatorInput
     bomsSubmitted?: BillOfMaterialCreateNestedManyWithoutSubmitterInput
     bomsWpoApproved?: BillOfMaterialCreateNestedManyWithoutWpoApproverInput
@@ -38035,6 +39264,7 @@ export namespace Prisma {
     purchaseOrders?: PurchaseOrderCreateNestedManyWithoutCreatorInput
     borrowedProcessed?: BorrowedItemCreateNestedManyWithoutProcessorInput
     supplierPrices?: SupplierPriceCreateNestedManyWithoutInputterInput
+    notifications?: NotificationCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutProjectBudgetsInput = {
@@ -38055,9 +39285,8 @@ export namespace Prisma {
     faultReportsSysApproved?: FaultReportUncheckedCreateNestedManyWithoutSystemApproverInput
     faultReportsPmApproved?: FaultReportUncheckedCreateNestedManyWithoutPmApproverInput
     warehouseReleases?: WarehouseReleaseUncheckedCreateNestedManyWithoutRequesterInput
-    wrWpoApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutWpoApproverInput
-    wrSysApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutSystemApproverInput
-    wrPmApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutPmApproverInput
+    wrWarehouseApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutWarehouseApproverInput
+    wrProcurementApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutProcurementApproverInput
     bomsCreated?: BillOfMaterialUncheckedCreateNestedManyWithoutCreatorInput
     bomsSubmitted?: BillOfMaterialUncheckedCreateNestedManyWithoutSubmitterInput
     bomsWpoApproved?: BillOfMaterialUncheckedCreateNestedManyWithoutWpoApproverInput
@@ -38069,6 +39298,7 @@ export namespace Prisma {
     purchaseOrders?: PurchaseOrderUncheckedCreateNestedManyWithoutCreatorInput
     borrowedProcessed?: BorrowedItemUncheckedCreateNestedManyWithoutProcessorInput
     supplierPrices?: SupplierPriceUncheckedCreateNestedManyWithoutInputterInput
+    notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutProjectBudgetsInput = {
@@ -38105,9 +39335,8 @@ export namespace Prisma {
     faultReportsSysApproved?: FaultReportUpdateManyWithoutSystemApproverNestedInput
     faultReportsPmApproved?: FaultReportUpdateManyWithoutPmApproverNestedInput
     warehouseReleases?: WarehouseReleaseUpdateManyWithoutRequesterNestedInput
-    wrWpoApproved?: WarehouseReleaseUpdateManyWithoutWpoApproverNestedInput
-    wrSysApproved?: WarehouseReleaseUpdateManyWithoutSystemApproverNestedInput
-    wrPmApproved?: WarehouseReleaseUpdateManyWithoutPmApproverNestedInput
+    wrWarehouseApproved?: WarehouseReleaseUpdateManyWithoutWarehouseApproverNestedInput
+    wrProcurementApproved?: WarehouseReleaseUpdateManyWithoutProcurementApproverNestedInput
     bomsCreated?: BillOfMaterialUpdateManyWithoutCreatorNestedInput
     bomsSubmitted?: BillOfMaterialUpdateManyWithoutSubmitterNestedInput
     bomsWpoApproved?: BillOfMaterialUpdateManyWithoutWpoApproverNestedInput
@@ -38119,6 +39348,7 @@ export namespace Prisma {
     purchaseOrders?: PurchaseOrderUpdateManyWithoutCreatorNestedInput
     borrowedProcessed?: BorrowedItemUpdateManyWithoutProcessorNestedInput
     supplierPrices?: SupplierPriceUpdateManyWithoutInputterNestedInput
+    notifications?: NotificationUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutProjectBudgetsInput = {
@@ -38139,9 +39369,8 @@ export namespace Prisma {
     faultReportsSysApproved?: FaultReportUncheckedUpdateManyWithoutSystemApproverNestedInput
     faultReportsPmApproved?: FaultReportUncheckedUpdateManyWithoutPmApproverNestedInput
     warehouseReleases?: WarehouseReleaseUncheckedUpdateManyWithoutRequesterNestedInput
-    wrWpoApproved?: WarehouseReleaseUncheckedUpdateManyWithoutWpoApproverNestedInput
-    wrSysApproved?: WarehouseReleaseUncheckedUpdateManyWithoutSystemApproverNestedInput
-    wrPmApproved?: WarehouseReleaseUncheckedUpdateManyWithoutPmApproverNestedInput
+    wrWarehouseApproved?: WarehouseReleaseUncheckedUpdateManyWithoutWarehouseApproverNestedInput
+    wrProcurementApproved?: WarehouseReleaseUncheckedUpdateManyWithoutProcurementApproverNestedInput
     bomsCreated?: BillOfMaterialUncheckedUpdateManyWithoutCreatorNestedInput
     bomsSubmitted?: BillOfMaterialUncheckedUpdateManyWithoutSubmitterNestedInput
     bomsWpoApproved?: BillOfMaterialUncheckedUpdateManyWithoutWpoApproverNestedInput
@@ -38153,6 +39382,7 @@ export namespace Prisma {
     purchaseOrders?: PurchaseOrderUncheckedUpdateManyWithoutCreatorNestedInput
     borrowedProcessed?: BorrowedItemUncheckedUpdateManyWithoutProcessorNestedInput
     supplierPrices?: SupplierPriceUncheckedUpdateManyWithoutInputterNestedInput
+    notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutSupplierPricesInput = {
@@ -38173,9 +39403,8 @@ export namespace Prisma {
     faultReportsSysApproved?: FaultReportCreateNestedManyWithoutSystemApproverInput
     faultReportsPmApproved?: FaultReportCreateNestedManyWithoutPmApproverInput
     warehouseReleases?: WarehouseReleaseCreateNestedManyWithoutRequesterInput
-    wrWpoApproved?: WarehouseReleaseCreateNestedManyWithoutWpoApproverInput
-    wrSysApproved?: WarehouseReleaseCreateNestedManyWithoutSystemApproverInput
-    wrPmApproved?: WarehouseReleaseCreateNestedManyWithoutPmApproverInput
+    wrWarehouseApproved?: WarehouseReleaseCreateNestedManyWithoutWarehouseApproverInput
+    wrProcurementApproved?: WarehouseReleaseCreateNestedManyWithoutProcurementApproverInput
     bomsCreated?: BillOfMaterialCreateNestedManyWithoutCreatorInput
     bomsSubmitted?: BillOfMaterialCreateNestedManyWithoutSubmitterInput
     bomsWpoApproved?: BillOfMaterialCreateNestedManyWithoutWpoApproverInput
@@ -38187,6 +39416,7 @@ export namespace Prisma {
     purchaseOrders?: PurchaseOrderCreateNestedManyWithoutCreatorInput
     borrowedProcessed?: BorrowedItemCreateNestedManyWithoutProcessorInput
     projectBudgets?: ProjectBudgetCreateNestedManyWithoutInputterInput
+    notifications?: NotificationCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutSupplierPricesInput = {
@@ -38207,9 +39437,8 @@ export namespace Prisma {
     faultReportsSysApproved?: FaultReportUncheckedCreateNestedManyWithoutSystemApproverInput
     faultReportsPmApproved?: FaultReportUncheckedCreateNestedManyWithoutPmApproverInput
     warehouseReleases?: WarehouseReleaseUncheckedCreateNestedManyWithoutRequesterInput
-    wrWpoApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutWpoApproverInput
-    wrSysApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutSystemApproverInput
-    wrPmApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutPmApproverInput
+    wrWarehouseApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutWarehouseApproverInput
+    wrProcurementApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutProcurementApproverInput
     bomsCreated?: BillOfMaterialUncheckedCreateNestedManyWithoutCreatorInput
     bomsSubmitted?: BillOfMaterialUncheckedCreateNestedManyWithoutSubmitterInput
     bomsWpoApproved?: BillOfMaterialUncheckedCreateNestedManyWithoutWpoApproverInput
@@ -38221,6 +39450,7 @@ export namespace Prisma {
     purchaseOrders?: PurchaseOrderUncheckedCreateNestedManyWithoutCreatorInput
     borrowedProcessed?: BorrowedItemUncheckedCreateNestedManyWithoutProcessorInput
     projectBudgets?: ProjectBudgetUncheckedCreateNestedManyWithoutInputterInput
+    notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutSupplierPricesInput = {
@@ -38257,9 +39487,8 @@ export namespace Prisma {
     faultReportsSysApproved?: FaultReportUpdateManyWithoutSystemApproverNestedInput
     faultReportsPmApproved?: FaultReportUpdateManyWithoutPmApproverNestedInput
     warehouseReleases?: WarehouseReleaseUpdateManyWithoutRequesterNestedInput
-    wrWpoApproved?: WarehouseReleaseUpdateManyWithoutWpoApproverNestedInput
-    wrSysApproved?: WarehouseReleaseUpdateManyWithoutSystemApproverNestedInput
-    wrPmApproved?: WarehouseReleaseUpdateManyWithoutPmApproverNestedInput
+    wrWarehouseApproved?: WarehouseReleaseUpdateManyWithoutWarehouseApproverNestedInput
+    wrProcurementApproved?: WarehouseReleaseUpdateManyWithoutProcurementApproverNestedInput
     bomsCreated?: BillOfMaterialUpdateManyWithoutCreatorNestedInput
     bomsSubmitted?: BillOfMaterialUpdateManyWithoutSubmitterNestedInput
     bomsWpoApproved?: BillOfMaterialUpdateManyWithoutWpoApproverNestedInput
@@ -38271,6 +39500,7 @@ export namespace Prisma {
     purchaseOrders?: PurchaseOrderUpdateManyWithoutCreatorNestedInput
     borrowedProcessed?: BorrowedItemUpdateManyWithoutProcessorNestedInput
     projectBudgets?: ProjectBudgetUpdateManyWithoutInputterNestedInput
+    notifications?: NotificationUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSupplierPricesInput = {
@@ -38291,9 +39521,8 @@ export namespace Prisma {
     faultReportsSysApproved?: FaultReportUncheckedUpdateManyWithoutSystemApproverNestedInput
     faultReportsPmApproved?: FaultReportUncheckedUpdateManyWithoutPmApproverNestedInput
     warehouseReleases?: WarehouseReleaseUncheckedUpdateManyWithoutRequesterNestedInput
-    wrWpoApproved?: WarehouseReleaseUncheckedUpdateManyWithoutWpoApproverNestedInput
-    wrSysApproved?: WarehouseReleaseUncheckedUpdateManyWithoutSystemApproverNestedInput
-    wrPmApproved?: WarehouseReleaseUncheckedUpdateManyWithoutPmApproverNestedInput
+    wrWarehouseApproved?: WarehouseReleaseUncheckedUpdateManyWithoutWarehouseApproverNestedInput
+    wrProcurementApproved?: WarehouseReleaseUncheckedUpdateManyWithoutProcurementApproverNestedInput
     bomsCreated?: BillOfMaterialUncheckedUpdateManyWithoutCreatorNestedInput
     bomsSubmitted?: BillOfMaterialUncheckedUpdateManyWithoutSubmitterNestedInput
     bomsWpoApproved?: BillOfMaterialUncheckedUpdateManyWithoutWpoApproverNestedInput
@@ -38305,6 +39534,7 @@ export namespace Prisma {
     purchaseOrders?: PurchaseOrderUncheckedUpdateManyWithoutCreatorNestedInput
     borrowedProcessed?: BorrowedItemUncheckedUpdateManyWithoutProcessorNestedInput
     projectBudgets?: ProjectBudgetUncheckedUpdateManyWithoutInputterNestedInput
+    notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutBomsCreatedInput = {
@@ -38325,9 +39555,8 @@ export namespace Prisma {
     faultReportsSysApproved?: FaultReportCreateNestedManyWithoutSystemApproverInput
     faultReportsPmApproved?: FaultReportCreateNestedManyWithoutPmApproverInput
     warehouseReleases?: WarehouseReleaseCreateNestedManyWithoutRequesterInput
-    wrWpoApproved?: WarehouseReleaseCreateNestedManyWithoutWpoApproverInput
-    wrSysApproved?: WarehouseReleaseCreateNestedManyWithoutSystemApproverInput
-    wrPmApproved?: WarehouseReleaseCreateNestedManyWithoutPmApproverInput
+    wrWarehouseApproved?: WarehouseReleaseCreateNestedManyWithoutWarehouseApproverInput
+    wrProcurementApproved?: WarehouseReleaseCreateNestedManyWithoutProcurementApproverInput
     bomsSubmitted?: BillOfMaterialCreateNestedManyWithoutSubmitterInput
     bomsWpoApproved?: BillOfMaterialCreateNestedManyWithoutWpoApproverInput
     bomsSystemApproved?: BillOfMaterialCreateNestedManyWithoutSystemApproverInput
@@ -38339,6 +39568,7 @@ export namespace Prisma {
     borrowedProcessed?: BorrowedItemCreateNestedManyWithoutProcessorInput
     projectBudgets?: ProjectBudgetCreateNestedManyWithoutInputterInput
     supplierPrices?: SupplierPriceCreateNestedManyWithoutInputterInput
+    notifications?: NotificationCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutBomsCreatedInput = {
@@ -38359,9 +39589,8 @@ export namespace Prisma {
     faultReportsSysApproved?: FaultReportUncheckedCreateNestedManyWithoutSystemApproverInput
     faultReportsPmApproved?: FaultReportUncheckedCreateNestedManyWithoutPmApproverInput
     warehouseReleases?: WarehouseReleaseUncheckedCreateNestedManyWithoutRequesterInput
-    wrWpoApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutWpoApproverInput
-    wrSysApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutSystemApproverInput
-    wrPmApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutPmApproverInput
+    wrWarehouseApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutWarehouseApproverInput
+    wrProcurementApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutProcurementApproverInput
     bomsSubmitted?: BillOfMaterialUncheckedCreateNestedManyWithoutSubmitterInput
     bomsWpoApproved?: BillOfMaterialUncheckedCreateNestedManyWithoutWpoApproverInput
     bomsSystemApproved?: BillOfMaterialUncheckedCreateNestedManyWithoutSystemApproverInput
@@ -38373,6 +39602,7 @@ export namespace Prisma {
     borrowedProcessed?: BorrowedItemUncheckedCreateNestedManyWithoutProcessorInput
     projectBudgets?: ProjectBudgetUncheckedCreateNestedManyWithoutInputterInput
     supplierPrices?: SupplierPriceUncheckedCreateNestedManyWithoutInputterInput
+    notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutBomsCreatedInput = {
@@ -38398,9 +39628,8 @@ export namespace Prisma {
     faultReportsSysApproved?: FaultReportCreateNestedManyWithoutSystemApproverInput
     faultReportsPmApproved?: FaultReportCreateNestedManyWithoutPmApproverInput
     warehouseReleases?: WarehouseReleaseCreateNestedManyWithoutRequesterInput
-    wrWpoApproved?: WarehouseReleaseCreateNestedManyWithoutWpoApproverInput
-    wrSysApproved?: WarehouseReleaseCreateNestedManyWithoutSystemApproverInput
-    wrPmApproved?: WarehouseReleaseCreateNestedManyWithoutPmApproverInput
+    wrWarehouseApproved?: WarehouseReleaseCreateNestedManyWithoutWarehouseApproverInput
+    wrProcurementApproved?: WarehouseReleaseCreateNestedManyWithoutProcurementApproverInput
     bomsCreated?: BillOfMaterialCreateNestedManyWithoutCreatorInput
     bomsWpoApproved?: BillOfMaterialCreateNestedManyWithoutWpoApproverInput
     bomsSystemApproved?: BillOfMaterialCreateNestedManyWithoutSystemApproverInput
@@ -38412,6 +39641,7 @@ export namespace Prisma {
     borrowedProcessed?: BorrowedItemCreateNestedManyWithoutProcessorInput
     projectBudgets?: ProjectBudgetCreateNestedManyWithoutInputterInput
     supplierPrices?: SupplierPriceCreateNestedManyWithoutInputterInput
+    notifications?: NotificationCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutBomsSubmittedInput = {
@@ -38432,9 +39662,8 @@ export namespace Prisma {
     faultReportsSysApproved?: FaultReportUncheckedCreateNestedManyWithoutSystemApproverInput
     faultReportsPmApproved?: FaultReportUncheckedCreateNestedManyWithoutPmApproverInput
     warehouseReleases?: WarehouseReleaseUncheckedCreateNestedManyWithoutRequesterInput
-    wrWpoApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutWpoApproverInput
-    wrSysApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutSystemApproverInput
-    wrPmApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutPmApproverInput
+    wrWarehouseApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutWarehouseApproverInput
+    wrProcurementApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutProcurementApproverInput
     bomsCreated?: BillOfMaterialUncheckedCreateNestedManyWithoutCreatorInput
     bomsWpoApproved?: BillOfMaterialUncheckedCreateNestedManyWithoutWpoApproverInput
     bomsSystemApproved?: BillOfMaterialUncheckedCreateNestedManyWithoutSystemApproverInput
@@ -38446,6 +39675,7 @@ export namespace Prisma {
     borrowedProcessed?: BorrowedItemUncheckedCreateNestedManyWithoutProcessorInput
     projectBudgets?: ProjectBudgetUncheckedCreateNestedManyWithoutInputterInput
     supplierPrices?: SupplierPriceUncheckedCreateNestedManyWithoutInputterInput
+    notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutBomsSubmittedInput = {
@@ -38471,9 +39701,8 @@ export namespace Prisma {
     faultReportsSysApproved?: FaultReportCreateNestedManyWithoutSystemApproverInput
     faultReportsPmApproved?: FaultReportCreateNestedManyWithoutPmApproverInput
     warehouseReleases?: WarehouseReleaseCreateNestedManyWithoutRequesterInput
-    wrWpoApproved?: WarehouseReleaseCreateNestedManyWithoutWpoApproverInput
-    wrSysApproved?: WarehouseReleaseCreateNestedManyWithoutSystemApproverInput
-    wrPmApproved?: WarehouseReleaseCreateNestedManyWithoutPmApproverInput
+    wrWarehouseApproved?: WarehouseReleaseCreateNestedManyWithoutWarehouseApproverInput
+    wrProcurementApproved?: WarehouseReleaseCreateNestedManyWithoutProcurementApproverInput
     bomsCreated?: BillOfMaterialCreateNestedManyWithoutCreatorInput
     bomsSubmitted?: BillOfMaterialCreateNestedManyWithoutSubmitterInput
     bomsSystemApproved?: BillOfMaterialCreateNestedManyWithoutSystemApproverInput
@@ -38485,6 +39714,7 @@ export namespace Prisma {
     borrowedProcessed?: BorrowedItemCreateNestedManyWithoutProcessorInput
     projectBudgets?: ProjectBudgetCreateNestedManyWithoutInputterInput
     supplierPrices?: SupplierPriceCreateNestedManyWithoutInputterInput
+    notifications?: NotificationCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutBomsWpoApprovedInput = {
@@ -38505,9 +39735,8 @@ export namespace Prisma {
     faultReportsSysApproved?: FaultReportUncheckedCreateNestedManyWithoutSystemApproverInput
     faultReportsPmApproved?: FaultReportUncheckedCreateNestedManyWithoutPmApproverInput
     warehouseReleases?: WarehouseReleaseUncheckedCreateNestedManyWithoutRequesterInput
-    wrWpoApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutWpoApproverInput
-    wrSysApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutSystemApproverInput
-    wrPmApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutPmApproverInput
+    wrWarehouseApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutWarehouseApproverInput
+    wrProcurementApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutProcurementApproverInput
     bomsCreated?: BillOfMaterialUncheckedCreateNestedManyWithoutCreatorInput
     bomsSubmitted?: BillOfMaterialUncheckedCreateNestedManyWithoutSubmitterInput
     bomsSystemApproved?: BillOfMaterialUncheckedCreateNestedManyWithoutSystemApproverInput
@@ -38519,6 +39748,7 @@ export namespace Prisma {
     borrowedProcessed?: BorrowedItemUncheckedCreateNestedManyWithoutProcessorInput
     projectBudgets?: ProjectBudgetUncheckedCreateNestedManyWithoutInputterInput
     supplierPrices?: SupplierPriceUncheckedCreateNestedManyWithoutInputterInput
+    notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutBomsWpoApprovedInput = {
@@ -38544,9 +39774,8 @@ export namespace Prisma {
     faultReportsSysApproved?: FaultReportCreateNestedManyWithoutSystemApproverInput
     faultReportsPmApproved?: FaultReportCreateNestedManyWithoutPmApproverInput
     warehouseReleases?: WarehouseReleaseCreateNestedManyWithoutRequesterInput
-    wrWpoApproved?: WarehouseReleaseCreateNestedManyWithoutWpoApproverInput
-    wrSysApproved?: WarehouseReleaseCreateNestedManyWithoutSystemApproverInput
-    wrPmApproved?: WarehouseReleaseCreateNestedManyWithoutPmApproverInput
+    wrWarehouseApproved?: WarehouseReleaseCreateNestedManyWithoutWarehouseApproverInput
+    wrProcurementApproved?: WarehouseReleaseCreateNestedManyWithoutProcurementApproverInput
     bomsCreated?: BillOfMaterialCreateNestedManyWithoutCreatorInput
     bomsSubmitted?: BillOfMaterialCreateNestedManyWithoutSubmitterInput
     bomsWpoApproved?: BillOfMaterialCreateNestedManyWithoutWpoApproverInput
@@ -38558,6 +39787,7 @@ export namespace Prisma {
     borrowedProcessed?: BorrowedItemCreateNestedManyWithoutProcessorInput
     projectBudgets?: ProjectBudgetCreateNestedManyWithoutInputterInput
     supplierPrices?: SupplierPriceCreateNestedManyWithoutInputterInput
+    notifications?: NotificationCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutBomsSystemApprovedInput = {
@@ -38578,9 +39808,8 @@ export namespace Prisma {
     faultReportsSysApproved?: FaultReportUncheckedCreateNestedManyWithoutSystemApproverInput
     faultReportsPmApproved?: FaultReportUncheckedCreateNestedManyWithoutPmApproverInput
     warehouseReleases?: WarehouseReleaseUncheckedCreateNestedManyWithoutRequesterInput
-    wrWpoApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutWpoApproverInput
-    wrSysApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutSystemApproverInput
-    wrPmApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutPmApproverInput
+    wrWarehouseApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutWarehouseApproverInput
+    wrProcurementApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutProcurementApproverInput
     bomsCreated?: BillOfMaterialUncheckedCreateNestedManyWithoutCreatorInput
     bomsSubmitted?: BillOfMaterialUncheckedCreateNestedManyWithoutSubmitterInput
     bomsWpoApproved?: BillOfMaterialUncheckedCreateNestedManyWithoutWpoApproverInput
@@ -38592,6 +39821,7 @@ export namespace Prisma {
     borrowedProcessed?: BorrowedItemUncheckedCreateNestedManyWithoutProcessorInput
     projectBudgets?: ProjectBudgetUncheckedCreateNestedManyWithoutInputterInput
     supplierPrices?: SupplierPriceUncheckedCreateNestedManyWithoutInputterInput
+    notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutBomsSystemApprovedInput = {
@@ -38617,9 +39847,8 @@ export namespace Prisma {
     faultReportsSysApproved?: FaultReportCreateNestedManyWithoutSystemApproverInput
     faultReportsPmApproved?: FaultReportCreateNestedManyWithoutPmApproverInput
     warehouseReleases?: WarehouseReleaseCreateNestedManyWithoutRequesterInput
-    wrWpoApproved?: WarehouseReleaseCreateNestedManyWithoutWpoApproverInput
-    wrSysApproved?: WarehouseReleaseCreateNestedManyWithoutSystemApproverInput
-    wrPmApproved?: WarehouseReleaseCreateNestedManyWithoutPmApproverInput
+    wrWarehouseApproved?: WarehouseReleaseCreateNestedManyWithoutWarehouseApproverInput
+    wrProcurementApproved?: WarehouseReleaseCreateNestedManyWithoutProcurementApproverInput
     bomsCreated?: BillOfMaterialCreateNestedManyWithoutCreatorInput
     bomsSubmitted?: BillOfMaterialCreateNestedManyWithoutSubmitterInput
     bomsWpoApproved?: BillOfMaterialCreateNestedManyWithoutWpoApproverInput
@@ -38631,6 +39860,7 @@ export namespace Prisma {
     borrowedProcessed?: BorrowedItemCreateNestedManyWithoutProcessorInput
     projectBudgets?: ProjectBudgetCreateNestedManyWithoutInputterInput
     supplierPrices?: SupplierPriceCreateNestedManyWithoutInputterInput
+    notifications?: NotificationCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutBomsAssignedStaffInput = {
@@ -38651,9 +39881,8 @@ export namespace Prisma {
     faultReportsSysApproved?: FaultReportUncheckedCreateNestedManyWithoutSystemApproverInput
     faultReportsPmApproved?: FaultReportUncheckedCreateNestedManyWithoutPmApproverInput
     warehouseReleases?: WarehouseReleaseUncheckedCreateNestedManyWithoutRequesterInput
-    wrWpoApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutWpoApproverInput
-    wrSysApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutSystemApproverInput
-    wrPmApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutPmApproverInput
+    wrWarehouseApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutWarehouseApproverInput
+    wrProcurementApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutProcurementApproverInput
     bomsCreated?: BillOfMaterialUncheckedCreateNestedManyWithoutCreatorInput
     bomsSubmitted?: BillOfMaterialUncheckedCreateNestedManyWithoutSubmitterInput
     bomsWpoApproved?: BillOfMaterialUncheckedCreateNestedManyWithoutWpoApproverInput
@@ -38665,6 +39894,7 @@ export namespace Prisma {
     borrowedProcessed?: BorrowedItemUncheckedCreateNestedManyWithoutProcessorInput
     projectBudgets?: ProjectBudgetUncheckedCreateNestedManyWithoutInputterInput
     supplierPrices?: SupplierPriceUncheckedCreateNestedManyWithoutInputterInput
+    notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutBomsAssignedStaffInput = {
@@ -38690,9 +39920,8 @@ export namespace Prisma {
     faultReportsSysApproved?: FaultReportCreateNestedManyWithoutSystemApproverInput
     faultReportsPmApproved?: FaultReportCreateNestedManyWithoutPmApproverInput
     warehouseReleases?: WarehouseReleaseCreateNestedManyWithoutRequesterInput
-    wrWpoApproved?: WarehouseReleaseCreateNestedManyWithoutWpoApproverInput
-    wrSysApproved?: WarehouseReleaseCreateNestedManyWithoutSystemApproverInput
-    wrPmApproved?: WarehouseReleaseCreateNestedManyWithoutPmApproverInput
+    wrWarehouseApproved?: WarehouseReleaseCreateNestedManyWithoutWarehouseApproverInput
+    wrProcurementApproved?: WarehouseReleaseCreateNestedManyWithoutProcurementApproverInput
     bomsCreated?: BillOfMaterialCreateNestedManyWithoutCreatorInput
     bomsSubmitted?: BillOfMaterialCreateNestedManyWithoutSubmitterInput
     bomsWpoApproved?: BillOfMaterialCreateNestedManyWithoutWpoApproverInput
@@ -38704,6 +39933,7 @@ export namespace Prisma {
     borrowedProcessed?: BorrowedItemCreateNestedManyWithoutProcessorInput
     projectBudgets?: ProjectBudgetCreateNestedManyWithoutInputterInput
     supplierPrices?: SupplierPriceCreateNestedManyWithoutInputterInput
+    notifications?: NotificationCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutBomsAssignedWpoInput = {
@@ -38724,9 +39954,8 @@ export namespace Prisma {
     faultReportsSysApproved?: FaultReportUncheckedCreateNestedManyWithoutSystemApproverInput
     faultReportsPmApproved?: FaultReportUncheckedCreateNestedManyWithoutPmApproverInput
     warehouseReleases?: WarehouseReleaseUncheckedCreateNestedManyWithoutRequesterInput
-    wrWpoApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutWpoApproverInput
-    wrSysApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutSystemApproverInput
-    wrPmApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutPmApproverInput
+    wrWarehouseApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutWarehouseApproverInput
+    wrProcurementApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutProcurementApproverInput
     bomsCreated?: BillOfMaterialUncheckedCreateNestedManyWithoutCreatorInput
     bomsSubmitted?: BillOfMaterialUncheckedCreateNestedManyWithoutSubmitterInput
     bomsWpoApproved?: BillOfMaterialUncheckedCreateNestedManyWithoutWpoApproverInput
@@ -38738,6 +39967,7 @@ export namespace Prisma {
     borrowedProcessed?: BorrowedItemUncheckedCreateNestedManyWithoutProcessorInput
     projectBudgets?: ProjectBudgetUncheckedCreateNestedManyWithoutInputterInput
     supplierPrices?: SupplierPriceUncheckedCreateNestedManyWithoutInputterInput
+    notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutBomsAssignedWpoInput = {
@@ -38763,9 +39993,8 @@ export namespace Prisma {
     faultReportsSysApproved?: FaultReportCreateNestedManyWithoutSystemApproverInput
     faultReportsPmApproved?: FaultReportCreateNestedManyWithoutPmApproverInput
     warehouseReleases?: WarehouseReleaseCreateNestedManyWithoutRequesterInput
-    wrWpoApproved?: WarehouseReleaseCreateNestedManyWithoutWpoApproverInput
-    wrSysApproved?: WarehouseReleaseCreateNestedManyWithoutSystemApproverInput
-    wrPmApproved?: WarehouseReleaseCreateNestedManyWithoutPmApproverInput
+    wrWarehouseApproved?: WarehouseReleaseCreateNestedManyWithoutWarehouseApproverInput
+    wrProcurementApproved?: WarehouseReleaseCreateNestedManyWithoutProcurementApproverInput
     bomsCreated?: BillOfMaterialCreateNestedManyWithoutCreatorInput
     bomsSubmitted?: BillOfMaterialCreateNestedManyWithoutSubmitterInput
     bomsWpoApproved?: BillOfMaterialCreateNestedManyWithoutWpoApproverInput
@@ -38777,6 +40006,7 @@ export namespace Prisma {
     borrowedProcessed?: BorrowedItemCreateNestedManyWithoutProcessorInput
     projectBudgets?: ProjectBudgetCreateNestedManyWithoutInputterInput
     supplierPrices?: SupplierPriceCreateNestedManyWithoutInputterInput
+    notifications?: NotificationCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutBomsAssignedSystemInput = {
@@ -38797,9 +40027,8 @@ export namespace Prisma {
     faultReportsSysApproved?: FaultReportUncheckedCreateNestedManyWithoutSystemApproverInput
     faultReportsPmApproved?: FaultReportUncheckedCreateNestedManyWithoutPmApproverInput
     warehouseReleases?: WarehouseReleaseUncheckedCreateNestedManyWithoutRequesterInput
-    wrWpoApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutWpoApproverInput
-    wrSysApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutSystemApproverInput
-    wrPmApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutPmApproverInput
+    wrWarehouseApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutWarehouseApproverInput
+    wrProcurementApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutProcurementApproverInput
     bomsCreated?: BillOfMaterialUncheckedCreateNestedManyWithoutCreatorInput
     bomsSubmitted?: BillOfMaterialUncheckedCreateNestedManyWithoutSubmitterInput
     bomsWpoApproved?: BillOfMaterialUncheckedCreateNestedManyWithoutWpoApproverInput
@@ -38811,6 +40040,7 @@ export namespace Prisma {
     borrowedProcessed?: BorrowedItemUncheckedCreateNestedManyWithoutProcessorInput
     projectBudgets?: ProjectBudgetUncheckedCreateNestedManyWithoutInputterInput
     supplierPrices?: SupplierPriceUncheckedCreateNestedManyWithoutInputterInput
+    notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutBomsAssignedSystemInput = {
@@ -38949,9 +40179,8 @@ export namespace Prisma {
     faultReportsSysApproved?: FaultReportUpdateManyWithoutSystemApproverNestedInput
     faultReportsPmApproved?: FaultReportUpdateManyWithoutPmApproverNestedInput
     warehouseReleases?: WarehouseReleaseUpdateManyWithoutRequesterNestedInput
-    wrWpoApproved?: WarehouseReleaseUpdateManyWithoutWpoApproverNestedInput
-    wrSysApproved?: WarehouseReleaseUpdateManyWithoutSystemApproverNestedInput
-    wrPmApproved?: WarehouseReleaseUpdateManyWithoutPmApproverNestedInput
+    wrWarehouseApproved?: WarehouseReleaseUpdateManyWithoutWarehouseApproverNestedInput
+    wrProcurementApproved?: WarehouseReleaseUpdateManyWithoutProcurementApproverNestedInput
     bomsSubmitted?: BillOfMaterialUpdateManyWithoutSubmitterNestedInput
     bomsWpoApproved?: BillOfMaterialUpdateManyWithoutWpoApproverNestedInput
     bomsSystemApproved?: BillOfMaterialUpdateManyWithoutSystemApproverNestedInput
@@ -38963,6 +40192,7 @@ export namespace Prisma {
     borrowedProcessed?: BorrowedItemUpdateManyWithoutProcessorNestedInput
     projectBudgets?: ProjectBudgetUpdateManyWithoutInputterNestedInput
     supplierPrices?: SupplierPriceUpdateManyWithoutInputterNestedInput
+    notifications?: NotificationUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutBomsCreatedInput = {
@@ -38983,9 +40213,8 @@ export namespace Prisma {
     faultReportsSysApproved?: FaultReportUncheckedUpdateManyWithoutSystemApproverNestedInput
     faultReportsPmApproved?: FaultReportUncheckedUpdateManyWithoutPmApproverNestedInput
     warehouseReleases?: WarehouseReleaseUncheckedUpdateManyWithoutRequesterNestedInput
-    wrWpoApproved?: WarehouseReleaseUncheckedUpdateManyWithoutWpoApproverNestedInput
-    wrSysApproved?: WarehouseReleaseUncheckedUpdateManyWithoutSystemApproverNestedInput
-    wrPmApproved?: WarehouseReleaseUncheckedUpdateManyWithoutPmApproverNestedInput
+    wrWarehouseApproved?: WarehouseReleaseUncheckedUpdateManyWithoutWarehouseApproverNestedInput
+    wrProcurementApproved?: WarehouseReleaseUncheckedUpdateManyWithoutProcurementApproverNestedInput
     bomsSubmitted?: BillOfMaterialUncheckedUpdateManyWithoutSubmitterNestedInput
     bomsWpoApproved?: BillOfMaterialUncheckedUpdateManyWithoutWpoApproverNestedInput
     bomsSystemApproved?: BillOfMaterialUncheckedUpdateManyWithoutSystemApproverNestedInput
@@ -38997,6 +40226,7 @@ export namespace Prisma {
     borrowedProcessed?: BorrowedItemUncheckedUpdateManyWithoutProcessorNestedInput
     projectBudgets?: ProjectBudgetUncheckedUpdateManyWithoutInputterNestedInput
     supplierPrices?: SupplierPriceUncheckedUpdateManyWithoutInputterNestedInput
+    notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserUpsertWithoutBomsSubmittedInput = {
@@ -39028,9 +40258,8 @@ export namespace Prisma {
     faultReportsSysApproved?: FaultReportUpdateManyWithoutSystemApproverNestedInput
     faultReportsPmApproved?: FaultReportUpdateManyWithoutPmApproverNestedInput
     warehouseReleases?: WarehouseReleaseUpdateManyWithoutRequesterNestedInput
-    wrWpoApproved?: WarehouseReleaseUpdateManyWithoutWpoApproverNestedInput
-    wrSysApproved?: WarehouseReleaseUpdateManyWithoutSystemApproverNestedInput
-    wrPmApproved?: WarehouseReleaseUpdateManyWithoutPmApproverNestedInput
+    wrWarehouseApproved?: WarehouseReleaseUpdateManyWithoutWarehouseApproverNestedInput
+    wrProcurementApproved?: WarehouseReleaseUpdateManyWithoutProcurementApproverNestedInput
     bomsCreated?: BillOfMaterialUpdateManyWithoutCreatorNestedInput
     bomsWpoApproved?: BillOfMaterialUpdateManyWithoutWpoApproverNestedInput
     bomsSystemApproved?: BillOfMaterialUpdateManyWithoutSystemApproverNestedInput
@@ -39042,6 +40271,7 @@ export namespace Prisma {
     borrowedProcessed?: BorrowedItemUpdateManyWithoutProcessorNestedInput
     projectBudgets?: ProjectBudgetUpdateManyWithoutInputterNestedInput
     supplierPrices?: SupplierPriceUpdateManyWithoutInputterNestedInput
+    notifications?: NotificationUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutBomsSubmittedInput = {
@@ -39062,9 +40292,8 @@ export namespace Prisma {
     faultReportsSysApproved?: FaultReportUncheckedUpdateManyWithoutSystemApproverNestedInput
     faultReportsPmApproved?: FaultReportUncheckedUpdateManyWithoutPmApproverNestedInput
     warehouseReleases?: WarehouseReleaseUncheckedUpdateManyWithoutRequesterNestedInput
-    wrWpoApproved?: WarehouseReleaseUncheckedUpdateManyWithoutWpoApproverNestedInput
-    wrSysApproved?: WarehouseReleaseUncheckedUpdateManyWithoutSystemApproverNestedInput
-    wrPmApproved?: WarehouseReleaseUncheckedUpdateManyWithoutPmApproverNestedInput
+    wrWarehouseApproved?: WarehouseReleaseUncheckedUpdateManyWithoutWarehouseApproverNestedInput
+    wrProcurementApproved?: WarehouseReleaseUncheckedUpdateManyWithoutProcurementApproverNestedInput
     bomsCreated?: BillOfMaterialUncheckedUpdateManyWithoutCreatorNestedInput
     bomsWpoApproved?: BillOfMaterialUncheckedUpdateManyWithoutWpoApproverNestedInput
     bomsSystemApproved?: BillOfMaterialUncheckedUpdateManyWithoutSystemApproverNestedInput
@@ -39076,6 +40305,7 @@ export namespace Prisma {
     borrowedProcessed?: BorrowedItemUncheckedUpdateManyWithoutProcessorNestedInput
     projectBudgets?: ProjectBudgetUncheckedUpdateManyWithoutInputterNestedInput
     supplierPrices?: SupplierPriceUncheckedUpdateManyWithoutInputterNestedInput
+    notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserUpsertWithoutBomsWpoApprovedInput = {
@@ -39107,9 +40337,8 @@ export namespace Prisma {
     faultReportsSysApproved?: FaultReportUpdateManyWithoutSystemApproverNestedInput
     faultReportsPmApproved?: FaultReportUpdateManyWithoutPmApproverNestedInput
     warehouseReleases?: WarehouseReleaseUpdateManyWithoutRequesterNestedInput
-    wrWpoApproved?: WarehouseReleaseUpdateManyWithoutWpoApproverNestedInput
-    wrSysApproved?: WarehouseReleaseUpdateManyWithoutSystemApproverNestedInput
-    wrPmApproved?: WarehouseReleaseUpdateManyWithoutPmApproverNestedInput
+    wrWarehouseApproved?: WarehouseReleaseUpdateManyWithoutWarehouseApproverNestedInput
+    wrProcurementApproved?: WarehouseReleaseUpdateManyWithoutProcurementApproverNestedInput
     bomsCreated?: BillOfMaterialUpdateManyWithoutCreatorNestedInput
     bomsSubmitted?: BillOfMaterialUpdateManyWithoutSubmitterNestedInput
     bomsSystemApproved?: BillOfMaterialUpdateManyWithoutSystemApproverNestedInput
@@ -39121,6 +40350,7 @@ export namespace Prisma {
     borrowedProcessed?: BorrowedItemUpdateManyWithoutProcessorNestedInput
     projectBudgets?: ProjectBudgetUpdateManyWithoutInputterNestedInput
     supplierPrices?: SupplierPriceUpdateManyWithoutInputterNestedInput
+    notifications?: NotificationUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutBomsWpoApprovedInput = {
@@ -39141,9 +40371,8 @@ export namespace Prisma {
     faultReportsSysApproved?: FaultReportUncheckedUpdateManyWithoutSystemApproverNestedInput
     faultReportsPmApproved?: FaultReportUncheckedUpdateManyWithoutPmApproverNestedInput
     warehouseReleases?: WarehouseReleaseUncheckedUpdateManyWithoutRequesterNestedInput
-    wrWpoApproved?: WarehouseReleaseUncheckedUpdateManyWithoutWpoApproverNestedInput
-    wrSysApproved?: WarehouseReleaseUncheckedUpdateManyWithoutSystemApproverNestedInput
-    wrPmApproved?: WarehouseReleaseUncheckedUpdateManyWithoutPmApproverNestedInput
+    wrWarehouseApproved?: WarehouseReleaseUncheckedUpdateManyWithoutWarehouseApproverNestedInput
+    wrProcurementApproved?: WarehouseReleaseUncheckedUpdateManyWithoutProcurementApproverNestedInput
     bomsCreated?: BillOfMaterialUncheckedUpdateManyWithoutCreatorNestedInput
     bomsSubmitted?: BillOfMaterialUncheckedUpdateManyWithoutSubmitterNestedInput
     bomsSystemApproved?: BillOfMaterialUncheckedUpdateManyWithoutSystemApproverNestedInput
@@ -39155,6 +40384,7 @@ export namespace Prisma {
     borrowedProcessed?: BorrowedItemUncheckedUpdateManyWithoutProcessorNestedInput
     projectBudgets?: ProjectBudgetUncheckedUpdateManyWithoutInputterNestedInput
     supplierPrices?: SupplierPriceUncheckedUpdateManyWithoutInputterNestedInput
+    notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserUpsertWithoutBomsSystemApprovedInput = {
@@ -39186,9 +40416,8 @@ export namespace Prisma {
     faultReportsSysApproved?: FaultReportUpdateManyWithoutSystemApproverNestedInput
     faultReportsPmApproved?: FaultReportUpdateManyWithoutPmApproverNestedInput
     warehouseReleases?: WarehouseReleaseUpdateManyWithoutRequesterNestedInput
-    wrWpoApproved?: WarehouseReleaseUpdateManyWithoutWpoApproverNestedInput
-    wrSysApproved?: WarehouseReleaseUpdateManyWithoutSystemApproverNestedInput
-    wrPmApproved?: WarehouseReleaseUpdateManyWithoutPmApproverNestedInput
+    wrWarehouseApproved?: WarehouseReleaseUpdateManyWithoutWarehouseApproverNestedInput
+    wrProcurementApproved?: WarehouseReleaseUpdateManyWithoutProcurementApproverNestedInput
     bomsCreated?: BillOfMaterialUpdateManyWithoutCreatorNestedInput
     bomsSubmitted?: BillOfMaterialUpdateManyWithoutSubmitterNestedInput
     bomsWpoApproved?: BillOfMaterialUpdateManyWithoutWpoApproverNestedInput
@@ -39200,6 +40429,7 @@ export namespace Prisma {
     borrowedProcessed?: BorrowedItemUpdateManyWithoutProcessorNestedInput
     projectBudgets?: ProjectBudgetUpdateManyWithoutInputterNestedInput
     supplierPrices?: SupplierPriceUpdateManyWithoutInputterNestedInput
+    notifications?: NotificationUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutBomsSystemApprovedInput = {
@@ -39220,9 +40450,8 @@ export namespace Prisma {
     faultReportsSysApproved?: FaultReportUncheckedUpdateManyWithoutSystemApproverNestedInput
     faultReportsPmApproved?: FaultReportUncheckedUpdateManyWithoutPmApproverNestedInput
     warehouseReleases?: WarehouseReleaseUncheckedUpdateManyWithoutRequesterNestedInput
-    wrWpoApproved?: WarehouseReleaseUncheckedUpdateManyWithoutWpoApproverNestedInput
-    wrSysApproved?: WarehouseReleaseUncheckedUpdateManyWithoutSystemApproverNestedInput
-    wrPmApproved?: WarehouseReleaseUncheckedUpdateManyWithoutPmApproverNestedInput
+    wrWarehouseApproved?: WarehouseReleaseUncheckedUpdateManyWithoutWarehouseApproverNestedInput
+    wrProcurementApproved?: WarehouseReleaseUncheckedUpdateManyWithoutProcurementApproverNestedInput
     bomsCreated?: BillOfMaterialUncheckedUpdateManyWithoutCreatorNestedInput
     bomsSubmitted?: BillOfMaterialUncheckedUpdateManyWithoutSubmitterNestedInput
     bomsWpoApproved?: BillOfMaterialUncheckedUpdateManyWithoutWpoApproverNestedInput
@@ -39234,6 +40463,7 @@ export namespace Prisma {
     borrowedProcessed?: BorrowedItemUncheckedUpdateManyWithoutProcessorNestedInput
     projectBudgets?: ProjectBudgetUncheckedUpdateManyWithoutInputterNestedInput
     supplierPrices?: SupplierPriceUncheckedUpdateManyWithoutInputterNestedInput
+    notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserUpsertWithoutBomsAssignedStaffInput = {
@@ -39265,9 +40495,8 @@ export namespace Prisma {
     faultReportsSysApproved?: FaultReportUpdateManyWithoutSystemApproverNestedInput
     faultReportsPmApproved?: FaultReportUpdateManyWithoutPmApproverNestedInput
     warehouseReleases?: WarehouseReleaseUpdateManyWithoutRequesterNestedInput
-    wrWpoApproved?: WarehouseReleaseUpdateManyWithoutWpoApproverNestedInput
-    wrSysApproved?: WarehouseReleaseUpdateManyWithoutSystemApproverNestedInput
-    wrPmApproved?: WarehouseReleaseUpdateManyWithoutPmApproverNestedInput
+    wrWarehouseApproved?: WarehouseReleaseUpdateManyWithoutWarehouseApproverNestedInput
+    wrProcurementApproved?: WarehouseReleaseUpdateManyWithoutProcurementApproverNestedInput
     bomsCreated?: BillOfMaterialUpdateManyWithoutCreatorNestedInput
     bomsSubmitted?: BillOfMaterialUpdateManyWithoutSubmitterNestedInput
     bomsWpoApproved?: BillOfMaterialUpdateManyWithoutWpoApproverNestedInput
@@ -39279,6 +40508,7 @@ export namespace Prisma {
     borrowedProcessed?: BorrowedItemUpdateManyWithoutProcessorNestedInput
     projectBudgets?: ProjectBudgetUpdateManyWithoutInputterNestedInput
     supplierPrices?: SupplierPriceUpdateManyWithoutInputterNestedInput
+    notifications?: NotificationUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutBomsAssignedStaffInput = {
@@ -39299,9 +40529,8 @@ export namespace Prisma {
     faultReportsSysApproved?: FaultReportUncheckedUpdateManyWithoutSystemApproverNestedInput
     faultReportsPmApproved?: FaultReportUncheckedUpdateManyWithoutPmApproverNestedInput
     warehouseReleases?: WarehouseReleaseUncheckedUpdateManyWithoutRequesterNestedInput
-    wrWpoApproved?: WarehouseReleaseUncheckedUpdateManyWithoutWpoApproverNestedInput
-    wrSysApproved?: WarehouseReleaseUncheckedUpdateManyWithoutSystemApproverNestedInput
-    wrPmApproved?: WarehouseReleaseUncheckedUpdateManyWithoutPmApproverNestedInput
+    wrWarehouseApproved?: WarehouseReleaseUncheckedUpdateManyWithoutWarehouseApproverNestedInput
+    wrProcurementApproved?: WarehouseReleaseUncheckedUpdateManyWithoutProcurementApproverNestedInput
     bomsCreated?: BillOfMaterialUncheckedUpdateManyWithoutCreatorNestedInput
     bomsSubmitted?: BillOfMaterialUncheckedUpdateManyWithoutSubmitterNestedInput
     bomsWpoApproved?: BillOfMaterialUncheckedUpdateManyWithoutWpoApproverNestedInput
@@ -39313,6 +40542,7 @@ export namespace Prisma {
     borrowedProcessed?: BorrowedItemUncheckedUpdateManyWithoutProcessorNestedInput
     projectBudgets?: ProjectBudgetUncheckedUpdateManyWithoutInputterNestedInput
     supplierPrices?: SupplierPriceUncheckedUpdateManyWithoutInputterNestedInput
+    notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserUpsertWithoutBomsAssignedWpoInput = {
@@ -39344,9 +40574,8 @@ export namespace Prisma {
     faultReportsSysApproved?: FaultReportUpdateManyWithoutSystemApproverNestedInput
     faultReportsPmApproved?: FaultReportUpdateManyWithoutPmApproverNestedInput
     warehouseReleases?: WarehouseReleaseUpdateManyWithoutRequesterNestedInput
-    wrWpoApproved?: WarehouseReleaseUpdateManyWithoutWpoApproverNestedInput
-    wrSysApproved?: WarehouseReleaseUpdateManyWithoutSystemApproverNestedInput
-    wrPmApproved?: WarehouseReleaseUpdateManyWithoutPmApproverNestedInput
+    wrWarehouseApproved?: WarehouseReleaseUpdateManyWithoutWarehouseApproverNestedInput
+    wrProcurementApproved?: WarehouseReleaseUpdateManyWithoutProcurementApproverNestedInput
     bomsCreated?: BillOfMaterialUpdateManyWithoutCreatorNestedInput
     bomsSubmitted?: BillOfMaterialUpdateManyWithoutSubmitterNestedInput
     bomsWpoApproved?: BillOfMaterialUpdateManyWithoutWpoApproverNestedInput
@@ -39358,6 +40587,7 @@ export namespace Prisma {
     borrowedProcessed?: BorrowedItemUpdateManyWithoutProcessorNestedInput
     projectBudgets?: ProjectBudgetUpdateManyWithoutInputterNestedInput
     supplierPrices?: SupplierPriceUpdateManyWithoutInputterNestedInput
+    notifications?: NotificationUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutBomsAssignedWpoInput = {
@@ -39378,9 +40608,8 @@ export namespace Prisma {
     faultReportsSysApproved?: FaultReportUncheckedUpdateManyWithoutSystemApproverNestedInput
     faultReportsPmApproved?: FaultReportUncheckedUpdateManyWithoutPmApproverNestedInput
     warehouseReleases?: WarehouseReleaseUncheckedUpdateManyWithoutRequesterNestedInput
-    wrWpoApproved?: WarehouseReleaseUncheckedUpdateManyWithoutWpoApproverNestedInput
-    wrSysApproved?: WarehouseReleaseUncheckedUpdateManyWithoutSystemApproverNestedInput
-    wrPmApproved?: WarehouseReleaseUncheckedUpdateManyWithoutPmApproverNestedInput
+    wrWarehouseApproved?: WarehouseReleaseUncheckedUpdateManyWithoutWarehouseApproverNestedInput
+    wrProcurementApproved?: WarehouseReleaseUncheckedUpdateManyWithoutProcurementApproverNestedInput
     bomsCreated?: BillOfMaterialUncheckedUpdateManyWithoutCreatorNestedInput
     bomsSubmitted?: BillOfMaterialUncheckedUpdateManyWithoutSubmitterNestedInput
     bomsWpoApproved?: BillOfMaterialUncheckedUpdateManyWithoutWpoApproverNestedInput
@@ -39392,6 +40621,7 @@ export namespace Prisma {
     borrowedProcessed?: BorrowedItemUncheckedUpdateManyWithoutProcessorNestedInput
     projectBudgets?: ProjectBudgetUncheckedUpdateManyWithoutInputterNestedInput
     supplierPrices?: SupplierPriceUncheckedUpdateManyWithoutInputterNestedInput
+    notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserUpsertWithoutBomsAssignedSystemInput = {
@@ -39423,9 +40653,8 @@ export namespace Prisma {
     faultReportsSysApproved?: FaultReportUpdateManyWithoutSystemApproverNestedInput
     faultReportsPmApproved?: FaultReportUpdateManyWithoutPmApproverNestedInput
     warehouseReleases?: WarehouseReleaseUpdateManyWithoutRequesterNestedInput
-    wrWpoApproved?: WarehouseReleaseUpdateManyWithoutWpoApproverNestedInput
-    wrSysApproved?: WarehouseReleaseUpdateManyWithoutSystemApproverNestedInput
-    wrPmApproved?: WarehouseReleaseUpdateManyWithoutPmApproverNestedInput
+    wrWarehouseApproved?: WarehouseReleaseUpdateManyWithoutWarehouseApproverNestedInput
+    wrProcurementApproved?: WarehouseReleaseUpdateManyWithoutProcurementApproverNestedInput
     bomsCreated?: BillOfMaterialUpdateManyWithoutCreatorNestedInput
     bomsSubmitted?: BillOfMaterialUpdateManyWithoutSubmitterNestedInput
     bomsWpoApproved?: BillOfMaterialUpdateManyWithoutWpoApproverNestedInput
@@ -39437,6 +40666,7 @@ export namespace Prisma {
     borrowedProcessed?: BorrowedItemUpdateManyWithoutProcessorNestedInput
     projectBudgets?: ProjectBudgetUpdateManyWithoutInputterNestedInput
     supplierPrices?: SupplierPriceUpdateManyWithoutInputterNestedInput
+    notifications?: NotificationUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutBomsAssignedSystemInput = {
@@ -39457,9 +40687,8 @@ export namespace Prisma {
     faultReportsSysApproved?: FaultReportUncheckedUpdateManyWithoutSystemApproverNestedInput
     faultReportsPmApproved?: FaultReportUncheckedUpdateManyWithoutPmApproverNestedInput
     warehouseReleases?: WarehouseReleaseUncheckedUpdateManyWithoutRequesterNestedInput
-    wrWpoApproved?: WarehouseReleaseUncheckedUpdateManyWithoutWpoApproverNestedInput
-    wrSysApproved?: WarehouseReleaseUncheckedUpdateManyWithoutSystemApproverNestedInput
-    wrPmApproved?: WarehouseReleaseUncheckedUpdateManyWithoutPmApproverNestedInput
+    wrWarehouseApproved?: WarehouseReleaseUncheckedUpdateManyWithoutWarehouseApproverNestedInput
+    wrProcurementApproved?: WarehouseReleaseUncheckedUpdateManyWithoutProcurementApproverNestedInput
     bomsCreated?: BillOfMaterialUncheckedUpdateManyWithoutCreatorNestedInput
     bomsSubmitted?: BillOfMaterialUncheckedUpdateManyWithoutSubmitterNestedInput
     bomsWpoApproved?: BillOfMaterialUncheckedUpdateManyWithoutWpoApproverNestedInput
@@ -39471,6 +40700,7 @@ export namespace Prisma {
     borrowedProcessed?: BorrowedItemUncheckedUpdateManyWithoutProcessorNestedInput
     projectBudgets?: ProjectBudgetUncheckedUpdateManyWithoutInputterNestedInput
     supplierPrices?: SupplierPriceUncheckedUpdateManyWithoutInputterNestedInput
+    notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type BomItemUpsertWithWhereUniqueWithoutBomInput = {
@@ -39985,9 +41215,8 @@ export namespace Prisma {
     faultReportsSysApproved?: FaultReportCreateNestedManyWithoutSystemApproverInput
     faultReportsPmApproved?: FaultReportCreateNestedManyWithoutPmApproverInput
     warehouseReleases?: WarehouseReleaseCreateNestedManyWithoutRequesterInput
-    wrWpoApproved?: WarehouseReleaseCreateNestedManyWithoutWpoApproverInput
-    wrSysApproved?: WarehouseReleaseCreateNestedManyWithoutSystemApproverInput
-    wrPmApproved?: WarehouseReleaseCreateNestedManyWithoutPmApproverInput
+    wrWarehouseApproved?: WarehouseReleaseCreateNestedManyWithoutWarehouseApproverInput
+    wrProcurementApproved?: WarehouseReleaseCreateNestedManyWithoutProcurementApproverInput
     bomsCreated?: BillOfMaterialCreateNestedManyWithoutCreatorInput
     bomsSubmitted?: BillOfMaterialCreateNestedManyWithoutSubmitterInput
     bomsWpoApproved?: BillOfMaterialCreateNestedManyWithoutWpoApproverInput
@@ -39999,6 +41228,7 @@ export namespace Prisma {
     borrowedProcessed?: BorrowedItemCreateNestedManyWithoutProcessorInput
     projectBudgets?: ProjectBudgetCreateNestedManyWithoutInputterInput
     supplierPrices?: SupplierPriceCreateNestedManyWithoutInputterInput
+    notifications?: NotificationCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutBomHistoriesInput = {
@@ -40019,9 +41249,8 @@ export namespace Prisma {
     faultReportsSysApproved?: FaultReportUncheckedCreateNestedManyWithoutSystemApproverInput
     faultReportsPmApproved?: FaultReportUncheckedCreateNestedManyWithoutPmApproverInput
     warehouseReleases?: WarehouseReleaseUncheckedCreateNestedManyWithoutRequesterInput
-    wrWpoApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutWpoApproverInput
-    wrSysApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutSystemApproverInput
-    wrPmApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutPmApproverInput
+    wrWarehouseApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutWarehouseApproverInput
+    wrProcurementApproved?: WarehouseReleaseUncheckedCreateNestedManyWithoutProcurementApproverInput
     bomsCreated?: BillOfMaterialUncheckedCreateNestedManyWithoutCreatorInput
     bomsSubmitted?: BillOfMaterialUncheckedCreateNestedManyWithoutSubmitterInput
     bomsWpoApproved?: BillOfMaterialUncheckedCreateNestedManyWithoutWpoApproverInput
@@ -40033,6 +41262,7 @@ export namespace Prisma {
     borrowedProcessed?: BorrowedItemUncheckedCreateNestedManyWithoutProcessorInput
     projectBudgets?: ProjectBudgetUncheckedCreateNestedManyWithoutInputterInput
     supplierPrices?: SupplierPriceUncheckedCreateNestedManyWithoutInputterInput
+    notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutBomHistoriesInput = {
@@ -40140,9 +41370,8 @@ export namespace Prisma {
     faultReportsSysApproved?: FaultReportUpdateManyWithoutSystemApproverNestedInput
     faultReportsPmApproved?: FaultReportUpdateManyWithoutPmApproverNestedInput
     warehouseReleases?: WarehouseReleaseUpdateManyWithoutRequesterNestedInput
-    wrWpoApproved?: WarehouseReleaseUpdateManyWithoutWpoApproverNestedInput
-    wrSysApproved?: WarehouseReleaseUpdateManyWithoutSystemApproverNestedInput
-    wrPmApproved?: WarehouseReleaseUpdateManyWithoutPmApproverNestedInput
+    wrWarehouseApproved?: WarehouseReleaseUpdateManyWithoutWarehouseApproverNestedInput
+    wrProcurementApproved?: WarehouseReleaseUpdateManyWithoutProcurementApproverNestedInput
     bomsCreated?: BillOfMaterialUpdateManyWithoutCreatorNestedInput
     bomsSubmitted?: BillOfMaterialUpdateManyWithoutSubmitterNestedInput
     bomsWpoApproved?: BillOfMaterialUpdateManyWithoutWpoApproverNestedInput
@@ -40154,6 +41383,7 @@ export namespace Prisma {
     borrowedProcessed?: BorrowedItemUpdateManyWithoutProcessorNestedInput
     projectBudgets?: ProjectBudgetUpdateManyWithoutInputterNestedInput
     supplierPrices?: SupplierPriceUpdateManyWithoutInputterNestedInput
+    notifications?: NotificationUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutBomHistoriesInput = {
@@ -40174,9 +41404,8 @@ export namespace Prisma {
     faultReportsSysApproved?: FaultReportUncheckedUpdateManyWithoutSystemApproverNestedInput
     faultReportsPmApproved?: FaultReportUncheckedUpdateManyWithoutPmApproverNestedInput
     warehouseReleases?: WarehouseReleaseUncheckedUpdateManyWithoutRequesterNestedInput
-    wrWpoApproved?: WarehouseReleaseUncheckedUpdateManyWithoutWpoApproverNestedInput
-    wrSysApproved?: WarehouseReleaseUncheckedUpdateManyWithoutSystemApproverNestedInput
-    wrPmApproved?: WarehouseReleaseUncheckedUpdateManyWithoutPmApproverNestedInput
+    wrWarehouseApproved?: WarehouseReleaseUncheckedUpdateManyWithoutWarehouseApproverNestedInput
+    wrProcurementApproved?: WarehouseReleaseUncheckedUpdateManyWithoutProcurementApproverNestedInput
     bomsCreated?: BillOfMaterialUncheckedUpdateManyWithoutCreatorNestedInput
     bomsSubmitted?: BillOfMaterialUncheckedUpdateManyWithoutSubmitterNestedInput
     bomsWpoApproved?: BillOfMaterialUncheckedUpdateManyWithoutWpoApproverNestedInput
@@ -40188,6 +41417,7 @@ export namespace Prisma {
     borrowedProcessed?: BorrowedItemUncheckedUpdateManyWithoutProcessorNestedInput
     projectBudgets?: ProjectBudgetUncheckedUpdateManyWithoutInputterNestedInput
     supplierPrices?: SupplierPriceUncheckedUpdateManyWithoutInputterNestedInput
+    notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type MaterialRequestCreateManyRequesterInput = {
@@ -40384,18 +41614,18 @@ export namespace Prisma {
     deliveryLocation?: string | null
     releaseDate?: Date | string
     dateReleased?: Date | string | null
-    status?: $Enums.Status
-    wpoApprovedBy?: string | null
-    wpoApprovedAt?: Date | string | null
-    systemApprovedBy?: string | null
-    systemApprovedAt?: Date | string | null
-    pmApprovedBy?: string | null
-    pmApprovedAt?: Date | string | null
+    status?: $Enums.WrStatus
+    warehouseApprovedBy?: string | null
+    warehouseApprovedAt?: Date | string | null
+    procurementApprovedBy?: string | null
+    procurementApprovedAt?: Date | string | null
+    rejectedSide?: string | null
+    rejectedReason?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
 
-  export type WarehouseReleaseCreateManyWpoApproverInput = {
+  export type WarehouseReleaseCreateManyWarehouseApproverInput = {
     id?: string
     docNo: string
     materialRequestId?: string | null
@@ -40406,17 +41636,17 @@ export namespace Prisma {
     releaseDate?: Date | string
     dateReleased?: Date | string | null
     requesterId: string
-    status?: $Enums.Status
-    wpoApprovedAt?: Date | string | null
-    systemApprovedBy?: string | null
-    systemApprovedAt?: Date | string | null
-    pmApprovedBy?: string | null
-    pmApprovedAt?: Date | string | null
+    status?: $Enums.WrStatus
+    warehouseApprovedAt?: Date | string | null
+    procurementApprovedBy?: string | null
+    procurementApprovedAt?: Date | string | null
+    rejectedSide?: string | null
+    rejectedReason?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
 
-  export type WarehouseReleaseCreateManySystemApproverInput = {
+  export type WarehouseReleaseCreateManyProcurementApproverInput = {
     id?: string
     docNo: string
     materialRequestId?: string | null
@@ -40427,33 +41657,12 @@ export namespace Prisma {
     releaseDate?: Date | string
     dateReleased?: Date | string | null
     requesterId: string
-    status?: $Enums.Status
-    wpoApprovedBy?: string | null
-    wpoApprovedAt?: Date | string | null
-    systemApprovedAt?: Date | string | null
-    pmApprovedBy?: string | null
-    pmApprovedAt?: Date | string | null
-    createdAt?: Date | string
-    updatedAt?: Date | string
-  }
-
-  export type WarehouseReleaseCreateManyPmApproverInput = {
-    id?: string
-    docNo: string
-    materialRequestId?: string | null
-    projectId?: string | null
-    projectName?: string | null
-    deliveryTarget?: string | null
-    deliveryLocation?: string | null
-    releaseDate?: Date | string
-    dateReleased?: Date | string | null
-    requesterId: string
-    status?: $Enums.Status
-    wpoApprovedBy?: string | null
-    wpoApprovedAt?: Date | string | null
-    systemApprovedBy?: string | null
-    systemApprovedAt?: Date | string | null
-    pmApprovedAt?: Date | string | null
+    status?: $Enums.WrStatus
+    warehouseApprovedBy?: string | null
+    warehouseApprovedAt?: Date | string | null
+    procurementApprovedAt?: Date | string | null
+    rejectedSide?: string | null
+    rejectedReason?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -40725,6 +41934,14 @@ export namespace Prisma {
     notes?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+  }
+
+  export type NotificationCreateManyUserInput = {
+    id?: string
+    message: string
+    link?: string | null
+    isRead?: boolean
+    createdAt?: Date | string
   }
 
   export type MaterialRequestUpdateWithoutRequesterInput = {
@@ -41320,16 +42537,16 @@ export namespace Prisma {
     deliveryLocation?: NullableStringFieldUpdateOperationsInput | string | null
     releaseDate?: DateTimeFieldUpdateOperationsInput | Date | string
     dateReleased?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    status?: EnumStatusFieldUpdateOperationsInput | $Enums.Status
-    wpoApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    systemApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    pmApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    status?: EnumWrStatusFieldUpdateOperationsInput | $Enums.WrStatus
+    warehouseApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    procurementApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rejectedSide?: NullableStringFieldUpdateOperationsInput | string | null
+    rejectedReason?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     materialRequest?: MaterialRequestUpdateOneWithoutWarehouseReleasesNestedInput
-    wpoApprover?: UserUpdateOneWithoutWrWpoApprovedNestedInput
-    systemApprover?: UserUpdateOneWithoutWrSysApprovedNestedInput
-    pmApprover?: UserUpdateOneWithoutWrPmApprovedNestedInput
+    warehouseApprover?: UserUpdateOneWithoutWrWarehouseApprovedNestedInput
+    procurementApprover?: UserUpdateOneWithoutWrProcurementApprovedNestedInput
     items?: WarehouseReleaseItemUpdateManyWithoutReleaseNestedInput
   }
 
@@ -41343,13 +42560,13 @@ export namespace Prisma {
     deliveryLocation?: NullableStringFieldUpdateOperationsInput | string | null
     releaseDate?: DateTimeFieldUpdateOperationsInput | Date | string
     dateReleased?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    status?: EnumStatusFieldUpdateOperationsInput | $Enums.Status
-    wpoApprovedBy?: NullableStringFieldUpdateOperationsInput | string | null
-    wpoApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    systemApprovedBy?: NullableStringFieldUpdateOperationsInput | string | null
-    systemApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    pmApprovedBy?: NullableStringFieldUpdateOperationsInput | string | null
-    pmApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    status?: EnumWrStatusFieldUpdateOperationsInput | $Enums.WrStatus
+    warehouseApprovedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    warehouseApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    procurementApprovedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    procurementApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rejectedSide?: NullableStringFieldUpdateOperationsInput | string | null
+    rejectedReason?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     items?: WarehouseReleaseItemUncheckedUpdateManyWithoutReleaseNestedInput
@@ -41365,18 +42582,18 @@ export namespace Prisma {
     deliveryLocation?: NullableStringFieldUpdateOperationsInput | string | null
     releaseDate?: DateTimeFieldUpdateOperationsInput | Date | string
     dateReleased?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    status?: EnumStatusFieldUpdateOperationsInput | $Enums.Status
-    wpoApprovedBy?: NullableStringFieldUpdateOperationsInput | string | null
-    wpoApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    systemApprovedBy?: NullableStringFieldUpdateOperationsInput | string | null
-    systemApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    pmApprovedBy?: NullableStringFieldUpdateOperationsInput | string | null
-    pmApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    status?: EnumWrStatusFieldUpdateOperationsInput | $Enums.WrStatus
+    warehouseApprovedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    warehouseApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    procurementApprovedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    procurementApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rejectedSide?: NullableStringFieldUpdateOperationsInput | string | null
+    rejectedReason?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
-  export type WarehouseReleaseUpdateWithoutWpoApproverInput = {
+  export type WarehouseReleaseUpdateWithoutWarehouseApproverInput = {
     id?: StringFieldUpdateOperationsInput | string
     docNo?: StringFieldUpdateOperationsInput | string
     projectId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -41385,20 +42602,20 @@ export namespace Prisma {
     deliveryLocation?: NullableStringFieldUpdateOperationsInput | string | null
     releaseDate?: DateTimeFieldUpdateOperationsInput | Date | string
     dateReleased?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    status?: EnumStatusFieldUpdateOperationsInput | $Enums.Status
-    wpoApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    systemApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    pmApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    status?: EnumWrStatusFieldUpdateOperationsInput | $Enums.WrStatus
+    warehouseApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    procurementApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rejectedSide?: NullableStringFieldUpdateOperationsInput | string | null
+    rejectedReason?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     materialRequest?: MaterialRequestUpdateOneWithoutWarehouseReleasesNestedInput
     requester?: UserUpdateOneRequiredWithoutWarehouseReleasesNestedInput
-    systemApprover?: UserUpdateOneWithoutWrSysApprovedNestedInput
-    pmApprover?: UserUpdateOneWithoutWrPmApprovedNestedInput
+    procurementApprover?: UserUpdateOneWithoutWrProcurementApprovedNestedInput
     items?: WarehouseReleaseItemUpdateManyWithoutReleaseNestedInput
   }
 
-  export type WarehouseReleaseUncheckedUpdateWithoutWpoApproverInput = {
+  export type WarehouseReleaseUncheckedUpdateWithoutWarehouseApproverInput = {
     id?: StringFieldUpdateOperationsInput | string
     docNo?: StringFieldUpdateOperationsInput | string
     materialRequestId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -41409,18 +42626,18 @@ export namespace Prisma {
     releaseDate?: DateTimeFieldUpdateOperationsInput | Date | string
     dateReleased?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     requesterId?: StringFieldUpdateOperationsInput | string
-    status?: EnumStatusFieldUpdateOperationsInput | $Enums.Status
-    wpoApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    systemApprovedBy?: NullableStringFieldUpdateOperationsInput | string | null
-    systemApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    pmApprovedBy?: NullableStringFieldUpdateOperationsInput | string | null
-    pmApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    status?: EnumWrStatusFieldUpdateOperationsInput | $Enums.WrStatus
+    warehouseApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    procurementApprovedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    procurementApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rejectedSide?: NullableStringFieldUpdateOperationsInput | string | null
+    rejectedReason?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     items?: WarehouseReleaseItemUncheckedUpdateManyWithoutReleaseNestedInput
   }
 
-  export type WarehouseReleaseUncheckedUpdateManyWithoutWpoApproverInput = {
+  export type WarehouseReleaseUncheckedUpdateManyWithoutWarehouseApproverInput = {
     id?: StringFieldUpdateOperationsInput | string
     docNo?: StringFieldUpdateOperationsInput | string
     materialRequestId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -41431,17 +42648,17 @@ export namespace Prisma {
     releaseDate?: DateTimeFieldUpdateOperationsInput | Date | string
     dateReleased?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     requesterId?: StringFieldUpdateOperationsInput | string
-    status?: EnumStatusFieldUpdateOperationsInput | $Enums.Status
-    wpoApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    systemApprovedBy?: NullableStringFieldUpdateOperationsInput | string | null
-    systemApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    pmApprovedBy?: NullableStringFieldUpdateOperationsInput | string | null
-    pmApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    status?: EnumWrStatusFieldUpdateOperationsInput | $Enums.WrStatus
+    warehouseApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    procurementApprovedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    procurementApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rejectedSide?: NullableStringFieldUpdateOperationsInput | string | null
+    rejectedReason?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
-  export type WarehouseReleaseUpdateWithoutSystemApproverInput = {
+  export type WarehouseReleaseUpdateWithoutProcurementApproverInput = {
     id?: StringFieldUpdateOperationsInput | string
     docNo?: StringFieldUpdateOperationsInput | string
     projectId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -41450,20 +42667,20 @@ export namespace Prisma {
     deliveryLocation?: NullableStringFieldUpdateOperationsInput | string | null
     releaseDate?: DateTimeFieldUpdateOperationsInput | Date | string
     dateReleased?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    status?: EnumStatusFieldUpdateOperationsInput | $Enums.Status
-    wpoApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    systemApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    pmApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    status?: EnumWrStatusFieldUpdateOperationsInput | $Enums.WrStatus
+    warehouseApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    procurementApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rejectedSide?: NullableStringFieldUpdateOperationsInput | string | null
+    rejectedReason?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     materialRequest?: MaterialRequestUpdateOneWithoutWarehouseReleasesNestedInput
     requester?: UserUpdateOneRequiredWithoutWarehouseReleasesNestedInput
-    wpoApprover?: UserUpdateOneWithoutWrWpoApprovedNestedInput
-    pmApprover?: UserUpdateOneWithoutWrPmApprovedNestedInput
+    warehouseApprover?: UserUpdateOneWithoutWrWarehouseApprovedNestedInput
     items?: WarehouseReleaseItemUpdateManyWithoutReleaseNestedInput
   }
 
-  export type WarehouseReleaseUncheckedUpdateWithoutSystemApproverInput = {
+  export type WarehouseReleaseUncheckedUpdateWithoutProcurementApproverInput = {
     id?: StringFieldUpdateOperationsInput | string
     docNo?: StringFieldUpdateOperationsInput | string
     materialRequestId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -41474,18 +42691,18 @@ export namespace Prisma {
     releaseDate?: DateTimeFieldUpdateOperationsInput | Date | string
     dateReleased?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     requesterId?: StringFieldUpdateOperationsInput | string
-    status?: EnumStatusFieldUpdateOperationsInput | $Enums.Status
-    wpoApprovedBy?: NullableStringFieldUpdateOperationsInput | string | null
-    wpoApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    systemApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    pmApprovedBy?: NullableStringFieldUpdateOperationsInput | string | null
-    pmApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    status?: EnumWrStatusFieldUpdateOperationsInput | $Enums.WrStatus
+    warehouseApprovedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    warehouseApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    procurementApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rejectedSide?: NullableStringFieldUpdateOperationsInput | string | null
+    rejectedReason?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     items?: WarehouseReleaseItemUncheckedUpdateManyWithoutReleaseNestedInput
   }
 
-  export type WarehouseReleaseUncheckedUpdateManyWithoutSystemApproverInput = {
+  export type WarehouseReleaseUncheckedUpdateManyWithoutProcurementApproverInput = {
     id?: StringFieldUpdateOperationsInput | string
     docNo?: StringFieldUpdateOperationsInput | string
     materialRequestId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -41496,77 +42713,12 @@ export namespace Prisma {
     releaseDate?: DateTimeFieldUpdateOperationsInput | Date | string
     dateReleased?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     requesterId?: StringFieldUpdateOperationsInput | string
-    status?: EnumStatusFieldUpdateOperationsInput | $Enums.Status
-    wpoApprovedBy?: NullableStringFieldUpdateOperationsInput | string | null
-    wpoApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    systemApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    pmApprovedBy?: NullableStringFieldUpdateOperationsInput | string | null
-    pmApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type WarehouseReleaseUpdateWithoutPmApproverInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    docNo?: StringFieldUpdateOperationsInput | string
-    projectId?: NullableStringFieldUpdateOperationsInput | string | null
-    projectName?: NullableStringFieldUpdateOperationsInput | string | null
-    deliveryTarget?: NullableStringFieldUpdateOperationsInput | string | null
-    deliveryLocation?: NullableStringFieldUpdateOperationsInput | string | null
-    releaseDate?: DateTimeFieldUpdateOperationsInput | Date | string
-    dateReleased?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    status?: EnumStatusFieldUpdateOperationsInput | $Enums.Status
-    wpoApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    systemApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    pmApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    materialRequest?: MaterialRequestUpdateOneWithoutWarehouseReleasesNestedInput
-    requester?: UserUpdateOneRequiredWithoutWarehouseReleasesNestedInput
-    wpoApprover?: UserUpdateOneWithoutWrWpoApprovedNestedInput
-    systemApprover?: UserUpdateOneWithoutWrSysApprovedNestedInput
-    items?: WarehouseReleaseItemUpdateManyWithoutReleaseNestedInput
-  }
-
-  export type WarehouseReleaseUncheckedUpdateWithoutPmApproverInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    docNo?: StringFieldUpdateOperationsInput | string
-    materialRequestId?: NullableStringFieldUpdateOperationsInput | string | null
-    projectId?: NullableStringFieldUpdateOperationsInput | string | null
-    projectName?: NullableStringFieldUpdateOperationsInput | string | null
-    deliveryTarget?: NullableStringFieldUpdateOperationsInput | string | null
-    deliveryLocation?: NullableStringFieldUpdateOperationsInput | string | null
-    releaseDate?: DateTimeFieldUpdateOperationsInput | Date | string
-    dateReleased?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    requesterId?: StringFieldUpdateOperationsInput | string
-    status?: EnumStatusFieldUpdateOperationsInput | $Enums.Status
-    wpoApprovedBy?: NullableStringFieldUpdateOperationsInput | string | null
-    wpoApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    systemApprovedBy?: NullableStringFieldUpdateOperationsInput | string | null
-    systemApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    pmApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    items?: WarehouseReleaseItemUncheckedUpdateManyWithoutReleaseNestedInput
-  }
-
-  export type WarehouseReleaseUncheckedUpdateManyWithoutPmApproverInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    docNo?: StringFieldUpdateOperationsInput | string
-    materialRequestId?: NullableStringFieldUpdateOperationsInput | string | null
-    projectId?: NullableStringFieldUpdateOperationsInput | string | null
-    projectName?: NullableStringFieldUpdateOperationsInput | string | null
-    deliveryTarget?: NullableStringFieldUpdateOperationsInput | string | null
-    deliveryLocation?: NullableStringFieldUpdateOperationsInput | string | null
-    releaseDate?: DateTimeFieldUpdateOperationsInput | Date | string
-    dateReleased?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    requesterId?: StringFieldUpdateOperationsInput | string
-    status?: EnumStatusFieldUpdateOperationsInput | $Enums.Status
-    wpoApprovedBy?: NullableStringFieldUpdateOperationsInput | string | null
-    wpoApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    systemApprovedBy?: NullableStringFieldUpdateOperationsInput | string | null
-    systemApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    pmApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    status?: EnumWrStatusFieldUpdateOperationsInput | $Enums.WrStatus
+    warehouseApprovedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    warehouseApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    procurementApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rejectedSide?: NullableStringFieldUpdateOperationsInput | string | null
+    rejectedReason?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -42410,6 +43562,30 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type NotificationUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    message?: StringFieldUpdateOperationsInput | string
+    link?: NullableStringFieldUpdateOperationsInput | string | null
+    isRead?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type NotificationUncheckedUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    message?: StringFieldUpdateOperationsInput | string
+    link?: NullableStringFieldUpdateOperationsInput | string | null
+    isRead?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type NotificationUncheckedUpdateManyWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    message?: StringFieldUpdateOperationsInput | string
+    link?: NullableStringFieldUpdateOperationsInput | string | null
+    isRead?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type MaterialRequestItemCreateManyRequestInput = {
     id?: number
     description: string
@@ -42440,13 +43616,13 @@ export namespace Prisma {
     releaseDate?: Date | string
     dateReleased?: Date | string | null
     requesterId: string
-    status?: $Enums.Status
-    wpoApprovedBy?: string | null
-    wpoApprovedAt?: Date | string | null
-    systemApprovedBy?: string | null
-    systemApprovedAt?: Date | string | null
-    pmApprovedBy?: string | null
-    pmApprovedAt?: Date | string | null
+    status?: $Enums.WrStatus
+    warehouseApprovedBy?: string | null
+    warehouseApprovedAt?: Date | string | null
+    procurementApprovedBy?: string | null
+    procurementApprovedAt?: Date | string | null
+    rejectedSide?: string | null
+    rejectedReason?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -42538,16 +43714,16 @@ export namespace Prisma {
     deliveryLocation?: NullableStringFieldUpdateOperationsInput | string | null
     releaseDate?: DateTimeFieldUpdateOperationsInput | Date | string
     dateReleased?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    status?: EnumStatusFieldUpdateOperationsInput | $Enums.Status
-    wpoApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    systemApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    pmApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    status?: EnumWrStatusFieldUpdateOperationsInput | $Enums.WrStatus
+    warehouseApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    procurementApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rejectedSide?: NullableStringFieldUpdateOperationsInput | string | null
+    rejectedReason?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     requester?: UserUpdateOneRequiredWithoutWarehouseReleasesNestedInput
-    wpoApprover?: UserUpdateOneWithoutWrWpoApprovedNestedInput
-    systemApprover?: UserUpdateOneWithoutWrSysApprovedNestedInput
-    pmApprover?: UserUpdateOneWithoutWrPmApprovedNestedInput
+    warehouseApprover?: UserUpdateOneWithoutWrWarehouseApprovedNestedInput
+    procurementApprover?: UserUpdateOneWithoutWrProcurementApprovedNestedInput
     items?: WarehouseReleaseItemUpdateManyWithoutReleaseNestedInput
   }
 
@@ -42561,13 +43737,13 @@ export namespace Prisma {
     releaseDate?: DateTimeFieldUpdateOperationsInput | Date | string
     dateReleased?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     requesterId?: StringFieldUpdateOperationsInput | string
-    status?: EnumStatusFieldUpdateOperationsInput | $Enums.Status
-    wpoApprovedBy?: NullableStringFieldUpdateOperationsInput | string | null
-    wpoApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    systemApprovedBy?: NullableStringFieldUpdateOperationsInput | string | null
-    systemApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    pmApprovedBy?: NullableStringFieldUpdateOperationsInput | string | null
-    pmApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    status?: EnumWrStatusFieldUpdateOperationsInput | $Enums.WrStatus
+    warehouseApprovedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    warehouseApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    procurementApprovedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    procurementApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rejectedSide?: NullableStringFieldUpdateOperationsInput | string | null
+    rejectedReason?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     items?: WarehouseReleaseItemUncheckedUpdateManyWithoutReleaseNestedInput
@@ -42583,13 +43759,13 @@ export namespace Prisma {
     releaseDate?: DateTimeFieldUpdateOperationsInput | Date | string
     dateReleased?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     requesterId?: StringFieldUpdateOperationsInput | string
-    status?: EnumStatusFieldUpdateOperationsInput | $Enums.Status
-    wpoApprovedBy?: NullableStringFieldUpdateOperationsInput | string | null
-    wpoApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    systemApprovedBy?: NullableStringFieldUpdateOperationsInput | string | null
-    systemApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    pmApprovedBy?: NullableStringFieldUpdateOperationsInput | string | null
-    pmApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    status?: EnumWrStatusFieldUpdateOperationsInput | $Enums.WrStatus
+    warehouseApprovedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    warehouseApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    procurementApprovedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    procurementApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rejectedSide?: NullableStringFieldUpdateOperationsInput | string | null
+    rejectedReason?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }

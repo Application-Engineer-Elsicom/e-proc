@@ -11,6 +11,7 @@ const DASHBOARD_BY_ROLE = {
   WPO: "/wpo",
   PROCUREMENT: "/procurement",
   PROJECT_MANAGER: "/pm",
+  WAREHOUSE: "/warehouse",
 };
 
 export default async function Home() {
@@ -25,7 +26,7 @@ export default async function Home() {
     redirect(dashboard);
   }
 
-  // FINANCE dan WAREHOUSE belum punya modul — lihat Tahap C di APP_PLAN.md
+  // FINANCE belum punya modul — lihat Tahap 4 (Document Control & Finance).
   return (
     <div className="flex flex-col items-center justify-center min-h-screen gap-3 px-6 text-center">
       <h1 className="text-2xl font-bold">Halo, {session.user.name}</h1>

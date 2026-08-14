@@ -52,12 +52,21 @@ export default async function PODetailPage({ params }) {
             {po.supplierName} • {new Date(po.poDate).toLocaleDateString('id-ID')}
           </p>
         </div>
-        <Link
-          href="/procurement/po-list"
-          className="px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg text-gray-700 dark:text-gray-300 font-bold hover:bg-gray-50 dark:hover:bg-gray-800 transition text-sm"
-        >
-          ← Back
-        </Link>
+        <div className="flex items-center gap-2">
+          <Link
+            href={`/procurement/po-list/${po.id}/pdf`}
+            target="_blank"
+            className="px-4 py-2 rounded-lg bg-blue-600 text-white font-bold hover:bg-blue-700 transition text-sm"
+          >
+            ⬇ PDF
+          </Link>
+          <Link
+            href="/procurement/po-list"
+            className="px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg text-gray-700 dark:text-gray-300 font-bold hover:bg-gray-50 dark:hover:bg-gray-800 transition text-sm"
+          >
+            ← Back
+          </Link>
+        </div>
       </div>
 
       <PODetailContent po={po} />

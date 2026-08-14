@@ -132,6 +132,15 @@ exports.Prisma.UserScalarFieldEnum = {
   createdAt: 'createdAt'
 };
 
+exports.Prisma.NotificationScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  message: 'message',
+  link: 'link',
+  isRead: 'isRead',
+  createdAt: 'createdAt'
+};
+
 exports.Prisma.MaterialRequestScalarFieldEnum = {
   id: 'id',
   docControlNo: 'docControlNo',
@@ -206,12 +215,12 @@ exports.Prisma.WarehouseReleaseScalarFieldEnum = {
   dateReleased: 'dateReleased',
   requesterId: 'requesterId',
   status: 'status',
-  wpoApprovedBy: 'wpoApprovedBy',
-  wpoApprovedAt: 'wpoApprovedAt',
-  systemApprovedBy: 'systemApprovedBy',
-  systemApprovedAt: 'systemApprovedAt',
-  pmApprovedBy: 'pmApprovedBy',
-  pmApprovedAt: 'pmApprovedAt',
+  warehouseApprovedBy: 'warehouseApprovedBy',
+  warehouseApprovedAt: 'warehouseApprovedAt',
+  procurementApprovedBy: 'procurementApprovedBy',
+  procurementApprovedAt: 'procurementApprovedAt',
+  rejectedSide: 'rejectedSide',
+  rejectedReason: 'rejectedReason',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -454,6 +463,13 @@ exports.Prisma.UserOrderByRelevanceFieldEnum = {
   position: 'position'
 };
 
+exports.Prisma.NotificationOrderByRelevanceFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  message: 'message',
+  link: 'link'
+};
+
 exports.Prisma.MaterialRequestOrderByRelevanceFieldEnum = {
   id: 'id',
   docControlNo: 'docControlNo',
@@ -506,9 +522,10 @@ exports.Prisma.WarehouseReleaseOrderByRelevanceFieldEnum = {
   deliveryTarget: 'deliveryTarget',
   deliveryLocation: 'deliveryLocation',
   requesterId: 'requesterId',
-  wpoApprovedBy: 'wpoApprovedBy',
-  systemApprovedBy: 'systemApprovedBy',
-  pmApprovedBy: 'pmApprovedBy'
+  warehouseApprovedBy: 'warehouseApprovedBy',
+  procurementApprovedBy: 'procurementApprovedBy',
+  rejectedSide: 'rejectedSide',
+  rejectedReason: 'rejectedReason'
 };
 
 exports.Prisma.WarehouseReleaseItemOrderByRelevanceFieldEnum = {
@@ -699,6 +716,15 @@ exports.FaultStatus = exports.$Enums.FaultStatus = {
   CLOSED: 'CLOSED'
 };
 
+exports.WrStatus = exports.$Enums.WrStatus = {
+  PENDING_APPROVAL: 'PENDING_APPROVAL',
+  WAREHOUSE_APPROVED: 'WAREHOUSE_APPROVED',
+  PROCUREMENT_APPROVED: 'PROCUREMENT_APPROVED',
+  APPROVED: 'APPROVED',
+  REJECTED: 'REJECTED',
+  SHIPPED: 'SHIPPED'
+};
+
 exports.POStatus = exports.$Enums.POStatus = {
   DRAFT: 'DRAFT',
   RELEASED: 'RELEASED',
@@ -745,6 +771,7 @@ exports.BomItemStatus = exports.$Enums.BomItemStatus = {
 
 exports.Prisma.ModelName = {
   User: 'User',
+  Notification: 'Notification',
   MaterialRequest: 'MaterialRequest',
   MaterialRequestItem: 'MaterialRequestItem',
   FaultReport: 'FaultReport',

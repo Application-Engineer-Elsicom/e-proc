@@ -248,6 +248,7 @@ export function getRoleDisplayName(user) {
     MARKETING: "Marketing",
     PROCUREMENT: "Procurement",
     PROJECT_MANAGER: "Project Manager",
+    WAREHOUSE: "Warehouse / Gudang",
     WPO: "Warehouse",
     FINANCE: "Finance",
   };
@@ -354,6 +355,21 @@ export function isProcurement(user) {
   return user && user.role === "PROCUREMENT";
 }
 
+/** Staf gudang — modul /warehouse (Goods Receipt & approval WR sisi fisik). */
+export function isWarehouse(user) {
+  return user && user.role === "WAREHOUSE";
+}
+
+/** Boleh approve/reject WR dari sisi Warehouse (cek fisik ketersediaan). */
+export function canApproveWRWarehouse(user) {
+  return user && user.role === "WAREHOUSE";
+}
+
+/** Boleh approve/reject WR dari sisi Procurement (cek kelengkapan pengadaan). */
+export function canApproveWRProcurement(user) {
+  return user && user.role === "PROCUREMENT";
+}
+
 // ─── Label Status ────────────────────────────────────────────────────────────
 // Satu tempat untuk semua nama status yang dilihat pengguna. Sebelumnya tiap
 // halaman punya peta sendiri, sehingga daftar menulis "WPO Review" sementara
@@ -400,9 +416,25 @@ function labelFrom(map, status) {
   return map[status] || String(status).replace(/_/g, " ");
 }
 
-/** Status dokumen FR / MR / WR (enum Status). */
+/** Status dokumen FR / MR (enum Status). */
 export function getStatusLabel(status) {
   return labelFrom(STATUS_LABELS, status);
+}
+
+// Warehouse Release memakai enum tersendiri (WrStatus) sejak approval-nya
+// dipisah jadi dua sisi independen Warehouse + Procurement.
+const WR_STATUS_LABELS = {
+  PENDING_APPROVAL: "Menunggu Approval",
+  WAREHOUSE_APPROVED: "Disetujui Warehouse (menunggu Procurement)",
+  PROCUREMENT_APPROVED: "Disetujui Procurement (menunggu Warehouse)",
+  APPROVED: "Disetujui",
+  REJECTED: "Ditolak",
+  SHIPPED: "Dikirim",
+};
+
+/** Status Warehouse Release (enum WrStatus). */
+export function getWrStatusLabel(status) {
+  return labelFrom(WR_STATUS_LABELS, status);
 }
 
 /** Status Bill of Material (enum BomStatus). */

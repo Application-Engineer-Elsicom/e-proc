@@ -14,8 +14,10 @@ import {
   LogOut,
   Menu,
   Package,
+  PackageCheck,
   Receipt,
   Truck,
+  Warehouse,
   X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -35,8 +37,11 @@ const ICONS = {
   approval: CheckSquare,
   plan: ClipboardList,
   receipt: Receipt,
+  warehouse: Warehouse,
+  goodsReceipt: PackageCheck,
 };
 import { Button } from "./ui/button";
+import NotificationBell from "./NotificationBell";
 import { Avatar, AvatarFallback, initials } from "./ui/avatar";
 import {
   DropdownMenu,
@@ -152,6 +157,8 @@ export default function AppShell({ moduleName, moduleSubtitle, navItems, user, c
           </Button>
 
           <div className="ml-auto flex items-center gap-3">
+            <NotificationBell />
+
             <div className="hidden text-right sm:block">
               <p className="text-sm font-medium leading-tight">{user.name}</p>
               <p className="text-xs text-muted-foreground">{user.roleLabel}</p>

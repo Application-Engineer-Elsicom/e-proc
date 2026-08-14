@@ -14,6 +14,7 @@ const NAV = [
   { href: '/procurement/bom', label: 'Bill of Material', icon: 'document' },
   { href: '/procurement/po-plan', label: 'Rencana PO', icon: 'plan' },
   { href: '/procurement/po-list', label: 'Daftar PO', icon: 'receipt' },
+  { href: '/procurement/warehouse-release', label: 'Approval WR', icon: 'approval' },
 ]
 
 export default async function ProcurementLayout({ children }) {

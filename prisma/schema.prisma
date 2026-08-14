@@ -72,6 +72,19 @@ enum FaultStatus {
   CLOSED
 }
 
+// Approval Warehouse Release: dua persetujuan independen & paralel —
+// Warehouse (cek fisik) DAN Procurement (cek kelengkapan pengadaan). WR baru
+// APPROVED bila keduanya setuju; REJECTED bila salah satu menolak. Menggantikan
+// rantai WPO/SYSTEM/PM lama (lihat Perancangan Terpadu Bab 3 & 6.2).
+enum WrStatus {
+  PENDING_APPROVAL    // Belum ada yang approve
+  WAREHOUSE_APPROVED  // Warehouse sudah, menunggu Procurement
+  PROCUREMENT_APPROVED // Procurement sudah, menunggu Warehouse
+  APPROVED            // Kedua sisi setuju
+  REJECTED            // Salah satu menolak
+  SHIPPED             // Barang dikirim (ditulis di Tahap 2)
+}
+
 enum Priority {
   LOW
   MEDIUM
@@ -122,9 +135,8 @@ model User {
   faultReportsSysApproved   FaultReport[]      @relation("FRSystemApprovedBy")
   faultReportsPmApproved    FaultReport[]      @relation("FRPmApprovedBy")
   warehouseReleases         WarehouseRelease[]
-  wrWpoApproved             WarehouseRelease[] @relation("WRWpoApprovedBy")
-  wrSysApproved             WarehouseRelease[] @relation("WRSystemApprovedBy")
-  wrPmApproved              WarehouseRelease[] @relation("WRPmApprovedBy")
+  wrWarehouseApproved       WarehouseRelease[] @relation("WRWarehouseApprovedBy")
+  wrProcurementApproved     WarehouseRelease[] @relation("WRProcurementApprovedBy")
 
   // New Relations - BoM
   bomsCreated        BillOfMaterial[] @relation("BomCreatedBy")
@@ -141,6 +153,23 @@ model User {
   borrowedProcessed  BorrowedItem[]   @relation("BorrowedProcessedBy")
   projectBudgets     ProjectBudget[]  @relation("BudgetInputBy")
   supplierPrices     SupplierPrice[]  @relation("SupplierPriceInputBy")
+
+  // Notifikasi in-app (Tahap 2)
+  notifications      Notification[]
+}
+
+// Notifikasi in-app minimal (Tahap 2, lihat Perancangan Terpadu 6.6).
+// Cukup ini dulu; email menyusul bila dibutuhkan (catatan APP_PLAN.md).
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  message   String
+  link      String?  // rute tujuan saat notifikasi diklik, mis. /warehouse
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([userId, isRead])
 }
 
 model MaterialRequest {
@@ -246,17 +275,16 @@ model WarehouseRelease {
   requesterId   String
   requester     User     @relation(fields: [requesterId], references: [id])
 
-  // Approval chain
-  status              Status    @default(WAITING_WPO)
-  wpoApprovedBy       String?
-  wpoApprover         User?     @relation("WRWpoApprovedBy", fields: [wpoApprovedBy], references: [id])
-  wpoApprovedAt       DateTime?
-  systemApprovedBy    String?
-  systemApprover      User?     @relation("WRSystemApprovedBy", fields: [systemApprovedBy], references: [id])
-  systemApprovedAt    DateTime?
-  pmApprovedBy        String?
-  pmApprover          User?     @relation("WRPmApprovedBy", fields: [pmApprovedBy], references: [id])
-  pmApprovedAt        DateTime?
+  // Approval ganda independen (lihat enum WrStatus)
+  status                  WrStatus  @default(PENDING_APPROVAL)
+  warehouseApprovedBy     String?
+  warehouseApprover       User?     @relation("WRWarehouseApprovedBy", fields: [warehouseApprovedBy], references: [id])
+  warehouseApprovedAt     DateTime?
+  procurementApprovedBy   String?
+  procurementApprover     User?     @relation("WRProcurementApprovedBy", fields: [procurementApprovedBy], references: [id])
+  procurementApprovedAt   DateTime?
+  rejectedSide            String?   // "WAREHOUSE" atau "PROCUREMENT"
+  rejectedReason          String?
 
   items         WarehouseReleaseItem[]
   createdAt     DateTime @default(now())
