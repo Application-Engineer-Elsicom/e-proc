@@ -8,10 +8,11 @@ import LogoutButton from "./components/LogoutButton";
 const DASHBOARD_BY_ROLE = {
   ENGINEER: "/engineer",
   MARKETING: "/marketing",
-  WPO: "/wpo",
   PROCUREMENT: "/procurement",
   PROJECT_MANAGER: "/pm",
   WAREHOUSE: "/warehouse",
+  DOCUMENT_CONTROL: "/document-control",
+  FINANCE: "/finance",
 };
 
 export default async function Home() {
@@ -26,7 +27,8 @@ export default async function Home() {
     redirect(dashboard);
   }
 
-  // FINANCE belum punya modul — lihat Tahap 4 (Document Control & Finance).
+  // Semua peran di enum sudah punya modul. Fallback ini hanya terpakai bila
+  // ada peran baru yang belum didaftarkan di DASHBOARD_BY_ROLE.
   return (
     <div className="flex flex-col items-center justify-center min-h-screen gap-3 px-6 text-center">
       <h1 className="text-2xl font-bold">Halo, {session.user.name}</h1>

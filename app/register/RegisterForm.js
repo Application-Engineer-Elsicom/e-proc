@@ -8,9 +8,9 @@ const ROLES = [
   { value: "MARKETING", label: "Marketing" },
   { value: "PROCUREMENT", label: "Procurement" },
   { value: "PROJECT_MANAGER", label: "Project Manager" },
-  { value: "WPO", label: "WPO" },
-  { value: "FINANCE", label: "Finance" },
   { value: "WAREHOUSE", label: "Warehouse" },
+  { value: "DOCUMENT_CONTROL", label: "Document Control" },
+  { value: "FINANCE", label: "Finance" },
 ];
 
 const ENGINEER_ROLES = [

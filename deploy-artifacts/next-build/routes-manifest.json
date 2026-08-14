@@ -109,6 +109,12 @@
       "namedRegex": "^/_not\\-found(?:/)?$"
     },
     {
+      "page": "/document-control",
+      "regex": "^/document\\-control(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/document\\-control(?:/)?$"
+    },
+    {
       "page": "/engineer",
       "regex": "^/engineer(?:/)?$",
       "routeKeys": {},
@@ -161,6 +167,12 @@
       "regex": "^/favicon\\.ico(?:/)?$",
       "routeKeys": {},
       "namedRegex": "^/favicon\\.ico(?:/)?$"
+    },
+    {
+      "page": "/finance",
+      "regex": "^/finance(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/finance(?:/)?$"
     },
     {
       "page": "/login",
@@ -263,12 +275,6 @@
       "regex": "^/warehouse/warehouse\\-release(?:/)?$",
       "routeKeys": {},
       "namedRegex": "^/warehouse/warehouse\\-release(?:/)?$"
-    },
-    {
-      "page": "/wpo",
-      "regex": "^/wpo(?:/)?$",
-      "routeKeys": {},
-      "namedRegex": "^/wpo(?:/)?$"
     }
   ],
   "dataRoutes": [],

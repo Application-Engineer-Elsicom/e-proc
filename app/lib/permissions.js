@@ -249,8 +249,8 @@ export function getRoleDisplayName(user) {
     PROCUREMENT: "Procurement",
     PROJECT_MANAGER: "Project Manager",
     WAREHOUSE: "Warehouse / Gudang",
-    WPO: "Warehouse",
     FINANCE: "Finance",
+    DOCUMENT_CONTROL: "Document Control",
   };
 
   return roleMap[role] || role;

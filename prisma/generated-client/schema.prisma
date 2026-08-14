@@ -19,10 +19,13 @@ enum Role {
   ENGINEER
   PROCUREMENT
   MARKETING
-  WPO
   PROJECT_MANAGER
   FINANCE
   WAREHOUSE
+  DOCUMENT_CONTROL
+  // Catatan: peran WPO berdiri-sendiri DIHAPUS (Perancangan Terpadu Bab 4) —
+  // tumpang tindih dengan ENGINEER sub-role WPO yang jadi satu-satunya sumber
+  // approval jenjang pertama. Sub-role EngineerRole.WPO tetap ada.
 }
 
 enum EngineerRole {

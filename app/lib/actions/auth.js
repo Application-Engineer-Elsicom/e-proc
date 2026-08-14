@@ -13,8 +13,8 @@ const CAN_CREATE_USERS = ["PROJECT_MANAGER"];
 // Hanya peran yang memang ada di enum Role. Tanpa ini, nilai apa pun dari
 // form akan masuk ke database.
 const ALLOWED_ROLES = [
-  "ENGINEER", "PROCUREMENT", "MARKETING",
-  "WPO", "PROJECT_MANAGER", "FINANCE", "WAREHOUSE",
+  "ENGINEER", "PROCUREMENT", "MARKETING", "PROJECT_MANAGER",
+  "FINANCE", "WAREHOUSE", "DOCUMENT_CONTROL",
 ];
 const ALLOWED_ENGINEER_ROLES = ["STAFF", "WPO", "SYSTEM"];
 

@@ -679,10 +679,10 @@ exports.Role = exports.$Enums.Role = {
   ENGINEER: 'ENGINEER',
   PROCUREMENT: 'PROCUREMENT',
   MARKETING: 'MARKETING',
-  WPO: 'WPO',
   PROJECT_MANAGER: 'PROJECT_MANAGER',
   FINANCE: 'FINANCE',
-  WAREHOUSE: 'WAREHOUSE'
+  WAREHOUSE: 'WAREHOUSE',
+  DOCUMENT_CONTROL: 'DOCUMENT_CONTROL'
 };
 
 exports.EngineerRole = exports.$Enums.EngineerRole = {
