@@ -28,22 +28,22 @@ export default function PMApprovalButtons({ reqId }) {
   return (
     <div className="flex flex-col gap-2">
       {errorMessage && (
-        <span className="text-red-500 text-[10px] font-bold mb-1">{errorMessage}</span>
+        <span className="mb-1 text-xs text-destructive">{errorMessage}</span>
       )}
-      <div className="flex gap-3">
-        <button 
-          onClick={handleReject} 
+      <div className="flex gap-2">
+        <button
+          onClick={handleReject}
           disabled={isPending}
-          className="flex-1 bg-white dark:bg-slate-900 text-gray-500 border border-gray-100 dark:border-gray-800 py-3 rounded-2xl font-bold hover:bg-red-50 hover:text-red-600 transition-all text-xs disabled:opacity-50 shadow-sm"
+          className="flex-1 rounded-md border py-2 text-xs font-medium text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive disabled:opacity-50"
         >
-          {isPending ? '...' : 'REJECT'}
+          {isPending ? '...' : 'Tolak'}
         </button>
-        <button 
-          onClick={handleApprove} 
+        <button
+          onClick={handleApprove}
           disabled={isPending}
-          className="flex-[2] bg-blue-600 text-white py-3 rounded-2xl font-black hover:bg-blue-700 transition-all text-xs shadow-lg shadow-blue-600/20 disabled:opacity-50"
+          className="flex-[2] rounded-md bg-primary py-2 text-xs font-semibold text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-50"
         >
-          {isPending ? 'PROCESSING...' : 'FINAL APPROVE'}
+          {isPending ? 'Memproses...' : 'Setujui Final'}
         </button>
       </div>
     </div>

@@ -48,83 +48,82 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen w-full flex flex-col md:flex-row bg-white">
+    <div className="flex min-h-screen w-full flex-col bg-background md:flex-row">
       {/* SISI KIRI: FORM */}
-      <div className="w-full md:w-[45%] flex flex-col items-center justify-center p-8 lg:p-16">
-        <div className="w-full max-w-md mb-10 flex flex-col items-center">
-          <div className="relative w-64 h-20 mb-6">
+      <div className="flex w-full flex-col items-center justify-center p-8 lg:p-16 md:w-[45%]">
+        <div className="mb-10 flex w-full max-w-md flex-col items-center">
+          <div className="relative mb-6 h-20 w-64">
             <Image src="/logo-elsicom.png" alt="Logo" fill className="object-contain" priority />
           </div>
-          <div className="text-center space-y-2">
-            <h2 className="text-2xl md:text-3xl font-bold text-gray-800 leading-tight">
+          <div className="space-y-1 text-center">
+            <h2 className="text-2xl font-semibold leading-tight text-foreground md:text-3xl">
               Elsicom Procurement Systems Management
             </h2>
-            <p className="text-xl md:text-2xl font-extrabold text-gray-700 tracking-[0.2em]">
+            <p className="text-sm font-medium tracking-[0.3em] text-muted-foreground">
               E-PROC
             </p>
           </div>
         </div>
 
-        <div className="w-full max-w-md bg-white p-8 rounded-xl border border-gray-100 shadow-2xl shadow-gray-200/50">
-          {/* Pesan Error jika login gagal */}
+        <div className="w-full max-w-md rounded-xl border bg-card p-8 shadow-sm">
           {error && (
-            <div className="mb-4 p-3 bg-red-100 text-red-700 text-sm font-bold rounded-lg border border-red-200">
+            <div className="mb-5 rounded-md border border-destructive/20 bg-destructive/10 px-3 py-2 text-sm text-destructive">
               {error}
             </div>
           )}
 
-          <form onSubmit={handleLogin} className="space-y-6">
+          <form onSubmit={handleLogin} className="space-y-5">
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2 uppercase tracking-wide">
+              <label className="mb-1.5 block text-sm font-medium text-foreground">
                 Username
               </label>
-              <input 
-                type="text" 
+              <input
+                type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                className="w-full px-4 py-3 rounded-lg border border-gray-400 bg-gray-50 text-gray-900 font-medium focus:ring-2 focus:ring-red-600 focus:bg-white focus:border-transparent outline-none transition-all"
+                className="w-full rounded-md border bg-background px-3 py-2.5 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring"
                 placeholder="Masukkan Username"
                 required
               />
             </div>
 
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2 uppercase tracking-wide">
+              <label className="mb-1.5 block text-sm font-medium text-foreground">
                 Password
               </label>
-              <input 
-                type="password" 
+              <input
+                type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-3 rounded-lg border border-gray-400 bg-gray-50 text-gray-900 font-medium focus:ring-2 focus:ring-red-600 focus:bg-white focus:border-transparent outline-none transition-all"
+                className="w-full rounded-md border bg-background px-3 py-2.5 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring"
                 placeholder="••••••••"
                 required
               />
             </div>
 
-            <button 
-              type="submit" 
+            <button
+              type="submit"
               disabled={loading}
-              className={`w-full ${loading ? 'bg-gray-400' : 'bg-[#2d2d2d] hover:bg-black'} text-white py-4 rounded-lg font-bold text-lg transition-all shadow-lg`}
+              className="w-full rounded-md bg-primary py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-50"
             >
               {loading ? 'Memproses…' : 'Masuk'}
             </button>
           </form>
 
           {/* Tidak ada tautan daftar mandiri: akun dibuat oleh pihak berwenang. */}
-          <p className="text-center mt-6 text-sm text-gray-600">
+          <p className="mt-6 text-center text-sm text-muted-foreground">
             Belum punya akun? Hubungi administrator sistem.
           </p>
         </div>
       </div>
 
       {/* SISI KANAN: GAMBAR */}
-      <div className="hidden md:flex w-full md:w-[55%] flex-col bg-white">
-        <div className="relative flex-1 w-full">
-          <Image src="/illustration-top.jpg" alt="Top" fill className="object-contain p-4" />
+      <div className="hidden flex-col bg-muted/30 md:flex md:w-[55%]">
+        <div className="relative w-full flex-1">
+          <Image src="/illustration-top.jpg" alt="Top" fill className="object-contain p-6" />
         </div>
-        <div className="relative flex-1 w-full">
-          <Image src="/illustration-bottom.jpg" alt="Bottom" fill className="object-contain p-4" />
+        <div className="relative w-full flex-1">
+          <Image src="/illustration-bottom.jpg" alt="Bottom" fill className="object-contain p-6" />
         </div>
       </div>
     </div>

@@ -20,50 +20,51 @@ const ENGINEER_ROLES = [
 ];
 
 const INPUT_CLASS =
-  "w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-red-600 outline-none";
+  "w-full rounded-md border bg-background px-3 py-2.5 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring";
+const LABEL_CLASS = "mb-1.5 block text-sm font-medium text-foreground";
 
 export default function RegisterForm() {
   const [state, formAction, isPending] = useActionState(registerUser, null);
   const [role, setRole] = useState("ENGINEER");
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-slate-900 p-4 transition-colors">
-      <div className="max-w-md w-full bg-white dark:bg-slate-800 p-10 rounded-2xl shadow-2xl border border-gray-100 dark:border-gray-700">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white">Buat Akun Pengguna</h1>
-          <p className="text-gray-500 dark:text-gray-400 mt-2">Elsicom Procurement Systems</p>
+    <div className="flex min-h-screen items-center justify-center bg-background p-4">
+      <div className="w-full max-w-md rounded-xl border bg-card p-8 shadow-sm">
+        <div className="mb-8 text-center">
+          <h1 className="text-2xl font-semibold text-foreground">Buat Akun Pengguna</h1>
+          <p className="mt-1 text-sm text-muted-foreground">Elsicom Procurement Systems</p>
         </div>
 
         {state?.error && (
-          <div className="mb-5 p-3 rounded-lg bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 text-sm text-red-700 dark:text-red-300">
+          <div className="mb-5 rounded-md border border-destructive/20 bg-destructive/10 px-3 py-2 text-sm text-destructive">
             {state.error}
           </div>
         )}
         {state?.success && (
-          <div className="mb-5 p-3 rounded-lg bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 text-sm text-green-700 dark:text-green-300">
+          <div className="mb-5 rounded-md border border-primary/20 bg-primary/10 px-3 py-2 text-sm text-primary">
             {state.message}
           </div>
         )}
 
-        <form action={formAction} className="space-y-5">
+        <form action={formAction} className="space-y-4">
           <div>
-            <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">Nama Lengkap</label>
+            <label className={LABEL_CLASS}>Nama Lengkap</label>
             <input name="name" type="text" placeholder="Budi Santoso" className={INPUT_CLASS} required />
           </div>
 
           <div>
-            <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">Username</label>
+            <label className={LABEL_CLASS}>Username</label>
             <input name="username" type="text" placeholder="budi.santoso" className={INPUT_CLASS} required />
           </div>
 
           <div>
-            <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">Password</label>
+            <label className={LABEL_CLASS}>Password</label>
             <input name="password" type="password" placeholder="••••••••" minLength={8} className={INPUT_CLASS} required />
-            <p className="text-xs text-gray-400 mt-1">Minimal 8 karakter.</p>
+            <p className="mt-1 text-xs text-muted-foreground">Minimal 8 karakter.</p>
           </div>
 
           <div>
-            <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">Peran</label>
+            <label className={LABEL_CLASS}>Peran</label>
             <select
               name="role"
               value={role}
@@ -79,7 +80,7 @@ export default function RegisterForm() {
           {/* Engineer wajib punya jenjang — menentukan tahap persetujuan mana yang dilewati */}
           {role === "ENGINEER" && (
             <div>
-              <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">Jenjang Engineer</label>
+              <label className={LABEL_CLASS}>Jenjang Engineer</label>
               <select name="engineerRole" className={INPUT_CLASS}>
                 {ENGINEER_ROLES.map((r) => (
                   <option key={r.value} value={r.value}>{r.label}</option>
@@ -89,14 +90,14 @@ export default function RegisterForm() {
           )}
 
           <div>
-            <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">Jabatan (opsional)</label>
+            <label className={LABEL_CLASS}>Jabatan (opsional)</label>
             <input name="position" type="text" placeholder="Field Engineer" className={INPUT_CLASS} />
           </div>
 
           <button
             type="submit"
             disabled={isPending}
-            className="w-full bg-[#2d2d2d] hover:bg-black disabled:bg-gray-400 text-white py-4 rounded-lg font-bold text-lg shadow-lg transition-all mt-4 transform active:scale-95"
+            className="mt-2 w-full rounded-md bg-primary py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-50"
           >
             {isPending ? "Menyimpan…" : "Buat Akun"}
           </button>

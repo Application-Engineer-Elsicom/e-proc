@@ -12,26 +12,38 @@
  * mengikuti class .dark yang tidak pernah dipasang.
  */
 :root {
-  --background: 0 0% 100%;
-  --foreground: 0 0% 3.9%;
+  /*
+   * Palet soft/muted, kontras rendah (panduan desain umum): kanvas abu-abu
+   * sangat tipis (cool gray) dengan kartu putih supaya berlapis lembut tanpa
+   * kontras keras; teks memakai slate gelap (bukan hitam pekat); aksen primer
+   * slate biru-keabuan yang teredam; sudut lebih membulat.
+   */
+  /*
+   * Aksen: warna khas Elsicom (emas/amber #FFC107) DIREDAM jadi emas tua yang
+   * kalem — dipakai untuk tombol primer, tautan, dan status fokus. Kanvas
+   * abu-abu hangat sangat tipis + kartu putih untuk kesan berlapis lembut,
+   * kontras rendah; teks slate-hangat gelap (bukan hitam pekat); sudut membulat.
+   */
+  --background: 40 20% 98%;
+  --foreground: 30 12% 22%;
   --card: 0 0% 100%;
-  --card-foreground: 0 0% 3.9%;
+  --card-foreground: 30 12% 22%;
   --popover: 0 0% 100%;
-  --popover-foreground: 0 0% 3.9%;
-  --primary: 0 0% 9%;
-  --primary-foreground: 0 0% 98%;
-  --secondary: 0 0% 96.1%;
-  --secondary-foreground: 0 0% 9%;
-  --muted: 0 0% 96.1%;
-  --muted-foreground: 0 0% 45.1%;
-  --accent: 0 0% 96.1%;
-  --accent-foreground: 0 0% 9%;
-  --destructive: 0 84.2% 60.2%;
-  --destructive-foreground: 0 0% 98%;
-  --border: 0 0% 89.8%;
-  --input: 0 0% 89.8%;
-  --ring: 0 0% 3.9%;
-  --radius: 0.5rem;
+  --popover-foreground: 30 12% 22%;
+  --primary: 36 46% 42%;
+  --primary-foreground: 40 40% 98%;
+  --secondary: 40 20% 95.5%;
+  --secondary-foreground: 30 20% 28%;
+  --muted: 40 18% 95.5%;
+  --muted-foreground: 30 8% 46%;
+  --accent: 40 40% 94%;
+  --accent-foreground: 30 25% 28%;
+  --destructive: 4 62% 52%;
+  --destructive-foreground: 40 40% 98%;
+  --border: 36 18% 89%;
+  --input: 36 18% 89%;
+  --ring: 36 46% 48%;
+  --radius: 0.7rem;
 
   /* Warna status dokumen — dipakai lewat helper di app/lib/status-style.js
      supaya satu status tampil sama di seluruh aplikasi. */
